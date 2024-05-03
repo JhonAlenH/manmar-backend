@@ -40,9 +40,53 @@ const getClients = async () => {
     return clients;
 }
 
+const getBrand = async (getBrand) => {
+    const brand = await Valrep.getBrand(getBrand);
+    if (brand.error) {
+        return {
+            error: brand.error
+        }
+    }
+    return brand;
+}
+
+const getModel = async (getModel) => {
+    const model = await Valrep.getModel(getModel);
+    if (model.error) {
+        return {
+            error: model.error
+        }
+    }
+    return model;
+}
+
+const getVersion = async (getVersion) => {
+    const version = await Valrep.getVersion(getVersion);
+    if (version.error) {
+        return {
+            error: version.error
+        }
+    }
+    return version;
+}
+
+const getColor = async () => {
+    const color = await Valrep.getColor();
+    if (color.error) {
+        return {
+            error: color.error
+        }
+    }
+    return color;
+}
+
 export default {
     getCedents,
     getTrade,
     getCoins,
-    getClients
+    getClients,
+    getBrand,
+    getModel,
+    getVersion,
+    getColor
 }

@@ -112,10 +112,125 @@ const getClients = async (req, res) => {
         });
 }
 
+const getBrand = async (req, res) => {
+    const brand = await valrepService.getBrand(req.body);
+    if (brand.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: brand.permissionError
+            });
+    }
+    if (brand.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: brand.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            data: {
+                brand: brand
+            }
+        });
+}
+
+const getModel = async (req, res) => {
+    const model = await valrepService.getModel(req.body);
+    if (model.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: model.permissionError
+            });
+    }
+    if (model.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: model.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            data: {
+                model: model
+            }
+        });
+}
+
+const getVersion = async (req, res) => {
+    const version = await valrepService.getVersion(req.body);
+    if (version.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: version.permissionError
+            });
+    }
+    if (version.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: version.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            data: {
+                version: version
+            }
+        });
+}
+
+const getColor = async (req, res) => {
+    const color = await valrepService.getColor();
+    if (color.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: color.permissionError
+            });
+    }
+    if (color.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: color.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            data: {
+                color: color
+            }
+        });
+}
 
 export default {
     getCedents,
     getTrade,
     getCoins,
-    getClients
+    getClients,
+    getBrand,
+    getModel,
+    getVersion,
+    getColor
 }
