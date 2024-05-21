@@ -10,9 +10,14 @@ router
     .post("/trade", valrepController.getTrade)
     .post("/coins", valrepController.getCoins)
     .post("/clients", valrepController.getClients)
+    .post("/takers", valrepController.getTakers)
+    .get("/takers/:xcedula", valrepController.getTakersId)
     .post("/brand", valrepController.getBrand)
     .post("/model", valrepController.getModel)
     .post("/version", valrepController.getVersion)
     .post("/color", valrepController.getColor)
+    .post("/method-of-payment", valrepController.getMethodOfPayment)
+    .post("/state", valrepController.getState)
+    .post("/city", valrepController.getCity)
 
 export default router;

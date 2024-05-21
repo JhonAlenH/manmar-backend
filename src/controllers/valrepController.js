@@ -224,6 +224,148 @@ const getColor = async (req, res) => {
         });
 }
 
+const getMethodOfPayment = async (req, res) => {
+    const payment = await valrepService.getMethodOfPayment();
+    if (payment.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: payment.permissionError
+            });
+    }
+    if (payment.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: payment.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            data: {
+                payment: payment
+            }
+        });
+}
+
+const getTakers = async (req, res) => {
+    const takers = await valrepService.getTakers();
+    if (takers.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: takers.permissionError
+            });
+    }
+    if (takers.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: takers.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            data: {
+                takers: takers
+            }
+        });
+}
+
+const getTakersId = async (req, res) => {
+    const takers = await valrepService.getTakersId(req.params.xcedula);
+    if (!takers) {
+        return res.status(200).send({
+          status: true,
+        });
+    }else{
+        return res
+        .status(200)
+        .send({
+            status: true,
+            data: {
+                ctomador: takers.ctomador,
+                xtomador: takers.xtomador,
+                xprofesion: takers.xprofesion,
+                icedula: takers.icedula,
+                xcedula: takers.xcedula,
+                xrif: takers.xrif,
+                xdomicilio: takers.xdomicilio,
+                xpais: takers.xpais,
+                xestado: takers.xestado,
+                xciudad: takers.xciudad,
+                xzona_postal: takers.xzona_postal,
+                xdireccion: takers.xdireccion,
+                xcorreo: takers.xcorreo,
+            }
+        });
+    }
+}
+
+const getState = async (req, res) => {
+    const state = await valrepService.getState(req.body);
+    if (state.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: state.permissionError
+            });
+    }
+    if (state.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: state.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            data: {
+                state: state
+            }
+        });
+}
+
+const getCity = async (req, res) => {
+    const city = await valrepService.getCity(req.body);
+    if (city.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: city.permissionError
+            });
+    }
+    if (city.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: city.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            data: {
+                city: city
+            }
+        });
+}
+
 export default {
     getCedents,
     getTrade,
@@ -232,5 +374,10 @@ export default {
     getBrand,
     getModel,
     getVersion,
-    getColor
+    getColor,
+    getMethodOfPayment,
+    getTakers,
+    getTakersId,
+    getState,
+    getCity
 }

@@ -8,6 +8,7 @@ import multer from 'multer';
 
 import v1AuthRouter from './v1/authRoutes.js';
 import v1ValrepRouter from './v1/valrepRoutes.js';
+import v1EmissionRouter from './v1/emissionRoutes.js';
 
 
 
@@ -34,7 +35,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 app.use("/api/v1/auth", v1AuthRouter);
 app.use("/api/v1/valrep", v1ValrepRouter);
-
+app.use("/api/v1/emission", v1EmissionRouter);
 
 
 

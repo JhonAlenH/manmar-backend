@@ -80,6 +80,51 @@ const getColor = async () => {
     return color;
 }
 
+const getMethodOfPayment = async () => {
+    const payment = await Valrep.getMethodOfPayment();
+    if (payment.error) {
+        return {
+            error: payment.error
+        }
+    }
+    return payment;
+}
+
+const getTakers = async () => {
+    const takers = await Valrep.getTakers();
+    if (takers.error) {
+        return {
+            error: takers.error
+        }
+    }
+    return takers;
+}
+
+const getTakersId = async (getTakersId) => {
+    const takers = await Valrep.getTakersId(getTakersId);
+    return takers;
+}
+
+const getState = async (getState) => {
+    const state = await Valrep.getState(getState);
+    if (state.error) {
+        return {
+            error: state.error
+        }
+    }
+    return state;
+}
+
+const getCity = async (getCity) => {
+    const city = await Valrep.getCity(getCity);
+    if (city.error) {
+        return {
+            error: city.error
+        }
+    }
+    return city;
+}
+
 export default {
     getCedents,
     getTrade,
@@ -88,5 +133,10 @@ export default {
     getBrand,
     getModel,
     getVersion,
-    getColor
+    getColor,
+    getMethodOfPayment,
+    getTakers,
+    getTakersId,
+    getState,
+    getCity
 }

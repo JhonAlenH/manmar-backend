@@ -6,6 +6,13 @@ const Trade = sequelize.define('maramos', {});
 const Coin = sequelize.define('mamonedas', {});
 const Clients = sequelize.define('maclientes', {});
 const Color = sequelize.define('macolores', {});
+const Payment = sequelize.define('mametodologiapago', {}, { tableName: 'mametodologiapago' });
+const Takers = sequelize.define('maVtomadores', 
+{  ctomador: {
+  type: Sequelize.INTEGER,
+  primaryKey: true,
+  allowNull: true,
+},});
 const Brand = sequelize.define('mainma', {  
   qano: {
     type: Sequelize.INTEGER,
@@ -54,6 +61,40 @@ const Version = sequelize.define('mainma', {
     allowNull: false,
   },
 }, { tableName: 'mainma' });
+const State = sequelize.define('maestados', {
+  cestado: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    allowNull: false,
+  },
+  cpais: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+  },
+  xestado: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+},);
+const City = sequelize.define('maciudades', {
+  cciudad: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    allowNull: false,
+  },
+  cpais: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+  },
+  cestado: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+  },
+  xciudad: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+},);
 
 
 const getCedents = async () => {
@@ -155,6 +196,98 @@ const getColor = async () => {
   }
 };
 
+const getMethodOfPayment = async () => {
+  try {
+    const metodologia = await Payment.findAll({
+      attributes: ['cmetodologiapago', 'xmetodologiapago'],
+    });
+    const result = metodologia.map((item) => item.get({ plain: true }));
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
+
+const getTakers = async () => {
+  try {
+    const tomador = await Takers.findAll({
+      attributes: ['ctomador', 
+                   'xtomador', 
+                   'xprofesion', 
+                   'icedula', 
+                   'xcedula', 
+                   'xrif', 
+                   'xdomicilio', 
+                   'xpais', 
+                   'xestado',
+                   'xciudad',
+                   'xzona_postal',
+                   'xdireccion',
+                   'xcorreo'],
+    });
+    const result = tomador.map((item) => item.get({ plain: true }));
+    return result;
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+const getTakersId = async (getTakersId) => {
+  console.log(getTakersId)
+  try {
+    const result = await Takers.findOne({
+      where: {xcedula: getTakersId},
+      attributes: ['ctomador', 
+                   'xtomador', 
+                   'xprofesion', 
+                   'icedula', 
+                   'xcedula', 
+                   'xrif', 
+                   'xdomicilio', 
+                   'xpais', 
+                   'xestado',
+                   'xciudad',
+                   'xzona_postal',
+                   'xdireccion',
+                   'xcorreo'],
+    });
+
+    return result ? result.get({ plain: true }) : null;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
+
+const getState = async (getState) => {
+  try {
+    const items = await State.findAll({
+      where: getState,
+      attributes: ['cestado', 'xestado'],
+    });
+    const result = items.map((item) => item.get({ plain: true }));
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
+
+const getCity = async (getCity) => {
+  try {
+    const items = await City.findAll({
+      where: getCity,
+      attributes: ['cciudad', 'xciudad'],
+    });
+    const result = items.map((item) => item.get({ plain: true }));
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
+
 export default {
   getCedents,
   getTrade,
@@ -163,5 +296,10 @@ export default {
   getBrand,
   getModel,
   getVersion,
-  getColor
+  getColor,
+  getMethodOfPayment,
+  getTakers,
+  getTakersId,
+  getState,
+  getCity
 };
