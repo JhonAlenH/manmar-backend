@@ -19,5 +19,6 @@ router
     .post("/method-of-payment", valrepController.getMethodOfPayment)
     .post("/state", valrepController.getState)
     .post("/city", valrepController.getCity)
+    .post("/executive", valrepController.getExecutive)
 
 export default router;

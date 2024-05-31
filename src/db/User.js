@@ -63,8 +63,24 @@ const getOneUser = async (xlogin) => {
     }
 }
 
+const getExecutive = async (xcorreo) => {
+    try {
+        let pool = await sql.connect(sqlConfig);
+        let result = await pool.request()
+           .input('xcorreo', sql.NVarChar, xcorreo)
+           .query('select cejecutivo from maejecutivos where xcorreo = @xcorreo')
+        await pool.close();
+        return result.recordset[0];
+    }
+    catch (error) {
+        console.log(error.message)
+        return { error: error.message };
+    }
+}
+
 export default {
     verifyIfUsernameExists,
     verifyIfPasswordMatchs,
-    getOneUser
+    getOneUser,
+    getExecutive
 }

@@ -125,6 +125,16 @@ const getCity = async (getCity) => {
     return city;
 }
 
+const getExecutive = async () => {
+    const executive = await Valrep.getExecutive();
+    if (executive.error) {
+        return {
+            error: executive.error
+        }
+    }
+    return executive;
+}
+
 export default {
     getCedents,
     getTrade,
@@ -138,5 +148,6 @@ export default {
     getTakers,
     getTakersId,
     getState,
-    getCity
+    getCity,
+    getExecutive
 }

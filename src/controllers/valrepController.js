@@ -366,6 +366,34 @@ const getCity = async (req, res) => {
         });
 }
 
+const getExecutive = async (req, res) => {
+    const executive = await valrepService.getExecutive();
+    if (executive.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: executive.permissionError
+            });
+    }
+    if (executive.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: executive.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            data: {
+                executive: executive
+            }
+        });
+}
+
 export default {
     getCedents,
     getTrade,
@@ -379,5 +407,6 @@ export default {
     getTakers,
     getTakersId,
     getState,
-    getCity
+    getCity,
+    getExecutive
 }

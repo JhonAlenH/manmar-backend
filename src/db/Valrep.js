@@ -7,6 +7,7 @@ const Coin = sequelize.define('mamonedas', {});
 const Clients = sequelize.define('maclientes', {});
 const Color = sequelize.define('macolores', {});
 const Payment = sequelize.define('mametodologiapago', {}, { tableName: 'mametodologiapago' });
+const Executive = sequelize.define('maejecutivos', {});
 const Takers = sequelize.define('maVtomadores', 
 {  ctomador: {
   type: Sequelize.INTEGER,
@@ -288,6 +289,19 @@ const getCity = async (getCity) => {
   }
 };
 
+const getExecutive = async () => {
+  try {
+    const exec = await Executive.findAll({
+      attributes: ['cejecutivo', 'xejecutivo', 'pcomision'],
+    });
+    const executive = exec.map((item) => item.get({ plain: true }));
+    return executive;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
+
 export default {
   getCedents,
   getTrade,
@@ -301,5 +315,6 @@ export default {
   getTakers,
   getTakersId,
   getState,
-  getCity
+  getCity,
+  getExecutive
 };

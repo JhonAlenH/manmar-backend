@@ -1,7 +1,6 @@
 import authService from '../service/authService.js';
 
 const createJWT = async (req, res) => {
-    console.log(req.body)
     const xlogin = req.body.xlogin;
     const verifiedUsername = await authService.verifyIfUsernameExists(xlogin);
     if (verifiedUsername.error) { 
@@ -33,6 +32,9 @@ const createJWT = async (req, res) => {
                 message: user.error
             });
     }
+
+    const executive = await authService.getExecutive(user.xcorreo);
+
     const jwt = authService.createJWT(user);
     
     res
@@ -50,6 +52,7 @@ const createJWT = async (req, res) => {
                 beliminar: user.beliminar,
                 ccorredor: user.ccorredor,
                 xcorredor: user.xcorredor,
+                cejecutivo: executive ? executive.cejecutivo : null,
                 token: 'Bearer ' + jwt
             }
         });

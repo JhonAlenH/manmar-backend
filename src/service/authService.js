@@ -49,9 +49,15 @@ const getOneUser = async (xlogin) => {
     return user;
 }
 
+const getExecutive = async (xcorreo) => {
+    const executive = await User.getExecutive(xcorreo);
+    return executive;
+};
+
 export default {
     verifyIfUsernameExists,
     verifyIfPasswordMatchs,
     createJWT,
-    getOneUser
+    getOneUser,
+    getExecutive
 }
