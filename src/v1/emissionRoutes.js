@@ -7,5 +7,6 @@ const router = express.Router();
 router
 
     .post("/receipt", emissionController.getReceipt)
+    .post("/producers", emissionController.getProducers)
 
 export default router;

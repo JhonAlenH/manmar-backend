@@ -10,6 +10,17 @@ const getReceipt = async (getReceipt) => {
     return receipt;
 }
 
+const getProducers = async () => {
+    const producers = await Emission.getProducers();
+    if (producers.error) {
+        return {
+            error: producers.error
+        }
+    }
+    return producers;
+}
+
 export default {
     getReceipt,
+    getProducers
 }

@@ -1,4 +1,6 @@
 import sql from "mssql";
+import { Sequelize } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const sqlConfig = {
     user: process.env.USER_BD,
@@ -11,6 +13,14 @@ const sqlConfig = {
         trustServerCertificate: true
     }
 }
+
+const Producers = sequelize.define('maproductores', {
+    cproductor: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        allowNull: true,
+    },
+});
 
 const getReceipt = async (getReceipt) => {
     const strPrecio = getReceipt.mprima; // El string que contiene el precio
@@ -35,6 +45,18 @@ const getReceipt = async (getReceipt) => {
         }
 }
 
+const getProducers = async () => {
+    try {
+      const producers = await Producers.findOne({
+        attributes: ['cproductor', 'xproductor', 'pcomision'],
+      });
+      return producers ? producers.get({ plain: true }) : {};;
+    } catch (error) {
+      return { error: error.message };
+    }
+  };
+
 export default {
     getReceipt,
+    getProducers
 }

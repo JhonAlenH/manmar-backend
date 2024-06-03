@@ -394,6 +394,62 @@ const getExecutive = async (req, res) => {
         });
 }
 
+const getAgents = async (req, res) => {
+    const agents = await valrepService.getAgents(req.params.cejecutivo);
+    if (agents.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: agents.permissionError
+            });
+    }
+    if (agents.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: agents.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            data: {
+                agents: agents
+            }
+        });
+}
+
+const getPlan = async (req, res) => {
+    const planes = await valrepService.getPlan(req.body.cramo);
+    if (planes.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: planes.permissionError
+            });
+    }
+    if (planes.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: planes.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            data: {
+                planes: planes
+            }
+        });
+}
+
 export default {
     getCedents,
     getTrade,
@@ -408,5 +464,7 @@ export default {
     getTakersId,
     getState,
     getCity,
-    getExecutive
+    getExecutive,
+    getAgents,
+    getPlan
 }

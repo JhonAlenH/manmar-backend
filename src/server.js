@@ -9,8 +9,8 @@ import multer from 'multer';
 import v1AuthRouter from './v1/authRoutes.js';
 import v1ValrepRouter from './v1/valrepRoutes.js';
 import v1EmissionRouter from './v1/emissionRoutes.js';
-
-
+import v1EstadosRouter from './v1/estadosRoutes.js';
+import v1MaestrosRouter from './v1/maestrosRoutes.js';
 
 const { diskStorage } = multer;
 
@@ -36,10 +36,8 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use("/api/v1/auth", v1AuthRouter);
 app.use("/api/v1/valrep", v1ValrepRouter);
 app.use("/api/v1/emission", v1EmissionRouter);
-
-
-
-
+app.use("/api/v1/estado", v1EstadosRouter);
+app.use("/api/v1/maestros", v1MaestrosRouter);
 
 const PORT = process.env.PORT || 3000; 
 

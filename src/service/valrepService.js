@@ -135,6 +135,26 @@ const getExecutive = async () => {
     return executive;
 }
 
+const getAgents = async (cejecutivo) => {
+    const agents = await Valrep.getAgents(cejecutivo);
+    if (agents.error) {
+        return {
+            error: agents.error
+        }
+    }
+    return agents;
+}
+
+const getPlan = async (cramo) => {
+    const planes = await Valrep.getPlan(cramo);
+    if (planes.error) {
+        return {
+            error: planes.error
+        }
+    }
+    return planes;
+}
+
 export default {
     getCedents,
     getTrade,
@@ -149,5 +169,7 @@ export default {
     getTakersId,
     getState,
     getCity,
-    getExecutive
+    getExecutive,
+    getAgents,
+    getPlan
 }

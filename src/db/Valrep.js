@@ -8,6 +8,8 @@ const Clients = sequelize.define('maclientes', {});
 const Color = sequelize.define('macolores', {});
 const Payment = sequelize.define('mametodologiapago', {}, { tableName: 'mametodologiapago' });
 const Executive = sequelize.define('maejecutivos', {});
+const Agents = sequelize.define('maagentes', {});
+const Planes = sequelize.define('maplanes', {});
 const Takers = sequelize.define('maVtomadores', 
 {  ctomador: {
   type: Sequelize.INTEGER,
@@ -302,6 +304,34 @@ const getExecutive = async () => {
   }
 };
 
+const getAgents = async (cejecutivo) => {
+  try {
+    const agent = await Agents.findAll({
+      where: {cejecutivo: cejecutivo},
+      attributes: ['cagente', 'xagente', 'pcomision'],
+    });
+    const agents = agent.map((item) => item.get({ plain: true }));
+    return agents;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
+
+const getPlan = async (cramo) => {
+  try {
+    const plan = await Planes.findAll({
+      where: {cramo: cramo},
+      attributes: ['cplan', 'xdescripcion'],
+    });
+    const planes = plan.map((item) => item.get({ plain: true }));
+    return planes;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
+
 export default {
   getCedents,
   getTrade,
@@ -316,5 +346,7 @@ export default {
   getTakersId,
   getState,
   getCity,
-  getExecutive
+  getExecutive,
+  getAgents,
+  getPlan
 };
