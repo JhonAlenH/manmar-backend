@@ -8,5 +8,8 @@ router
 
     .post("/receipt", emissionController.getReceipt)
     .post("/producers", emissionController.getProducers)
+    .post("/tariffs", emissionController.getTariffs)
+    .post("/search", emissionController.searchContract)
+    .post("/create", emissionController.createContract)
 
 export default router;

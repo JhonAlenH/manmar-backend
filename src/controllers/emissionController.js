@@ -61,7 +61,90 @@ const getProducers = async (req, res) => {
         });
 }
 
+const getTariffs = async (req, res) => {
+    const tariffs = await emissionService.getTariffs(req.body);
+    if (tariffs.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: tariffs.permissionError
+            });
+    }
+    if (tariffs.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: tariffs.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            pcomision: tariffs.pcomision
+        });
+}
+
+const searchContract = async (req, res) => {
+    const contracts = await emissionService.searchContract(req.body);
+    if (contracts.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: contracts.permissionError
+            });
+    }
+    if (contracts.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: contracts.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            data: {
+                contracts: contracts
+            }
+        });
+}
+
+const createContract = async (req, res) => {
+    const create = await emissionService.createContract(req.body);
+    if (create.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: create.permissionError
+            });
+    }
+    if (create.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: create.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            message: `La póliza ${req.body.xpoliza} ha sido creada exitosamente`
+        });
+}
+
 export default {
     getReceipt,
-    getProducers
+    getProducers,
+    getTariffs,
+    searchContract,
+    createContract
 }
