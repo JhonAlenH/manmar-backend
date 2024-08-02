@@ -141,10 +141,38 @@ const createContract = async (req, res) => {
         });
 }
 
+const detailContract = async (req, res) => {
+    const contratos = await emissionService.detailContract(req.params.id);
+    if (contratos.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: contratos.permissionError
+            });
+    }
+    if (contratos.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: contratos.error
+            });
+    }
+    console.log(contratos)
+    return res
+        .status(200)
+        .send({
+            status: true,
+            data: contratos
+        });
+}
+
 export default {
     getReceipt,
     getProducers,
     getTariffs,
     searchContract,
-    createContract
+    createContract,
+    detailContract
 }

@@ -11,5 +11,6 @@ router
     .post("/tariffs", emissionController.getTariffs)
     .post("/search", emissionController.searchContract)
     .post("/create", emissionController.createContract)
+    .post("/detail/:id", emissionController.detailContract)
 
 export default router;

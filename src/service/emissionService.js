@@ -50,10 +50,21 @@ const createContract = async (createContract) => {
     return create;
 }
 
+const detailContract = async (id) => {
+    const contract = await Emission.detailContract(id);
+    if (contract.error) {
+        return {
+            error: contract.error
+        }
+    }
+    return contract;
+}
+
 export default {
     getReceipt,
     getProducers,
     getTariffs,
     searchContract,
-    createContract
+    createContract,
+    detailContract
 }

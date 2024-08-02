@@ -30,6 +30,14 @@ import sequelize from '../config/database.js';
     },
   });
 
+  const DetailContract = sequelize.define('poVpolizasDetalle', {
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      allowNull: true,
+    },
+  }, {tableName: 'poVpolizasDetalle'});
+
   const Contracts = sequelize.define('poVpolizas', {});
 
   const getReceipt = async (getReceipt) => {
@@ -95,7 +103,7 @@ import sequelize from '../config/database.js';
   
       const contratos = await Contracts.findAll({
         where: whereClause,
-        attributes: ['xpoliza', 'xcedente', 'xramo', 'xasegurado', 'fdesde', 'fhasta'],
+        attributes: ['id', 'xpoliza', 'xcedente', 'xramo', 'xasegurado', 'fdesde', 'fhasta'],
       });
   
       const contracts = contratos.map((item) => item.get({ plain: true }));
@@ -135,10 +143,30 @@ import sequelize from '../config/database.js';
     }
   };
 
+  const detailContract = async (id) => {
+    try {
+      const contract = await DetailContract.findOne({
+        where: {
+          id: id
+        },
+        attributes: [
+          'id', 'ccedente', 'xcedente', 'casegurado', 'xnombre', 
+          'cramo', 'xramo', 'xpoliza', 'fdesde_pol', 'fhasta_pol', 
+          'cmetodologiapago', 'xmetodologiapago', 'msumaext', 'msuma', 
+          'mprimaext', 'mprima', 'xtomador'
+        ],
+      });
+      return contract ? contract.get({ plain: true }) : {};;
+    } catch (error) {
+      return { error: error.message };
+    }
+  };
+
 export default {
     getReceipt,
     getProducers,
     getTariffs,
     searchContract,
-    createContract
+    createContract,
+    detailContract
 }
