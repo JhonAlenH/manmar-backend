@@ -1,6 +1,8 @@
 import sql from "mssql";
 import { Sequelize } from 'sequelize';
 import sequelize from '../config/database.js';
+import cron from 'node-cron';
+import nodemailer from 'nodemailer';
 
   const sqlConfig = {
       user: process.env.USER_BD,
@@ -184,16 +186,13 @@ import sequelize from '../config/database.js';
   };
 
   const updateContract = async (data) => {
-    console.log(data);
     let pool;
     try {
         pool = await sql.connect(sqlConfig);
         const keys = Object.keys(data).filter(key => key !== 'id');
-        console.log(keys);
 
         // Construir la cláusula SET
         const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
-        console.log(setClause);
 
         const query = `UPDATE popolizas SET ${setClause} WHERE id = @id`;
 
@@ -218,6 +217,104 @@ import sequelize from '../config/database.js';
     }
 };
 
+// async function checkExpiringContracts() {
+//   let pool;
+//   try {
+//       pool = await sql.connect(sqlConfig);
+
+//       const currentMonth = new Date().getMonth() + 1;
+//       const currentYear = new Date().getFullYear();
+
+//       const query = `
+//           SELECT * FROM poVpolizasDetalle 
+//           WHERE MONTH(fhasta_pol) = @currentMonth
+//           AND YEAR(fhasta_pol) = @currentYear
+//       `;
+
+//       const result = await pool.request()
+//           .input('currentMonth', sql.Int, currentMonth)
+//           .input('currentYear', sql.Int, currentYear)
+//           .query(query);
+
+//       const contracts = result.recordset;
+
+//       if (contracts.length > 0) {
+//           let emailHtml = `
+//               <h2>Contratos que vencen en ${currentMonth}/${currentYear}:</h2>
+//               <table border="1" cellpadding="5" cellspacing="0">
+//                   <thead>
+//                       <tr>
+//                           <th>ID</th>
+//                           <th>Póliza</th>
+//                           <th>Fecha de Vencimiento</th>
+//                           <th>Asegurado</th>
+//                           <th>Tomador</th>
+//                       </tr>
+//                   </thead>
+//                   <tbody>
+//           `;
+//           contracts.forEach(contract => {
+//             const formattedDate = new Date(contract.fhasta_pol).toLocaleDateString('es-ES');
+//               emailHtml += `
+//                   <tr>
+//                       <td>${contract.id}</td>
+//                       <td>${contract.xpoliza}</td>
+//                       <td>${formattedDate}</td>
+//                       <td>${contract.xnombre}</td>
+//                       <td>${contract.xtomador}</td>
+//                   </tr>
+//               `;
+//           });
+//           emailHtml += `
+//                   </tbody>
+//               </table>
+//           `;
+//           await sendEmail(`Contratos Vencen en ${currentMonth}/${currentYear}`, emailHtml);
+//       } else {
+//           console.log('No hay contratos que venzan este mes.');
+//       }
+
+//   } catch (error) {
+//       console.error('Error ejecutando la consulta:', error.message);
+//   } finally {
+//       if (pool) {
+//           await pool.close();
+//       }
+//   }
+// }
+
+// // Configuración de nodemailer
+// const transporter = nodemailer.createTransport({
+//   service: 'gmail', // o cualquier otro servicio de correo (e.g., 'yahoo', 'outlook')
+//   auth: {
+//         user: 'alenjhon9@gmail.com',
+//         pass: 'nnvwygxnvdpjegbj'
+//   }
+// });
+
+// // Función para enviar correos
+// async function sendEmail(subject, html) {
+//   const mailOptions = {
+//       from: 'Manmar Corretaje de Seguros',
+//       to: 'alenjhon9@gmail.com', // Cambia esto por la dirección de destino
+//       subject: subject,
+//       html: html
+//   };
+
+//   try {
+//       await transporter.sendMail(mailOptions);
+//       console.log('Correo enviado correctamente');
+//   } catch (error) {
+//       console.error('Error al enviar el correo:', error.message);
+//   }
+// }
+
+
+// // Programar el demonio para que se ejecute cada 2 minutos
+// cron.schedule('*/1 * * * *', () => {
+//   console.log('Ejecutando el demonio para verificar contratos que vencen...');
+//   checkExpiringContracts();
+// });
 
 export default {
     getReceipt,
