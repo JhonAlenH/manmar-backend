@@ -10,6 +10,16 @@ const getReceipt = async (getReceipt) => {
     return receipt;
 }
 
+const getReceiptUpdate = async (getReceiptUpdate) => {
+    const receipt = await Emission.getReceiptUpdate(getReceiptUpdate);
+    if (receipt.error) {
+        return {
+            error: receipt.error
+        }
+    }
+    return receipt;
+}
+
 const getProducers = async () => {
     const producers = await Emission.getProducers();
     if (producers.error) {
@@ -60,11 +70,23 @@ const detailContract = async (id) => {
     return contract;
 }
 
+const updateContract = async (updateContract) => {
+    const update = await Emission.updateContract(updateContract);
+    if (update.error) {
+        return {
+            error: update.error
+        }
+    }
+    return update;
+}
+
 export default {
     getReceipt,
+    getReceiptUpdate,
     getProducers,
     getTariffs,
     searchContract,
     createContract,
-    detailContract
+    detailContract,
+    updateContract
 }

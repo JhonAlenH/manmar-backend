@@ -145,14 +145,14 @@ const getAgents = async (cejecutivo) => {
     return agents;
 }
 
-const getPlan = async (cramo) => {
-    const planes = await Valrep.getPlan(cramo);
-    if (planes.error) {
+const getInsurance = async () => {
+    const insurance = await Valrep.getInsurance();
+    if (insurance.error) {
         return {
-            error: planes.error
+            error: insurance.error
         }
     }
-    return planes;
+    return insurance;
 }
 
 export default {
@@ -171,5 +171,5 @@ export default {
     getCity,
     getExecutive,
     getAgents,
-    getPlan
+    getInsurance
 }

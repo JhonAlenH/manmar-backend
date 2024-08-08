@@ -9,7 +9,7 @@ const Color = sequelize.define('macolores', {});
 const Payment = sequelize.define('mametodologiapago', {}, { tableName: 'mametodologiapago' });
 const Executive = sequelize.define('maejecutivos', {});
 const Agents = sequelize.define('maagentes', {});
-const Planes = sequelize.define('maplanes', {});
+const Insurance = sequelize.define('maasegurados', {});
 const Takers = sequelize.define('maVtomadores', 
 {  ctomador: {
   type: Sequelize.INTEGER,
@@ -318,16 +318,14 @@ const getAgents = async (cejecutivo) => {
   }
 };
 
-const getPlan = async (cramo) => {
+const getInsurance = async () => {
   try {
-    const plan = await Planes.findAll({
-      where: {cramo: cramo},
-      attributes: ['cplan', 'xdescripcion'],
+    const asegurados = await Insurance.findAll({
+      attributes: ['casegurado', 'xnombre', 'xapellido', 'itipodoc', 'xcedula'],
     });
-    const planes = plan.map((item) => item.get({ plain: true }));
-    return planes;
+    const insurances = asegurados.map((item) => item.get({ plain: true }));
+    return insurances;
   } catch (error) {
-    console.log(error.message)
     return { error: error.message };
   }
 };
@@ -348,5 +346,5 @@ export default {
   getCity,
   getExecutive,
   getAgents,
-  getPlan
+  getInsurance
 };

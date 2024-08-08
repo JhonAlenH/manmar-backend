@@ -21,6 +21,6 @@ router
     .post("/city", valrepController.getCity)
     .post("/executive", valrepController.getExecutive)
     .get("/agents/:cejecutivo", valrepController.getAgents)
-    .post("/planes", valrepController.getPlan)
+    .post("/insurance", valrepController.getInsurance)
 
 export default router;

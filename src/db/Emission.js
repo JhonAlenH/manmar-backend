@@ -63,6 +63,27 @@ import sequelize from '../config/database.js';
           }
   }
 
+  const getReceiptUpdate = async (getReceiptUpdate) => {
+    const strPrecio = getReceiptUpdate.mprima; // El string que contiene el precio
+    const precioNumerico = parseFloat(strPrecio.replace(',', '.')); // Convertir a número con decimales
+    try{
+        let pool = await sql.connect(sqlConfig);
+        let result = await pool.request()
+        .input('id', sql.Int, getReceiptUpdate.id)
+        .input('mmonto', sql.Numeric(18, 2), precioNumerico)
+        .input('fdesde', sql.DateTime, getReceiptUpdate.fdesde)
+        .execute('pobconsulta_prima');
+        const receipt= await pool.request()
+        .query('select * from tmconsulta_prima');
+        await pool.close();
+        return receipt
+              
+    }catch(err){
+      console.log(err.message)
+        return { error: err.message };
+        }
+}
+
   const getProducers = async () => {
     try {
       const producers = await Producers.findOne({
@@ -153,7 +174,7 @@ import sequelize from '../config/database.js';
           'id', 'ccedente', 'xcedente', 'casegurado', 'xnombre', 
           'cramo', 'xramo', 'xpoliza', 'fdesde_pol', 'fhasta_pol', 
           'cmetodologiapago', 'xmetodologiapago', 'msumaext', 'msuma', 
-          'mprimaext', 'mprima', 'xtomador'
+          'mprimaext', 'mprima', 'xtomador', 'cmoneda', 'xmoneda'
         ],
       });
       return contract ? contract.get({ plain: true }) : {};;
@@ -162,11 +183,49 @@ import sequelize from '../config/database.js';
     }
   };
 
+  const updateContract = async (data) => {
+    console.log(data);
+    let pool;
+    try {
+        pool = await sql.connect(sqlConfig);
+        const keys = Object.keys(data).filter(key => key !== 'id');
+        console.log(keys);
+
+        // Construir la cláusula SET
+        const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
+        console.log(setClause);
+
+        const query = `UPDATE popolizas SET ${setClause} WHERE id = @id`;
+
+        const updateRequest = pool.request();
+
+        // Asignar los valores correspondientes desde data
+        keys.forEach((key, index) => {
+            updateRequest.input(`param${index + 1}`, data[key]);
+        });
+        updateRequest.input('id', data.id);
+
+        const update = await updateRequest.query(query);
+
+        return update;
+    } catch (error) {
+        console.error(error.message);
+        return { error: error.message };
+    } finally {
+        if (pool) {
+            await pool.close();
+        }
+    }
+};
+
+
 export default {
     getReceipt,
+    getReceiptUpdate,
     getProducers,
     getTariffs,
     searchContract,
     createContract,
-    detailContract
+    detailContract,
+    updateContract
 }

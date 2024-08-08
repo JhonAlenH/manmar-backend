@@ -422,22 +422,22 @@ const getAgents = async (req, res) => {
         });
 }
 
-const getPlan = async (req, res) => {
-    const planes = await valrepService.getPlan(req.body.cramo);
-    if (planes.permissionError) {
+const getInsurance = async (req, res) => {
+    const insurance = await valrepService.getInsurance();
+    if (insurance.permissionError) {
         return res
             .status(403)
             .send({
                 status: false,
-                message: planes.permissionError
+                message: insurance.permissionError
             });
     }
-    if (planes.error) {
+    if (insurance.error) {
         return res
             .status(500)
             .send({
                 status: false,
-                message: planes.error
+                message: insurance.error
             });
     }
     return res
@@ -445,7 +445,7 @@ const getPlan = async (req, res) => {
         .send({
             status: true,
             data: {
-                planes: planes
+                insurance: insurance
             }
         });
 }
@@ -466,5 +466,5 @@ export default {
     getCity,
     getExecutive,
     getAgents,
-    getPlan
+    getInsurance
 }

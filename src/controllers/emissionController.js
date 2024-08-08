@@ -33,6 +33,39 @@ const getReceipt = async (req, res) => {
         });
 }
 
+const getReceiptUpdate = async (req, res) => {
+    const receipt = await emissionService.getReceiptUpdate(req.body);
+    if (receipt.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: receipt.permissionError
+            });
+    }
+    if (receipt.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: receipt.error
+            });
+    }
+    const formattedList = receipt.recordset.map((item) => ({
+        fdesde: item.fdesde,
+        fhasta: item.fhasta,
+        mprima: item.mprima
+    }));
+    return res
+        .status(200)
+        .send({
+            status: true,
+            data: {
+                receipt: formattedList
+            }
+        });
+}
+
 const getProducers = async (req, res) => {
     const producers = await emissionService.getProducers();
     if (producers.permissionError) {
@@ -159,7 +192,6 @@ const detailContract = async (req, res) => {
                 message: contratos.error
             });
     }
-    console.log(contratos)
     return res
         .status(200)
         .send({
@@ -168,11 +200,39 @@ const detailContract = async (req, res) => {
         });
 }
 
+const updateContract = async (req, res) => {
+    const update = await emissionService.updateContract(req.body);
+    if (update.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: update.permissionError
+            });
+    }
+    if (update.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: update.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            message: `Se ha actualizado el contrato exitosamente`
+        });
+}
+
 export default {
     getReceipt,
+    getReceiptUpdate,
     getProducers,
     getTariffs,
     searchContract,
     createContract,
-    detailContract
+    detailContract,
+    updateContract
 }
