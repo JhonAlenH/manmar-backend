@@ -160,8 +160,14 @@ import nodemailer from 'nodemailer';
         const selectPoliza = await request.query`SELECT id FROM popolizas ORDER BY id DESC`
         const selectedPoliza = selectPoliza.recordset[0]
         console.log(selectedPoliza.id);
+        await pool.close();
         for (const document of data.documentos) {
-          const request2 = await request.query`INSERT INTO podocumentos (id_poliza, xtitulo, xruta, bactivo) VALUES (${selectedPoliza.id}, '${document.xtitulo}', '${document.xruta}', 1)`
+          pool = await sql.connect(sqlConfig);
+          const request2 = pool.request();
+          let request21 = await request2.query`INSERT INTO podocumentos (id_poliza, xtitulo, xruta, bactivo) VALUES (${selectedPoliza.id}, '${document.xtitulo}', '${document.xruta}', 1)`
+          console.log(request21);
+          await pool.close();
+
         }
       }
   
