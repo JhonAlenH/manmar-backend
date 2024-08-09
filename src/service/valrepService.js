@@ -155,6 +155,16 @@ const getInsurance = async () => {
     return insurance;
 }
 
+const getCoverage = async (cramo) => {
+    const coverage = await Valrep.getCoverage(cramo);
+    if (coverage.error) {
+        return {
+            error: coverage.error
+        }
+    }
+    return coverage;
+}
+
 export default {
     getCedents,
     getTrade,
@@ -171,5 +181,6 @@ export default {
     getCity,
     getExecutive,
     getAgents,
-    getInsurance
+    getInsurance,
+    getCoverage
 }

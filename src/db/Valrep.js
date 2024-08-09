@@ -98,6 +98,12 @@ const City = sequelize.define('maciudades', {
     allowNull: false,
   },
 },);
+const Coverage = sequelize.define('macoberturas', 
+  {  ccobertura: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    allowNull: true,
+  },});
 
 
 const getCedents = async () => {
@@ -330,6 +336,19 @@ const getInsurance = async () => {
   }
 };
 
+const getCoverage = async (cramo) => {
+  try {
+    const coberturas = await Coverage.findAll({
+      where: {cramo: cramo},
+      attributes: ['ccobertura', 'xcobertura'],
+    });
+    const coverage = coberturas.map((item) => item.get({ plain: true }));
+    return coverage;
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
 export default {
   getCedents,
   getTrade,
@@ -346,5 +365,6 @@ export default {
   getCity,
   getExecutive,
   getAgents,
-  getInsurance
+  getInsurance,
+  getCoverage
 };

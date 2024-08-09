@@ -450,6 +450,34 @@ const getInsurance = async (req, res) => {
         });
 }
 
+const getCoverage = async (req, res) => {
+    const coverage = await valrepService.getCoverage(req.params.cramo);
+    if (coverage.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: coverage.permissionError
+            });
+    }
+    if (coverage.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: coverage.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            data: {
+                coverage: coverage
+            }
+        });
+}
+
 export default {
     getCedents,
     getTrade,
@@ -466,5 +494,6 @@ export default {
     getCity,
     getExecutive,
     getAgents,
-    getInsurance
+    getInsurance,
+    getCoverage
 }
