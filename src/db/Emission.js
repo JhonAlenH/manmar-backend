@@ -149,7 +149,8 @@ import nodemailer from 'nodemailer';
     let pool;
     try {
       pool = await sql.connect(sqlConfig);
-      const keys = Object.keys(data);
+      const keys = Object.keys(data).filter(key => key != 'documentos');
+
       const values = keys.map(key => data[key] === '' ? null : data[key]);
 
       const request = pool.request();
@@ -162,6 +163,15 @@ import nodemailer from 'nodemailer';
       });
   
       const create = await request.query(query);
+
+      if (create.rowsAffected[0] > 0) {
+        const selectPoliza = await request.query`SELECT id FROM popolizas ORDER BY id DESC`
+        const selectedPoliza = selectPoliza.recordset[0]
+        console.log(selectedPoliza.id);
+        for (const document of data.documentos) {
+          const request2 = await request.query`INSERT INTO podocumentos (id_poliza, xtitulo, xruta, bactivo) VALUES (${selectedPoliza.id}, '${document.xtitulo}', '${document.xruta}', 1)`
+        }
+      }
   
       return create;
     } catch (error) {

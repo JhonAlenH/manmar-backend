@@ -42,6 +42,7 @@ app.use("/api/v1/maestros", v1MaestrosRouter);
 const PORT = process.env.PORT || 3000; 
 
 const DOCUMENTS_PATH = './public/documents';
+const DOCUMENTS_PATH2 = '/api/get-document/';
 
 app.get('/api/get-document/:filename', (req, res) => {
   const filename = req.params.filename;
@@ -81,8 +82,8 @@ let document_upload = multer({
     }
 });
 
-app.post('/api/upload/documents', document_upload.array('xdocumentos', 5), (req, res) => {
-  const files = req.files;
+app.post('/api/upload/documents', document_upload.array('file', 5), (req, res) => {
+  const files = req.body;
 
   if (!files || files.length === 0) {
     const error = new Error('Please upload at least one file');
@@ -90,10 +91,26 @@ app.post('/api/upload/documents', document_upload.array('xdocumentos', 5), (req,
     console.log(error.message)
     return res.status(400).json({ data: { status: false, code: 400, message: error.message } });
   }
+  const absolutePath = DOCUMENTS_PATH2 + files.url + '/' + files.fileName;
 
 //   const uploadedFiles = files.map(file => ({ filename: file.filename }));
 
-  res.json({ data: { status: true, uploadedFile: files } });
+  res.json({ data: { status: true, uploadedFile: files, url: absolutePath } });
+});
+app.post('/api/upload/document/emission', document_upload.array('file', 5), (req, res) => {
+  const files = req.body;
+
+  if (!files || files.length === 0) {
+    const error = new Error('Please upload at least one file');
+    error.httpStatusCode = 400;
+    console.log(error.message)
+    return res.status(400).json({ data: { status: false, code: 400, message: error.message } });
+  }
+  const absolutePath = DOCUMENTS_PATH2 + files.fileName;
+
+//   const uploadedFiles = files.map(file => ({ filename: file.filename }));
+
+  res.json({ data: { status: true, uploadedFile: files, url: absolutePath } });
 });
 
 app.post('/api/upload/image', document_upload.array('image'),(req, res , err) => {
