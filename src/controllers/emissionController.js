@@ -226,6 +226,38 @@ const updateContract = async (req, res) => {
         });
 }
 
+const searchPolicy = async (req, res) => {
+    const policy = await emissionService.searchPolicy(req.params.xpoliza);
+    if (policy.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: policy.permissionError
+            });
+    }
+    if (policy.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: policy.error
+            });
+    }
+    console.log(policy)
+    if(!policy){
+        return res.status(200).send({
+            status: true,
+            message: `Estimado usuario, el número de póliza ingresado se encuentra con una vigencia activa, por favor coloque otro número`,
+        });
+    }
+    return res
+        .status(200)
+        .send({
+            status: false
+        });
+}
+
 export default {
     getReceipt,
     getReceiptUpdate,
@@ -234,5 +266,6 @@ export default {
     searchContract,
     createContract,
     detailContract,
-    updateContract
+    updateContract,
+    searchPolicy
 }

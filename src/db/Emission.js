@@ -42,6 +42,14 @@ import nodemailer from 'nodemailer';
 
   const Contracts = sequelize.define('poVpolizas', {});
 
+  const Policy = sequelize.define('poVpolizasDetalle', {
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      allowNull: true,
+    },
+  }, {tableName: 'poVpolizasDetalle'});
+
   const getReceipt = async (getReceipt) => {
       const strPrecio = getReceipt.mprima; // El string que contiene el precio
       const precioNumerico = parseFloat(strPrecio.replace(',', '.')); // Convertir a número con decimales
@@ -233,6 +241,18 @@ import nodemailer from 'nodemailer';
     }
 };
 
+const searchPolicy = async (xpoliza) => {
+  try {
+    const producers = await Policy.findOne({
+      where:{ xpoliza: xpoliza},
+      attributes: ['xpoliza'],
+    });
+    return producers ? producers.get({ plain: true }) : {};;
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
 // async function checkExpiringContracts() {
 //   let pool;
 //   try {
@@ -340,5 +360,6 @@ export default {
     searchContract,
     createContract,
     detailContract,
-    updateContract
+    updateContract,
+    searchPolicy
 }

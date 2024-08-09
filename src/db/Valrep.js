@@ -337,6 +337,7 @@ const getInsurance = async () => {
 };
 
 const getCoverage = async (cramo) => {
+  console.log(cramo)
   try {
     const coberturas = await Coverage.findAll({
       where: {cramo: cramo},

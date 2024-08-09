@@ -14,5 +14,6 @@ router
     .post("/create", emissionController.createContract)
     .post("/detail/:id", emissionController.detailContract)
     .post("/update", emissionController.updateContract)
+    .post("/policy/:xpoliza", emissionController.searchPolicy)
 
 export default router;
