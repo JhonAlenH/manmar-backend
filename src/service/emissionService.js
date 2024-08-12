@@ -90,6 +90,16 @@ const searchPolicy = async (xpoliza) => {
     return policy;
 }
 
+const searchReceipt = async (id) => {
+    const receipt = await Emission.searchReceipt(id);
+    if (receipt.error) {
+        return {
+            error: receipt.error
+        }
+    }
+    return receipt;
+}
+
 export default {
     getReceipt,
     getReceiptUpdate,
@@ -99,5 +109,6 @@ export default {
     createContract,
     detailContract,
     updateContract,
-    searchPolicy
+    searchPolicy,
+    searchReceipt
 }

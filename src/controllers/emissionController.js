@@ -244,17 +244,43 @@ const searchPolicy = async (req, res) => {
                 message: policy.error
             });
     }
-    console.log(policy)
-    if(!policy){
+    if(!policy.xpoliza){
+        return res.status(200).send({
+            status: true
+        });
+    }else{
         return res.status(200).send({
             status: true,
+            xpoliza: policy.xpoliza,
             message: `Estimado usuario, el número de póliza ingresado se encuentra con una vigencia activa, por favor coloque otro número`,
         });
+    }
+
+}
+
+const searchReceipt = async (req, res) => {
+    const receipt = await emissionService.searchReceipt(req.params.id);
+    if (receipt.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: receipt.permissionError
+            });
+    }
+    if (receipt.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: receipt.error
+            });
     }
     return res
         .status(200)
         .send({
-            status: false
+            status: true,
+            receipt: receipt
         });
 }
 
@@ -267,5 +293,6 @@ export default {
     createContract,
     detailContract,
     updateContract,
-    searchPolicy
+    searchPolicy,
+    searchReceipt
 }

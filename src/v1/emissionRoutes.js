@@ -15,5 +15,6 @@ router
     .post("/detail/:id", emissionController.detailContract)
     .post("/update", emissionController.updateContract)
     .post("/policy/:xpoliza", emissionController.searchPolicy)
+    .post("/search-receipt/:id", emissionController.searchReceipt)
 
 export default router;

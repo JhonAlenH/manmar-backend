@@ -478,6 +478,34 @@ const getCoverage = async (req, res) => {
         });
 }
 
+const getBank = async (req, res) => {
+    const bank = await valrepService.getBank();
+    if (bank.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: bank.permissionError
+            });
+    }
+    if (bank.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: bank.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            data: {
+                bank: bank
+            }
+        });
+}
+
 export default {
     getCedents,
     getTrade,
@@ -495,5 +523,6 @@ export default {
     getExecutive,
     getAgents,
     getInsurance,
-    getCoverage
+    getCoverage,
+    getBank
 }

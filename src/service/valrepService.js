@@ -165,6 +165,16 @@ const getCoverage = async (cramo) => {
     return coverage;
 }
 
+const getBank = async () => {
+    const bank = await Valrep.getBank();
+    if (bank.error) {
+        return {
+            error: bank.error
+        }
+    }
+    return bank;
+}
+
 export default {
     getCedents,
     getTrade,
@@ -182,5 +192,6 @@ export default {
     getExecutive,
     getAgents,
     getInsurance,
-    getCoverage
+    getCoverage,
+    getBank
 }

@@ -10,6 +10,7 @@ const Payment = sequelize.define('mametodologiapago', {}, { tableName: 'mametodo
 const Executive = sequelize.define('maejecutivos', {});
 const Agents = sequelize.define('maagentes', {});
 const Insurance = sequelize.define('maasegurados', {});
+const Bank = sequelize.define('mabancos', {});
 const Takers = sequelize.define('maVtomadores', 
 {  ctomador: {
   type: Sequelize.INTEGER,
@@ -337,7 +338,6 @@ const getInsurance = async () => {
 };
 
 const getCoverage = async (cramo) => {
-  console.log(cramo)
   try {
     const coberturas = await Coverage.findAll({
       where: {cramo: cramo},
@@ -345,6 +345,18 @@ const getCoverage = async (cramo) => {
     });
     const coverage = coberturas.map((item) => item.get({ plain: true }));
     return coverage;
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+const getBank = async () => {
+  try {
+    const bancos = await Bank.findAll({
+      attributes: ['cbanco', 'xbanco'],
+    });
+    const bank = bancos.map((item) => item.get({ plain: true }));
+    return bank;
   } catch (error) {
     return { error: error.message };
   }
@@ -367,5 +379,6 @@ export default {
   getExecutive,
   getAgents,
   getInsurance,
-  getCoverage
+  getCoverage,
+  getBank
 };

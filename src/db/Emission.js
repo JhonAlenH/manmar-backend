@@ -50,6 +50,8 @@ import nodemailer from 'nodemailer';
     },
   }, {tableName: 'poVpolizasDetalle'});
 
+  const Receipt = sequelize.define('cbrecibos', {});
+
   const getReceipt = async (getReceipt) => {
       const strPrecio = getReceipt.mprima; // El string que contiene el precio
       const precioNumerico = parseFloat(strPrecio.replace(',', '.')); // Convertir a número con decimales
@@ -253,6 +255,19 @@ const searchPolicy = async (xpoliza) => {
   }
 };
 
+const searchReceipt = async (id) => {
+  try {
+    const recibos = await Receipt.findAll({
+      where:{ id_poliza: id},
+      attributes: ['nrecibo', 'fdesde_rec', 'fhasta_rec', 'mprimaext', 'fcobro', 'id_poliza'],
+    });
+    const receipt = recibos.map((item) => item.get({ plain: true }));
+    return receipt
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
 // async function checkExpiringContracts() {
 //   let pool;
 //   try {
@@ -361,5 +376,6 @@ export default {
     createContract,
     detailContract,
     updateContract,
-    searchPolicy
+    searchPolicy,
+    searchReceipt
 }

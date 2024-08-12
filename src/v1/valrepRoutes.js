@@ -23,5 +23,6 @@ router
     .get("/agents/:cejecutivo", valrepController.getAgents)
     .post("/insurance", valrepController.getInsurance)
     .post("/coverage/:cramo", valrepController.getCoverage)
+    .post("/bank", valrepController.getBank)
 
 export default router;
