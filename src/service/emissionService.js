@@ -100,6 +100,16 @@ const searchReceipt = async (id) => {
     return receipt;
 }
 
+const updateReceipt = async (updateReceipt) => {
+    const update = await Emission.updateReceipt(updateReceipt);
+    if (update.error) {
+        return {
+            error: update.error
+        }
+    }
+    return update;
+}
+
 export default {
     getReceipt,
     getReceiptUpdate,
@@ -110,5 +120,6 @@ export default {
     detailContract,
     updateContract,
     searchPolicy,
-    searchReceipt
+    searchReceipt,
+    updateReceipt
 }
