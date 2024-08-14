@@ -172,14 +172,21 @@ import nodemailer from 'nodemailer';
         const selectedPoliza = selectPoliza.recordset[0]
         console.log(selectedPoliza.id);
         await pool.close();
+        let query2 = `INSERT INTO podocumentos (id_poliza, xtitulo, xruta, bactivo) VALUES`
+        let u = 1
         for (const document of data.documentos) {
-          pool = await sql.connect(sqlConfig);
-          const request2 = pool.request();
-          let request21 = await request2.query`INSERT INTO podocumentos (id_poliza, xtitulo, xruta, bactivo) VALUES (${selectedPoliza.id}, '${document.xtitulo}', '${document.xruta}', 1)`
-          console.log(request21);
-          await pool.close();
-
+          query2 += `(${selectedPoliza.id}, '${document.xtitulo}', '${document.xruta}', 1)`
+          if(u < data.documentos.length) {
+            query2 += `, `
+          }
+          u++
         }
+        console.log(query2);
+        pool = await sql.connect(sqlConfig);
+        const request2 = pool.request();
+        let request21 = await request2.query(query2)
+        console.log(request21);
+        await pool.close();
       }
   
       return create;
