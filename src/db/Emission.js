@@ -52,6 +52,7 @@ import nodemailer from 'nodemailer';
 
   const Receipt = sequelize.define('cbrecibos', {});
 
+
   const getReceipt = async (getReceipt) => {
       const strPrecio = getReceipt.mprima; // El string que contiene el precio
       const precioNumerico = parseFloat(strPrecio.replace(',', '.')); // Convertir a número con decimales
@@ -303,6 +304,33 @@ const updateReceipt = async (data) => {
   }
 };
 
+const searchDueReceipt = async () => {
+  try {
+    // Conectar al pool
+    let pool = await sql.connect(sqlConfig);
+
+    // Ejecutar la consulta
+    let result = await pool.request()
+      .query(`SELECT p.id_poliza, p.xpoliza, p.nrecibo, p.fdesde_rec, p.fhasta_rec, p.fcobro, p.ccedente, p.xcedente, p.mprimaext
+              FROM cbVrecibos p
+              WHERE p.fcobro IS NULL
+                AND p.fdesde_rec = (
+                  SELECT MIN(c.fdesde_rec)
+                  FROM cbrecibos c
+                  WHERE c.id_poliza = p.id_poliza
+                    AND c.fcobro IS NULL
+                );`);
+
+    // Extraer los registros
+    const receipt = result.recordset;
+
+    return receipt;
+  } catch (err) {
+    console.log(err.message);
+    return { error: err.message };
+  }
+};
+
 // async function checkExpiringContracts() {
 //   let pool;
 //   try {
@@ -413,5 +441,6 @@ export default {
     updateContract,
     searchPolicy,
     searchReceipt,
-    updateReceipt
+    updateReceipt,
+    searchDueReceipt
 }

@@ -17,5 +17,6 @@ router
     .post("/policy/:xpoliza", emissionController.searchPolicy)
     .post("/search-receipt/:id", emissionController.searchReceipt)
     .post("/update-receipt", emissionController.updateReceipt)
+    .post("/receipt-due", emissionController.searchDueReceipt)
 
 export default router;

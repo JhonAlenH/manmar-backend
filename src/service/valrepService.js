@@ -175,6 +175,16 @@ const getBank = async () => {
     return bank;
 }
 
+const getBankManmar = async () => {
+    const bank = await Valrep.getBankManmar();
+    if (bank.error) {
+        return {
+            error: bank.error
+        }
+    }
+    return bank;
+}
+
 export default {
     getCedents,
     getTrade,
@@ -193,5 +203,6 @@ export default {
     getAgents,
     getInsurance,
     getCoverage,
-    getBank
+    getBank,
+    getBankManmar
 }

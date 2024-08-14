@@ -362,6 +362,21 @@ const getBank = async () => {
   }
 };
 
+const getBankManmar = async () => {
+  try {
+    const bancos = await Bank.findAll({
+      where: {
+        ibanco_p: 'P'
+      },
+      attributes: ['cbanco', 'xbanco'],
+    });
+    const bank = bancos.map((item) => item.get({ plain: true }));
+    return bank;
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
 export default {
   getCedents,
   getTrade,
@@ -380,5 +395,6 @@ export default {
   getAgents,
   getInsurance,
   getCoverage,
-  getBank
+  getBank,
+  getBankManmar
 };
