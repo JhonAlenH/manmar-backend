@@ -192,11 +192,29 @@ const detailContract = async (req, res) => {
                 message: contratos.error
             });
     }
+    const documentos = await emissionService.documentsContract(req.params.id);
+
+    if (documentos.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: documentos.permissionError
+            });
+    }
+
+    const documentList = documentos.map(item => ({
+        xnombrenota: item.xarchivo,
+        xruta: item.xruta,
+        xtitulo: item.xtitulo,
+    }))
+
     return res
         .status(200)
         .send({
             status: true,
-            data: contratos
+            data: contratos,
+            documents: documentList
         });
 }
 

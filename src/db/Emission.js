@@ -52,6 +52,8 @@ import nodemailer from 'nodemailer';
 
   const Receipt = sequelize.define('cbrecibos', {});
 
+  const Document = sequelize.define('podocumentos', {});
+
 
   const getReceipt = async (getReceipt) => {
       const strPrecio = getReceipt.mprima; // El string que contiene el precio
@@ -172,10 +174,10 @@ import nodemailer from 'nodemailer';
         const selectedPoliza = selectPoliza.recordset[0]
         console.log(selectedPoliza.id);
         await pool.close();
-        let query2 = `INSERT INTO podocumentos (id_poliza, xtitulo, xruta, bactivo) VALUES`
+        let query2 = `INSERT INTO podocumentos (id_poliza, xtitulo, xruta, bactivo, xarchivo) VALUES`
         let u = 1
         for (const document of data.documentos) {
-          query2 += `(${selectedPoliza.id}, '${document.xtitulo}', '${document.xruta}', 1)`
+          query2 += `(${selectedPoliza.id}, '${document.xtitulo}', '${document.xruta}', 1, '${document.xnombrenota}')`
           if(u < data.documentos.length) {
             query2 += `, `
           }
@@ -214,6 +216,23 @@ import nodemailer from 'nodemailer';
         ],
       });
       return contract ? contract.get({ plain: true }) : {};;
+    } catch (error) {
+      return { error: error.message };
+    }
+  };
+
+  const documentsContract = async (id) => {
+    try {
+      const documentos = await Document.findAll({
+        where: {
+          id_poliza: id
+        },
+        attributes: [
+          'xtitulo', 'xruta', 'xarchivo'
+        ],
+      });
+      const documents = documentos.map((item) => item.get({ plain: true }));
+      return documents
     } catch (error) {
       return { error: error.message };
     }
@@ -445,6 +464,7 @@ export default {
     searchContract,
     createContract,
     detailContract,
+    documentsContract,
     updateContract,
     searchPolicy,
     searchReceipt,

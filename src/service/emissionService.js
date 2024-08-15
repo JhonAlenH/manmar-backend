@@ -70,6 +70,16 @@ const detailContract = async (id) => {
     return contract;
 }
 
+const documentsContract = async (id) => {
+    const document = await Emission.documentsContract(id);
+    if (document.error) {
+        return {
+            error: document.error
+        }
+    }
+    return document;
+}
+
 const updateContract = async (updateContract) => {
     const update = await Emission.updateContract(updateContract);
     if (update.error) {
@@ -128,6 +138,7 @@ export default {
     searchContract,
     createContract,
     detailContract,
+    documentsContract,
     updateContract,
     searchPolicy,
     searchReceipt,
