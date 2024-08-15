@@ -286,7 +286,9 @@ const searchReceipt = async (id) => {
   try {
     const recibos = await Receipt.findAll({
       where:{ id_poliza: id},
-      attributes: ['nrecibo', 'fdesde_rec', 'fhasta_rec', 'mprimaext', 'fcobro', 'id_poliza', 'mcomisionext'],
+      attributes: ['nrecibo', 'fdesde_rec', 'fhasta_rec', 'mprimaext', 'fcobro', 'id_poliza', 'mcomisionext',
+        'fcobrorec', 'iestadorec'
+      ],
     });
     const receipt = recibos.map((item) => item.get({ plain: true }));
     return receipt
@@ -354,6 +356,41 @@ const searchDueReceipt = async () => {
   } catch (err) {
     console.log(err.message);
     return { error: err.message };
+  }
+};
+
+const updateReceiptPremium = async (data) => {
+  let pool;
+  try {
+      pool = await sql.connect(sqlConfig);
+      const keys = Object.keys(data).filter(key => 
+        key !== 'id_poliza' &&
+        key !== 'nrecibo');
+
+      // Construir la cláusula SET
+      const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
+
+      const query = `UPDATE cbrecibos SET ${setClause} WHERE id_poliza = @id_poliza and nrecibo = @nrecibo`;
+
+      const updateRequest = pool.request();
+
+      // Asignar los valores correspondientes desde data
+      keys.forEach((key, index) => {
+          updateRequest.input(`param${index + 1}`, data[key]);
+      });
+      updateRequest.input('id_poliza', data.id_poliza);
+      updateRequest.input('nrecibo', data.nrecibo);
+
+      const update = await updateRequest.query(query);
+
+      return update;
+  } catch (error) {
+      console.error(error.message);
+      return { error: error.message };
+  } finally {
+      if (pool) {
+          await pool.close();
+      }
   }
 };
 
@@ -469,5 +506,6 @@ export default {
     searchPolicy,
     searchReceipt,
     updateReceipt,
-    searchDueReceipt
+    searchDueReceipt,
+    updateReceiptPremium
 }

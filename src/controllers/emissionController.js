@@ -355,6 +355,33 @@ const searchDueReceipt = async (req, res) => {
         });
 }
 
+const updateReceiptPremium = async (req, res) => {
+    const update = await emissionService.updateReceiptPremium(req.body);
+    if (update.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: update.permissionError
+            });
+    }
+    if (update.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: update.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            status_receipt: true,
+            message: `Se ha actualizado el recibo exitosamente`
+        });
+}
+
 export default {
     getReceipt,
     getReceiptUpdate,
@@ -367,5 +394,6 @@ export default {
     searchPolicy,
     searchReceipt,
     updateReceipt,
-    searchDueReceipt
+    searchDueReceipt,
+    updateReceiptPremium
 }
