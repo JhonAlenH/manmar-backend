@@ -347,11 +347,24 @@ const searchDueReceipt = async (req, res) => {
                 message: receipt.error
             });
     }
+    // Aplicar el filtro distinct por cedente
+    const distinctCedentes = receipt.reduce((acc, current) => {
+        const xcedenteExists = acc.find(item => item.ccedente === current.ccedente);
+        if (!xcedenteExists) {
+            acc.push({
+                ccedente: current.ccedente,
+                xcedente: current.xcedente
+            });
+        }
+        return acc;
+    }, []);
+
     return res
         .status(200)
         .send({
             status: true,
-            receipt: receipt
+            receipt: receipt,
+            cedents: distinctCedentes
         });
 }
 
