@@ -339,7 +339,7 @@ const searchDueReceipt = async () => {
 
     // Ejecutar la consulta
     let result = await pool.request()
-      .query(`SELECT p.id_poliza, p.xpoliza, p.nrecibo, p.fdesde_rec, p.fhasta_rec, p.fcobro, p.ccedente, p.xcedente, p.mprimaext, p.mcomisionext
+      .query(`SELECT p.id_poliza, p.xpoliza, p.nrecibo, p.fdesde_rec, p.fhasta_rec, p.fcobro, p.ccedente, p.xcedente, p.mprimaext, p.mcomisionext, p.ivalor
               FROM cbVrecibos p
               WHERE p.fcobro IS NULL
                 AND p.fdesde_rec = (
