@@ -301,27 +301,35 @@ const updateReceipt = async (data) => {
   let pool;
   try {
       pool = await sql.connect(sqlConfig);
-      const keys = Object.keys(data).filter(key => 
-        key !== 'id_poliza' &&
-        key !== 'nrecibo');
+      if (Array.isArray(data.recibos) && data.recibos.length > 0) {
+        await Promise.all(data.recibos.map(async (recibos) => {
+          const keys = Object.keys(recibos).filter(key => 
+            key !== 'id_poliza' &&
+            key !== 'nrecibo'
+          );
+          const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
 
-      // Construir la cláusula SET
-      const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
+          console.log(setClause);
+      
+          const queryUpdate = `UPDATE cbrecibos SET ${setClause} WHERE id_poliza = @id_poliza AND nrecibo = @nrecibo`;
+      
+          const updateRequest = pool.request();
+          keys.forEach((key, index) => {
+              const value = recibos[key] === '' ? null : recibos[key];
+              updateRequest.input(`param${index + 1}`, value);
+          });
+          updateRequest.input('id_poliza', recibos.id_poliza);
+          updateRequest.input('nrecibo', recibos.nrecibo);
+      
+          await updateRequest.query(queryUpdate);
+        }));
 
-      const query = `UPDATE cbrecibos SET ${setClause} WHERE id_poliza = @id_poliza and nrecibo = @nrecibo`;
-
-      const updateRequest = pool.request();
-
-      // Asignar los valores correspondientes desde data
-      keys.forEach((key, index) => {
-          updateRequest.input(`param${index + 1}`, data[key]);
-      });
-      updateRequest.input('id_poliza', data.id_poliza);
-      updateRequest.input('nrecibo', data.nrecibo);
-
-      const update = await updateRequest.query(query);
-
-      return update;
+        // Retorna un mensaje de éxito o algún objeto si todo fue bien
+        return { message: 'Actualización exitosa' };
+      } else {
+        // Retorna un mensaje indicando que no se realizó ninguna actualización
+        return { message: 'No se realizaron actualizaciones' };
+      }
   } catch (error) {
       console.error(error.message);
       return { error: error.message };
