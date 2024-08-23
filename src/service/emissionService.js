@@ -140,6 +140,26 @@ const updateReceiptPremium = async (updateReceiptPremium) => {
     return update;
 }
 
+const searchFertilizers = async (searchFertilizers) => {
+    const abonos = await Emission.searchFertilizers(searchFertilizers);
+    if (abonos.error) {
+        return {
+            error: abonos.error
+        }
+    }
+    return abonos;
+}
+
+const createAbono = async (createAbono) => {
+    const create = await Emission.createAbono(createAbono);
+    if (create.error) {
+        return {
+            error: create.error
+        }
+    }
+    return create;
+}
+
 export default {
     getReceipt,
     getReceiptUpdate,
@@ -154,5 +174,7 @@ export default {
     searchReceipt,
     updateReceipt,
     searchDueReceipt,
-    updateReceiptPremium
+    updateReceiptPremium,
+    searchFertilizers,
+    createAbono
 }

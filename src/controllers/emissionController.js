@@ -395,6 +395,59 @@ const updateReceiptPremium = async (req, res) => {
         });
 }
 
+const searchFertilizers = async (req, res) => {
+    const abonos = await emissionService.searchFertilizers(req.body);
+    if (abonos.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: abonos.permissionError
+            });
+    }
+    if (abonos.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: abonos.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            abonos: abonos
+        });
+}
+
+const createAbono = async (req, res) => {
+    const create = await emissionService.createAbono(req.body);
+    if (create.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: create.permissionError
+            });
+    }
+    if (create.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: create.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            status_receipt: true,
+            message: `Se ha ingresado el abono`
+        });
+}
+
 export default {
     getReceipt,
     getReceiptUpdate,
@@ -408,5 +461,7 @@ export default {
     searchReceipt,
     updateReceipt,
     searchDueReceipt,
-    updateReceiptPremium
+    updateReceiptPremium,
+    searchFertilizers,
+    createAbono
 }

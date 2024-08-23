@@ -50,6 +50,14 @@ import nodemailer from 'nodemailer';
     },
   }, {tableName: 'poVpolizasDetalle'});
 
+  const Abonos = sequelize.define('cbabonos', {
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      allowNull: true,
+    },
+  }, {tableName: 'cbabonos'});
+
   const Receipt = sequelize.define('cbrecibos', {});
 
   const Document = sequelize.define('podocumentos', {});
@@ -287,7 +295,7 @@ const searchReceipt = async (id) => {
     const recibos = await Receipt.findAll({
       where:{ id_poliza: id},
       attributes: ['nrecibo', 'fdesde_rec', 'fhasta_rec', 'mprimaext', 'fcobro', 'id_poliza', 'mcomisionext',
-        'fcobrorec', 'iestadorec'
+        'fcobrorec', 'iestadorec', 'crecibo'
       ],
     });
     const receipt = recibos.map((item) => item.get({ plain: true }));
@@ -391,6 +399,60 @@ const updateReceiptPremium = async (data) => {
       if (pool) {
           await pool.close();
       }
+  }
+};
+
+const searchFertilizers = async (searchFertilizers) => {
+  try {
+    const fer = await Abonos.findAll({
+      where:{ 
+        id_poliza: searchFertilizers.id_poliza,
+        crecibo: searchFertilizers.crecibo
+      },
+      attributes: ['fabono', 'mabono', 'id_poliza', 'crecibo'],
+    });
+    const abonos = fer.map((item) => item.get({ plain: true }));
+    return abonos
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+const createAbono = async (createAbono) => {
+  try {
+    const pool = await sql.connect(sqlConfig);
+
+    // Filtra y prepara las claves y valores, ignorando las que están vacías
+    const keys = Object.keys(createAbono).filter(key => createAbono[key] !== undefined && createAbono[key] !== '');
+
+    if (keys.length === 0) {
+      throw new Error('No hay datos válidos para insertar.');
+    }
+
+    const values = keys.map(key => createAbono[key]);
+
+    const request = pool.request();
+
+    // Genera los placeholders
+    const placeholders = keys.map((_, i) => `@param${i + 1}`).join(',');
+
+    // Construye la consulta SQL
+    const query = `INSERT INTO cbabonos (${keys.join(',')}) VALUES (${placeholders})`;
+
+    // Añade los parámetros al request
+    keys.forEach((key, index) => {
+      request.input(`param${index + 1}`, values[index]);
+    });
+
+    // Ejecuta la consulta
+    const result = await request.query(query);
+    return result;
+  } catch (error) {
+    console.error('Error al insertar abonos:', error.message);
+    return { error: error.message };
+  } finally {
+    // Cierra la conexión para evitar fugas de recursos
+
   }
 };
 
@@ -507,5 +569,7 @@ export default {
     searchReceipt,
     updateReceipt,
     searchDueReceipt,
-    updateReceiptPremium
+    updateReceiptPremium,
+    searchFertilizers,
+    createAbono
 }
