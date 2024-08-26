@@ -20,6 +20,6 @@ router
     .post("/receipt-due", emissionController.searchDueReceipt)
     .post("/update-receipt-premium", emissionController.updateReceiptPremium)
     .post("/search-fertilizers", emissionController.searchFertilizers)
-    .post("/add-abono", emissionController.createAbono)
+    .post("/fee-charged", emissionController.feeCharged)
 
 export default router;

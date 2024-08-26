@@ -150,14 +150,14 @@ const searchFertilizers = async (searchFertilizers) => {
     return abonos;
 }
 
-const createAbono = async (createAbono) => {
-    const create = await Emission.createAbono(createAbono);
-    if (create.error) {
+const feeCharged = async () => {
+    const fee = await Emission.feeCharged();
+    if (fee.error) {
         return {
-            error: create.error
+            error: fee.error
         }
     }
-    return create;
+    return fee;
 }
 
 export default {
@@ -176,5 +176,5 @@ export default {
     searchDueReceipt,
     updateReceiptPremium,
     searchFertilizers,
-    createAbono
+    feeCharged
 }

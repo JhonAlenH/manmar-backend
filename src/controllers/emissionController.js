@@ -421,30 +421,42 @@ const searchFertilizers = async (req, res) => {
         });
 }
 
-const createAbono = async (req, res) => {
-    const create = await emissionService.createAbono(req.body);
-    if (create.permissionError) {
+const feeCharged = async (req, res) => {
+    const fee = await emissionService.feeCharged();
+    if (fee.permissionError) {
         return res
             .status(403)
             .send({
                 status: false,
-                message: create.permissionError
+                message: fee.permissionError
             });
     }
-    if (create.error) {
+    if (fee.error) {
         return res
             .status(500)
             .send({
                 status: false,
-                message: create.error
+                message: fee.error
             });
     }
+    // Aplicar el filtro distinct por cedente
+    const distinctCedentes = fee.reduce((acc, current) => {
+        const xcedenteExists = acc.find(item => item.ccedente === current.ccedente);
+        if (!xcedenteExists) {
+            acc.push({
+                ccedente: current.ccedente,
+                xcedente: current.xcedente
+            });
+        }
+        return acc;
+    }, []);
+
     return res
         .status(200)
         .send({
             status: true,
-            status_receipt: true,
-            message: `Se ha ingresado el abono`
+            fee: fee,
+            cedents: distinctCedentes
         });
 }
 
@@ -463,5 +475,5 @@ export default {
     searchDueReceipt,
     updateReceiptPremium,
     searchFertilizers,
-    createAbono
+    feeCharged
 }

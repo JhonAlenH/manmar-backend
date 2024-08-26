@@ -418,41 +418,22 @@ const searchFertilizers = async (searchFertilizers) => {
   }
 };
 
-const createAbono = async (createAbono) => {
+const feeCharged = async () => {
   try {
-    const pool = await sql.connect(sqlConfig);
+    // Conectar al pool
+    let pool = await sql.connect(sqlConfig);
 
-    // Filtra y prepara las claves y valores, ignorando las que están vacías
-    const keys = Object.keys(createAbono).filter(key => createAbono[key] !== undefined && createAbono[key] !== '');
+    // Ejecutar la consulta
+    let result = await pool.request()
+      .query(`SELECT * FROM cbVrecibos where fcobro is not null`);
 
-    if (keys.length === 0) {
-      throw new Error('No hay datos válidos para insertar.');
-    }
+    // Extraer los registros
+    const fee = result.recordset;
 
-    const values = keys.map(key => createAbono[key]);
-
-    const request = pool.request();
-
-    // Genera los placeholders
-    const placeholders = keys.map((_, i) => `@param${i + 1}`).join(',');
-
-    // Construye la consulta SQL
-    const query = `INSERT INTO cbabonos (${keys.join(',')}) VALUES (${placeholders})`;
-
-    // Añade los parámetros al request
-    keys.forEach((key, index) => {
-      request.input(`param${index + 1}`, values[index]);
-    });
-
-    // Ejecuta la consulta
-    const result = await request.query(query);
-    return result;
-  } catch (error) {
-    console.error('Error al insertar abonos:', error.message);
-    return { error: error.message };
-  } finally {
-    // Cierra la conexión para evitar fugas de recursos
-
+    return fee;
+  } catch (err) {
+    console.log(err.message);
+    return { error: err.message };
   }
 };
 
@@ -571,5 +552,5 @@ export default {
     searchDueReceipt,
     updateReceiptPremium,
     searchFertilizers,
-    createAbono
+    feeCharged
 }
