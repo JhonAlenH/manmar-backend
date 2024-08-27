@@ -58,7 +58,7 @@ import nodemailer from 'nodemailer';
     },
   }, {tableName: 'cbabonos'});
 
-  const Receipt = sequelize.define('cbrecibos', {});
+  const Complement = sequelize.define('cbcomplementos', {});
 
   const Document = sequelize.define('podocumentos', {});
 
@@ -290,16 +290,14 @@ const searchPolicy = async (xpoliza) => {
   }
 };
 
-const searchReceipt = async (id) => {
+const searchComplement = async (id) => {
   try {
-    const recibos = await Receipt.findAll({
+    const complementos = await Complement.findAll({
       where:{ id_poliza: id},
-      attributes: ['nrecibo', 'fdesde_rec', 'fhasta_rec', 'mprimaext', 'fcobro', 'id_poliza', 'mcomisionext',
-        'fcobrorec', 'iestadorec', 'crecibo'
-      ],
+      attributes: ['fcomplemento', 'mcomplemento', 'crecibo', 'id_poliza'],
     });
-    const receipt = recibos.map((item) => item.get({ plain: true }));
-    return receipt
+    const complement = complementos.map((item) => item.get({ plain: true }));
+    return complement
   } catch (error) {
     return { error: error.message };
   }
@@ -437,6 +435,45 @@ const feeCharged = async () => {
   }
 };
 
+const createComplement = async (data) => {
+  try {
+    console.log(data); // Log de la data para inspeccionar su estructura
+
+    // Conectar al pool
+    let pool = await sql.connect(sqlConfig);
+
+    if (Array.isArray(data.complemento) && data.complemento.length > 0) {
+      await Promise.all(data.complemento.map(async (complemento) => {
+        // Verifica que complemento no es null y es un objeto plano (no un array)
+        if (complemento && typeof complemento === 'object' && !Array.isArray(complemento)) { 
+          const complementoKeys = Object.keys(complemento).filter(key => complemento[key] !== undefined);
+          const complementoValues = complementoKeys.map(key => complemento[key] === '' ? null : complemento[key]);
+          const placeholderscomplemento = complementoKeys.map((_, i) => `@soparam${i + 1}`).join(',');
+
+          const querycomplemento = `INSERT INTO cbcomplementos (${complementoKeys.join(',')}) VALUES (${placeholderscomplemento})`;
+          
+          const complementoRequest = pool.request();
+          complementoKeys.forEach((key, index) => {
+            complementoRequest.input(`soparam${index + 1}`, complementoValues[index]);
+          });
+        
+          await complementoRequest.query(querycomplemento);
+        } else {
+          console.warn("Elemento 'complemento' no válido:", complemento);
+        }
+      }));
+    }
+
+    const fee = 'veeee';
+    return fee;
+
+  } catch (err) {
+    console.log(err.message);
+    return { error: err.message };
+  }
+};
+
+
 // async function checkExpiringContracts() {
 //   let pool;
 //   try {
@@ -547,10 +584,11 @@ export default {
     documentsContract,
     updateContract,
     searchPolicy,
-    searchReceipt,
+    searchComplement,
     updateReceipt,
     searchDueReceipt,
     updateReceiptPremium,
     searchFertilizers,
-    feeCharged
+    feeCharged,
+    createComplement
 }

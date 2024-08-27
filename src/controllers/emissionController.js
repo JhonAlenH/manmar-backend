@@ -276,29 +276,29 @@ const searchPolicy = async (req, res) => {
 
 }
 
-const searchReceipt = async (req, res) => {
-    const receipt = await emissionService.searchReceipt(req.params.id);
-    if (receipt.permissionError) {
+const searchComplement = async (req, res) => {
+    const complement = await emissionService.searchComplement(req.params.id);
+    if (complement.permissionError) {
         return res
             .status(403)
             .send({
                 status: false,
-                message: receipt.permissionError
+                message: complement.permissionError
             });
     }
-    if (receipt.error) {
+    if (complement.error) {
         return res
             .status(500)
             .send({
                 status: false,
-                message: receipt.error
+                message: complement.error
             });
     }
     return res
         .status(200)
         .send({
             status: true,
-            receipt: receipt
+            complement: complement
         });
 }
 
@@ -460,6 +460,32 @@ const feeCharged = async (req, res) => {
         });
 }
 
+const createComplement = async (req, res) => {
+    const create = await emissionService.createComplement(req.body);
+    if (create.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: create.permissionError
+            });
+    }
+    if (create.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: create.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            message: `Se ha actualizado el recibo exitosamente`
+        });
+}
+
 export default {
     getReceipt,
     getReceiptUpdate,
@@ -470,10 +496,11 @@ export default {
     detailContract,
     updateContract,
     searchPolicy,
-    searchReceipt,
+    searchComplement,
     updateReceipt,
     searchDueReceipt,
     updateReceiptPremium,
     searchFertilizers,
-    feeCharged
+    feeCharged,
+    createComplement
 }

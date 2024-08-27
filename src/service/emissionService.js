@@ -100,14 +100,14 @@ const searchPolicy = async (xpoliza) => {
     return policy;
 }
 
-const searchReceipt = async (id) => {
-    const receipt = await Emission.searchReceipt(id);
-    if (receipt.error) {
+const searchComplement = async (id) => {
+    const complement = await Emission.searchComplement(id);
+    if (complement.error) {
         return {
-            error: receipt.error
+            error: complement.error
         }
     }
-    return receipt;
+    return complement;
 }
 
 const updateReceipt = async (updateReceipt) => {
@@ -160,6 +160,16 @@ const feeCharged = async () => {
     return fee;
 }
 
+const createComplement = async (createComplement) => {
+    const create = await Emission.createComplement(createComplement);
+    if (create.error) {
+        return {
+            error: create.error
+        }
+    }
+    return create;
+}
+
 export default {
     getReceipt,
     getReceiptUpdate,
@@ -171,10 +181,11 @@ export default {
     documentsContract,
     updateContract,
     searchPolicy,
-    searchReceipt,
+    searchComplement,
     updateReceipt,
     searchDueReceipt,
     updateReceiptPremium,
     searchFertilizers,
-    feeCharged
+    feeCharged,
+    createComplement
 }
