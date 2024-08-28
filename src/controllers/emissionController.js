@@ -276,6 +276,32 @@ const searchPolicy = async (req, res) => {
 
 }
 
+const searchReceipt = async (req, res) => {
+    const receipt = await emissionService.searchReceipt(req.params.id);
+    if (receipt.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: receipt.permissionError
+            });
+    }
+    if (receipt.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: receipt.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            receipt: receipt
+        });
+}
+
 const searchComplement = async (req, res) => {
     const complement = await emissionService.searchComplement(req.params.id);
     if (complement.permissionError) {
@@ -496,6 +522,7 @@ export default {
     detailContract,
     updateContract,
     searchPolicy,
+    searchReceipt,
     searchComplement,
     updateReceipt,
     searchDueReceipt,

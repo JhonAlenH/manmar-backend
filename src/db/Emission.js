@@ -58,6 +58,8 @@ import nodemailer from 'nodemailer';
     },
   }, {tableName: 'cbabonos'});
 
+  const Receipt = sequelize.define('cbrecibos', {});
+
   const Complement = sequelize.define('cbcomplementos', {});
 
   const Document = sequelize.define('podocumentos', {});
@@ -285,6 +287,21 @@ const searchPolicy = async (xpoliza) => {
       attributes: ['xpoliza'],
     });
     return producers ? producers.get({ plain: true }) : {};;
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+const searchReceipt = async (id) => {
+  try {
+    const recibos = await Receipt.findAll({
+      where:{ id_poliza: id},
+      attributes: ['nrecibo', 'fdesde_rec', 'fhasta_rec', 'mprimaext', 'fcobro', 'id_poliza', 'mcomisionext',
+        'fcobrorec', 'iestadorec', 'crecibo'
+      ],
+    });
+    const receipt = recibos.map((item) => item.get({ plain: true }));
+    return receipt
   } catch (error) {
     return { error: error.message };
   }
@@ -584,6 +601,7 @@ export default {
     documentsContract,
     updateContract,
     searchPolicy,
+    searchReceipt,
     searchComplement,
     updateReceipt,
     searchDueReceipt,
