@@ -23,5 +23,6 @@ router
     .post("/search-fertilizers", emissionController.searchFertilizers)
     .post("/fee-charged", emissionController.feeCharged)
     .post("/complement", emissionController.createComplement)
+    .post("/add-abono", emissionController.createAbono)
 
 export default router;

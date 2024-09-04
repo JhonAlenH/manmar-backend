@@ -512,6 +512,34 @@ const createComplement = async (req, res) => {
         });
 }
 
+const createAbono = async (req, res) => {
+    const create = await emissionService.createAbono(req.body);
+    if (create.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: create.permissionError
+            });
+    }
+    if (create.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: create.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            status_receipt: true,
+            message: `Se ha ingresado el abono`
+        });
+}
+
+
 export default {
     getReceipt,
     getReceiptUpdate,
@@ -529,5 +557,6 @@ export default {
     updateReceiptPremium,
     searchFertilizers,
     feeCharged,
-    createComplement
+    createComplement,
+    createAbono
 }

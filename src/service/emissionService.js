@@ -180,6 +180,16 @@ const createComplement = async (createComplement) => {
     return create;
 }
 
+const createAbono = async (createAbono) => {
+    const create = await Emission.createAbono(createAbono);
+    if (create.error) {
+        return {
+            error: create.error
+        }
+    }
+    return create;
+}
+
 export default {
     getReceipt,
     getReceiptUpdate,
@@ -198,5 +208,6 @@ export default {
     updateReceiptPremium,
     searchFertilizers,
     feeCharged,
-    createComplement
+    createComplement,
+    createAbono
 }

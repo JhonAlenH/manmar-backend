@@ -50,13 +50,13 @@ import nodemailer from 'nodemailer';
     },
   }, {tableName: 'poVpolizasDetalle'});
 
-  const Abonos = sequelize.define('cbabonos', {
+  const Abonos = sequelize.define('cbmovimientos', {
     id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
       allowNull: true,
     },
-  }, {tableName: 'cbabonos'});
+  }, {tableName: 'cbmovimientos'});
 
   const Receipt = sequelize.define('cbrecibos', {});
 
@@ -269,6 +269,16 @@ import nodemailer from 'nodemailer';
 
         const update = await updateRequest.query(query);
 
+        // Actualizar solo ccedente en cbrecibos
+        const updateCbrecibosQuery = `UPDATE cbrecibos SET ccedente = @ccedente WHERE id_poliza = @id`;
+
+        const updateRequestCbrecibos = pool.request();
+        updateRequestCbrecibos.input('ccedente', data.ccedente);
+        updateRequestCbrecibos.input('id', data.id);
+
+        // Ejecutar la actualización en cbrecibos
+        await updateRequestCbrecibos.query(updateCbrecibosQuery);
+
         return update;
     } catch (error) {
         console.error(error.message);
@@ -278,7 +288,7 @@ import nodemailer from 'nodemailer';
             await pool.close();
         }
     }
-};
+  };
 
 const searchPolicy = async (xpoliza) => {
   try {
@@ -331,8 +341,6 @@ const updateReceipt = async (data) => {
             key !== 'nrecibo'
           );
           const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
-
-          console.log(setClause);
       
           const queryUpdate = `UPDATE cbrecibos SET ${setClause} WHERE id_poliza = @id_poliza AND nrecibo = @nrecibo`;
       
@@ -424,7 +432,7 @@ const searchFertilizers = async (searchFertilizers) => {
         id_poliza: searchFertilizers.id_poliza,
         crecibo: searchFertilizers.crecibo
       },
-      attributes: ['fabono', 'mabono', 'id_poliza', 'crecibo'],
+      attributes: ['fmovimiento', 'mpagado', 'id_poliza', 'crecibo'],
     });
     const abonos = fer.map((item) => item.get({ plain: true }));
     return abonos
@@ -454,7 +462,6 @@ const feeCharged = async () => {
 
 const createComplement = async (data) => {
   try {
-    console.log(data); // Log de la data para inspeccionar su estructura
 
     // Conectar al pool
     let pool = await sql.connect(sqlConfig);
@@ -489,6 +496,58 @@ const createComplement = async (data) => {
     return { error: err.message };
   }
 };
+
+const createAbono = async (createAbono) => {
+  let pool = await sql.connect(sqlConfig);
+  try {
+    const { crecibo, id_poliza } = createAbono;
+
+    // Paso 1: Hacer el SELECT para obtener ncuota
+    const selectQuery = 'SELECT max(ncuota) as ncuota FROM cbmovimientos WHERE crecibo = @crecibo AND id_poliza = @id_poliza';
+    const selectResult = await pool.request()
+      .input('crecibo', crecibo)
+      .input('id_poliza', id_poliza)
+      .query(selectQuery);
+
+    // Paso 2: Verificar si se encontraron registros y asignar ncuota
+    let ncuota = 1; // Valor predeterminado si no hay registros
+    if (selectResult.recordset.length > 0) {
+      ncuota = selectResult.recordset[0].ncuota + 1; // Si hay registros, sumar 1 a ncuota
+    }
+
+    // Paso 3: Preparar y filtrar los datos de createAbono para el INSERT
+    const keys = Object.keys(createAbono).filter(key => createAbono[key] !== undefined && createAbono[key] !== '');
+
+    if (keys.length === 0) {
+      throw new Error('No hay datos válidos para insertar.');
+    }
+
+    const values = keys.map(key => createAbono[key]);
+
+    const request = pool.request();
+
+    // Genera los placeholders y añade ncuota
+    const placeholders = keys.map((_, i) => `@param${i + 1}`).join(',');
+    const query = `INSERT INTO cbmovimientos (${keys.join(',')}, ncuota) VALUES (${placeholders}, @ncuota)`;
+
+    // Añade los parámetros al request
+    keys.forEach((key, index) => {
+      request.input(`param${index + 1}`, values[index]);
+    });
+    request.input('ncuota', ncuota);
+
+    // Ejecuta el INSERT
+    const result = await request.query(query);
+    return result;
+  } catch (error) {
+    console.error('Error al insertar abonos:', error.message);
+    return { error: error.message };
+  } finally {
+    // Cierra la conexión para evitar fugas de recursos
+    pool.close();
+  }
+};
+
 
 
 // async function checkExpiringContracts() {
@@ -608,5 +667,6 @@ export default {
     updateReceiptPremium,
     searchFertilizers,
     feeCharged,
-    createComplement
+    createComplement,
+    createAbono
 }
