@@ -24,5 +24,6 @@ router
     .post("/fee-charged", emissionController.feeCharged)
     .post("/complement", emissionController.createComplement)
     .post("/add-abono", emissionController.createAbono)
+    .post("/search-distribution", emissionController.searchDistribution)
 
 export default router;

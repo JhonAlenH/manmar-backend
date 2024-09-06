@@ -190,6 +190,17 @@ const createAbono = async (createAbono) => {
     return create;
 }
 
+const searchDistribution = async (searchDistribution) => {
+    const distribucion = await Emission.searchDistribution(searchDistribution);
+    if (distribucion.error) {
+        return {
+            error: distribucion.error
+        }
+    }
+    return distribucion;
+}
+
+
 export default {
     getReceipt,
     getReceiptUpdate,
@@ -209,5 +220,6 @@ export default {
     searchFertilizers,
     feeCharged,
     createComplement,
-    createAbono
+    createAbono,
+    searchDistribution
 }

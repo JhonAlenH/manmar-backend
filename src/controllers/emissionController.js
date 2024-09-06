@@ -539,6 +539,31 @@ const createAbono = async (req, res) => {
         });
 }
 
+const searchDistribution = async (req, res) => {
+    const distribucion = await emissionService.searchDistribution(req.body);
+    if (distribucion.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: distribucion.permissionError
+            });
+    }
+    if (distribucion.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: distribucion.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            distribucion: distribucion
+        });
+}
 
 export default {
     getReceipt,
@@ -558,5 +583,6 @@ export default {
     searchFertilizers,
     feeCharged,
     createComplement,
-    createAbono
+    createAbono,
+    searchDistribution
 }

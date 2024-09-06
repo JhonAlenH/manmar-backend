@@ -1,5 +1,5 @@
 import sql from "mssql";
-import { Sequelize } from 'sequelize';
+import { Sequelize, Op } from 'sequelize';
 import sequelize from '../config/database.js';
 import cron from 'node-cron';
 import nodemailer from 'nodemailer';
@@ -57,6 +57,15 @@ import nodemailer from 'nodemailer';
       allowNull: true,
     },
   }, {tableName: 'cbmovimientos'});
+
+  const Distribution = sequelize.define('cbVmovimientos', {
+    ncuota: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      allowNull: true,
+    },
+  }, {tableName: 'cbVmovimientos'});
+
 
   const Receipt = sequelize.define('cbrecibos', {});
 
@@ -573,7 +582,40 @@ const createAbono = async (createAbono) => {
   }
 };
 
+const searchDistribution = async (searchDistribution) => {
+  try {
+    const dist = await Distribution.findAll({
+      where: { 
+        fmovimiento: {
+          [Op.gte]: searchDistribution.fdesde, // Mayor o igual a fdesde
+          [Op.lte]: searchDistribution.fhasta  // Menor o igual a fhasta
+        }
+      },
+      attributes: [
+        'crecibo',               // Recibo
+        'ncuota',                // Número de cuota
+        'id_poliza',             // ID de la póliza
+        'xproductor',            // Nombre del productor
+        'xejecutivo',            // Nombre del ejecutivo
+        'xagente',               // Nombre del agente
+        'cproductor',            // Código del productor
+        'cejecutivo',            // Código del ejecutivo
+        'cagente',               // Código del agente
+        'itipomov',              // Tipo de movimiento
+        'fmovimiento',           // Fecha de movimiento
+        'mcomision_p',           // Comisión del productor
+        'mcomision_e',           // Comisión del ejecutivo
+        'mcomision_a'            // Comisión del agente
+      ],
+    });
 
+    const distribucion = dist.map((item) => item.get({ plain: true }));
+    return distribucion;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
 
 // async function checkExpiringContracts() {
 //   let pool;
@@ -693,5 +735,6 @@ export default {
     searchFertilizers,
     feeCharged,
     createComplement,
-    createAbono
+    createAbono,
+    searchDistribution
 }
