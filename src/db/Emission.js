@@ -60,7 +60,7 @@ import nodemailer from 'nodemailer';
 
   const Receipt = sequelize.define('cbrecibos', {});
 
-  const Complement = sequelize.define('cbcomplementos', {});
+  const Complement = sequelize.define('cbmovimientos', {});
 
   const Document = sequelize.define('podocumentos', {});
 
@@ -320,8 +320,11 @@ const searchReceipt = async (id) => {
 const searchComplement = async (id) => {
   try {
     const complementos = await Complement.findAll({
-      where:{ id_poliza: id},
-      attributes: ['fcomplemento', 'mcomplemento', 'crecibo', 'id_poliza'],
+      where:{ 
+        id_poliza: id,
+        itipomov: 'C'
+      },
+      attributes: ['fmovimiento', 'mpagado', 'crecibo', 'id_poliza'],
     });
     const complement = complementos.map((item) => item.get({ plain: true }));
     return complement
@@ -462,7 +465,6 @@ const feeCharged = async () => {
 
 const createComplement = async (data) => {
   try {
-
     // Conectar al pool
     let pool = await sql.connect(sqlConfig);
 
@@ -472,30 +474,53 @@ const createComplement = async (data) => {
         if (complemento && typeof complemento === 'object' && !Array.isArray(complemento)) { 
           const complementoKeys = Object.keys(complemento).filter(key => complemento[key] !== undefined);
           const complementoValues = complementoKeys.map(key => complemento[key] === '' ? null : complemento[key]);
-          const placeholderscomplemento = complementoKeys.map((_, i) => `@soparam${i + 1}`).join(',');
 
-          const querycomplemento = `INSERT INTO cbcomplementos (${complementoKeys.join(',')}) VALUES (${placeholderscomplemento})`;
-          
-          const complementoRequest = pool.request();
-          complementoKeys.forEach((key, index) => {
-            complementoRequest.input(`soparam${index + 1}`, complementoValues[index]);
+          // Paso 1: Hacer el SELECT para obtener ncuota
+          const { crecibo, id_poliza } = complemento; // Asegúrate de que 'crecibo' e 'id_poliza' estén en 'complemento'
+          const selectQuery = 'SELECT max(ncuota) as ncuota FROM cbmovimientos WHERE crecibo = @crecibo AND id_poliza = @id_poliza';
+          const selectResult = await pool.request()
+            .input('crecibo', crecibo)
+            .input('id_poliza', id_poliza)
+            .query(selectQuery);
+
+          // Paso 2: Verificar si se encontraron registros y asignar ncuota
+          let ncuota = 1; // Valor predeterminado si no hay registros
+          if (selectResult.recordset.length > 0) {
+            ncuota = selectResult.recordset[0].ncuota + 1; // Si hay registros, sumar 1 a ncuota
+          }
+
+          // Paso 3: Preparar y filtrar los datos de complemento para el INSERT en cbmovimientos
+          const movKeys = Object.keys(complemento).filter(key => complemento[key] !== undefined && complemento[key] !== '');
+          const movValues = movKeys.map(key => complemento[key]);
+
+          const movRequest = pool.request();
+
+          // Genera los placeholders y añade ncuota
+          const movPlaceholders = movKeys.map((_, i) => `@param${i + 1}`).join(',');
+          const movQuery = `INSERT INTO cbmovimientos (${movKeys.join(',')}, ncuota) VALUES (${movPlaceholders}, @ncuota)`;
+
+          // Añade los parámetros al request
+          movKeys.forEach((key, index) => {
+            movRequest.input(`param${index + 1}`, movValues[index]);
           });
-        
-          await complementoRequest.query(querycomplemento);
+          movRequest.input('ncuota', ncuota);
+
+          // Ejecuta el INSERT en cbmovimientos
+          await movRequest.query(movQuery);
         } else {
           console.warn("Elemento 'complemento' no válido:", complemento);
         }
       }));
     }
 
-    const fee = 'veeee';
-    return fee;
+    return { success: true, message: 'Insert completed successfully' };
 
   } catch (err) {
     console.log(err.message);
     return { error: err.message };
   }
 };
+
 
 const createAbono = async (createAbono) => {
   let pool = await sql.connect(sqlConfig);
