@@ -200,6 +200,16 @@ const searchDistribution = async (searchDistribution) => {
     return distribucion;
 }
 
+const paymentProductor = async (paymentProductor) => {
+    const payment = await Emission.paymentProductor(paymentProductor);
+    if (payment.error) {
+        return {
+            error: payment.error
+        }
+    }
+    return payment;
+}
+
 
 export default {
     getReceipt,
@@ -221,5 +231,6 @@ export default {
     feeCharged,
     createComplement,
     createAbono,
-    searchDistribution
+    searchDistribution,
+    paymentProductor
 }

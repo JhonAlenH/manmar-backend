@@ -605,7 +605,10 @@ const searchDistribution = async (searchDistribution) => {
         'fmovimiento',           // Fecha de movimiento
         'mcomision_p',           // Comisión del productor
         'mcomision_e',           // Comisión del ejecutivo
-        'mcomision_a'            // Comisión del agente
+        'mcomision_a',            // Comisión del agente
+        'fpago_p',           // Comisión del productor
+        'fpago_e',           // Comisión del ejecutivo
+        'fpago_a'            // Comisión del agente
       ],
     });
 
@@ -614,6 +617,61 @@ const searchDistribution = async (searchDistribution) => {
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
+  }
+};
+
+const paymentProductor = async (data) => {
+  let pool;
+  try {
+      pool = await sql.connect(sqlConfig);
+      if (Array.isArray(data.productores) && data.productores.length > 0) {
+        await Promise.all(data.productores.map(async (productores) => {
+          console.log(productores)
+          const keys = Object.keys(productores).filter(key => 
+            key !== 'id_poliza' &&
+            key !== 'crecibo' &&
+            key !== 'ncuota' &&
+            key !== 'xproductor' &&
+            key !== 'xejecutivo' &&
+            key !== 'xagente' &&
+            key !== 'cproductor' &&
+            key !== 'cejecutivo' &&
+            key !== 'cagente' &&
+            key !== 'itipomov' &&
+            key !== 'fmovimiento' &&
+            key !== 'mcomision_p' &&
+            key !== 'mcomision_e' &&
+            key !== 'mcomision_a' 
+          );
+          const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
+      
+          const queryUpdate = `UPDATE cbmovimientos SET ${setClause} WHERE id_poliza = @id_poliza AND crecibo = @crecibo AND ncuota = @ncuota AND fpago_p is null`;
+      
+          const updateRequest = pool.request();
+          keys.forEach((key, index) => {
+              const value = productores[key] === '' ? null : productores[key];
+              updateRequest.input(`param${index + 1}`, value);
+          });
+          updateRequest.input('id_poliza', productores.id_poliza);
+          updateRequest.input('crecibo', productores.crecibo);
+          updateRequest.input('ncuota', productores.ncuota);
+      
+          await updateRequest.query(queryUpdate);
+        }));
+
+        // Retorna un mensaje de éxito o algún objeto si todo fue bien
+        return { message: 'Actualización exitosa' };
+      } else {
+        // Retorna un mensaje indicando que no se realizó ninguna actualización
+        return { message: 'No se realizaron actualizaciones' };
+      }
+  } catch (error) {
+      console.error(error.message);
+      return { error: error.message };
+  } finally {
+      if (pool) {
+          await pool.close();
+      }
   }
 };
 
@@ -736,5 +794,6 @@ export default {
     feeCharged,
     createComplement,
     createAbono,
-    searchDistribution
+    searchDistribution,
+    paymentProductor
 }
