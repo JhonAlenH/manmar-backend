@@ -592,6 +592,33 @@ const paymentProductor = async (req, res) => {
         });
 }
 
+const paymentEjecutivo = async (req, res) => {
+    const payment = await emissionService.paymentEjecutivo(req.body);
+    if (payment.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: payment.permissionError
+            });
+    }
+    if (payment.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: payment.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            status_receipt: true,
+            message: `Se ha ingresado el pago`
+        });
+}
+
 export default {
     getReceipt,
     getReceiptUpdate,
@@ -612,5 +639,6 @@ export default {
     createComplement,
     createAbono,
     searchDistribution,
-    paymentProductor
+    paymentProductor,
+    paymentEjecutivo
 }

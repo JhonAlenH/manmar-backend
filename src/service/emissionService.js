@@ -210,6 +210,16 @@ const paymentProductor = async (paymentProductor) => {
     return payment;
 }
 
+const paymentEjecutivo = async (paymentEjecutivo) => {
+    const payment = await Emission.paymentEjecutivo(paymentEjecutivo);
+    if (payment.error) {
+        return {
+            error: payment.error
+        }
+    }
+    return payment;
+}
+
 
 export default {
     getReceipt,
@@ -232,5 +242,6 @@ export default {
     createComplement,
     createAbono,
     searchDistribution,
-    paymentProductor
+    paymentProductor,
+    paymentEjecutivo
 }

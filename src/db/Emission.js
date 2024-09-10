@@ -390,7 +390,7 @@ const searchDueReceipt = async () => {
 
     // Ejecutar la consulta
     let result = await pool.request()
-      .query(`SELECT * FROM cbVrecibos where fcobro is null`);
+      .query(`SELECT * FROM cbVrecibos where fcobro is null and iestadorec = 'C'`);
 
     // Extraer los registros
     const receipt = result.recordset;
@@ -442,7 +442,8 @@ const searchFertilizers = async (searchFertilizers) => {
     const fer = await Abonos.findAll({
       where:{ 
         id_poliza: searchFertilizers.id_poliza,
-        crecibo: searchFertilizers.crecibo
+        crecibo: searchFertilizers.crecibo,
+        itipomov: 'A'
       },
       attributes: ['fmovimiento', 'mpagado', 'id_poliza', 'crecibo'],
     });
@@ -589,7 +590,8 @@ const searchDistribution = async (searchDistribution) => {
         fmovimiento: {
           [Op.gte]: searchDistribution.fdesde, // Mayor o igual a fdesde
           [Op.lte]: searchDistribution.fhasta  // Menor o igual a fhasta
-        }
+        },
+        ccedente: searchDistribution.ccedente
       },
       attributes: [
         'crecibo',               // Recibo
@@ -655,6 +657,61 @@ const paymentProductor = async (data) => {
           updateRequest.input('id_poliza', productores.id_poliza);
           updateRequest.input('crecibo', productores.crecibo);
           updateRequest.input('ncuota', productores.ncuota);
+      
+          await updateRequest.query(queryUpdate);
+        }));
+
+        // Retorna un mensaje de éxito o algún objeto si todo fue bien
+        return { message: 'Actualización exitosa' };
+      } else {
+        // Retorna un mensaje indicando que no se realizó ninguna actualización
+        return { message: 'No se realizaron actualizaciones' };
+      }
+  } catch (error) {
+      console.error(error.message);
+      return { error: error.message };
+  } finally {
+      if (pool) {
+          await pool.close();
+      }
+  }
+};
+
+const paymentEjecutivo = async (data) => {
+  let pool;
+  try {
+      pool = await sql.connect(sqlConfig);
+      if (Array.isArray(data.ejecutivos) && data.ejecutivos.length > 0) {
+        await Promise.all(data.ejecutivos.map(async (ejecutivos) => {
+          console.log(ejecutivos)
+          const keys = Object.keys(ejecutivos).filter(key => 
+            key !== 'id_poliza' &&
+            key !== 'crecibo' &&
+            key !== 'ncuota' &&
+            key !== 'xproductor' &&
+            key !== 'xejecutivo' &&
+            key !== 'xagente' &&
+            key !== 'cproductor' &&
+            key !== 'cejecutivo' &&
+            key !== 'cagente' &&
+            key !== 'itipomov' &&
+            key !== 'fmovimiento' &&
+            key !== 'mcomision_p' &&
+            key !== 'mcomision_e' &&
+            key !== 'mcomision_a' 
+          );
+          const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
+      
+          const queryUpdate = `UPDATE cbmovimientos SET ${setClause} WHERE id_poliza = @id_poliza AND crecibo = @crecibo AND ncuota = @ncuota AND fpago_e is null`;
+      
+          const updateRequest = pool.request();
+          keys.forEach((key, index) => {
+              const value = ejecutivos[key] === '' ? null : ejecutivos[key];
+              updateRequest.input(`param${index + 1}`, value);
+          });
+          updateRequest.input('id_poliza', ejecutivos.id_poliza);
+          updateRequest.input('crecibo', ejecutivos.crecibo);
+          updateRequest.input('ncuota', ejecutivos.ncuota);
       
           await updateRequest.query(queryUpdate);
         }));
@@ -795,5 +852,6 @@ export default {
     createComplement,
     createAbono,
     searchDistribution,
-    paymentProductor
+    paymentProductor,
+    paymentEjecutivo
 }
