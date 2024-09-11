@@ -316,7 +316,7 @@ const searchReceipt = async (id) => {
     const recibos = await Receipt.findAll({
       where:{ id_poliza: id},
       attributes: ['nrecibo', 'fdesde_rec', 'fhasta_rec', 'mprimaext', 'fcobro', 'id_poliza', 'mcomisionext',
-        'fcobrorec', 'iestadorec', 'crecibo'
+        'fcobrorec', 'iestadorec', 'crecibo', 'xruta_rec'
       ],
     });
     const receipt = recibos.map((item) => item.get({ plain: true }));
@@ -732,6 +732,62 @@ const paymentEjecutivo = async (data) => {
   }
 };
 
+const paymentAgente = async (data) => {
+  let pool;
+  try {
+      pool = await sql.connect(sqlConfig);
+      if (Array.isArray(data.agentes) && data.agentes.length > 0) {
+        await Promise.all(data.agentes.map(async (agentes) => {
+          console.log(agentes)
+          const keys = Object.keys(agentes).filter(key => 
+            key !== 'id_poliza' &&
+            key !== 'crecibo' &&
+            key !== 'ncuota' &&
+            key !== 'xproductor' &&
+            key !== 'xejecutivo' &&
+            key !== 'xagente' &&
+            key !== 'cproductor' &&
+            key !== 'cejecutivo' &&
+            key !== 'cagente' &&
+            key !== 'itipomov' &&
+            key !== 'fmovimiento' &&
+            key !== 'mcomision_p' &&
+            key !== 'mcomision_e' &&
+            key !== 'mcomision_a' 
+          );
+          const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
+      
+          const queryUpdate = `UPDATE cbmovimientos SET ${setClause} WHERE id_poliza = @id_poliza AND crecibo = @crecibo AND ncuota = @ncuota AND fpago_e is null`;
+      
+          const updateRequest = pool.request();
+          keys.forEach((key, index) => {
+              const value = agentes[key] === '' ? null : agentes[key];
+              updateRequest.input(`param${index + 1}`, value);
+          });
+          updateRequest.input('id_poliza', agentes.id_poliza);
+          updateRequest.input('crecibo', agentes.crecibo);
+          updateRequest.input('ncuota', agentes.ncuota);
+      
+          await updateRequest.query(queryUpdate);
+        }));
+
+        // Retorna un mensaje de éxito o algún objeto si todo fue bien
+        return { message: 'Actualización exitosa' };
+      } else {
+        // Retorna un mensaje indicando que no se realizó ninguna actualización
+        return { message: 'No se realizaron actualizaciones' };
+      }
+  } catch (error) {
+      console.error(error.message);
+      return { error: error.message };
+  } finally {
+      if (pool) {
+          await pool.close();
+      }
+  }
+};
+
+
 // async function checkExpiringContracts() {
 //   let pool;
 //   try {
@@ -853,5 +909,6 @@ export default {
     createAbono,
     searchDistribution,
     paymentProductor,
-    paymentEjecutivo
+    paymentEjecutivo,
+    paymentAgente
 }

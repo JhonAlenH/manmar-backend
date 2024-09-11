@@ -17,16 +17,16 @@ const { diskStorage } = multer;
 const app = express(); 
 dotenv;
 
-// app.use(cors({
-//   origin: '*',  // o especifica el dominio permitido
-//   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-//   optionsSuccessStatus: 204,
-//   credentials: true ,
-//   allowedHeaders: ['Content-Type', 'Authorization', 'x-client-channel'],
+app.use(cors({
+  origin: '*',  // o especifica el dominio permitido
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  optionsSuccessStatus: 204,
+  credentials: true ,
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-client-channel'],
   
-// }));
+}));
 
-// app.use(cors());
+app.use(cors());
 
 app.use(express.json({ limit: '10mb' }));
 
@@ -84,7 +84,6 @@ let document_upload = multer({
 
 app.post('/api/upload/documents', document_upload.array('file', 5), (req, res) => {
   const files = req.body;
-
   if (!files || files.length === 0) {
     const error = new Error('Please upload at least one file');
     error.httpStatusCode = 400;
@@ -97,9 +96,10 @@ app.post('/api/upload/documents', document_upload.array('file', 5), (req, res) =
 
   res.json({ data: { status: true, uploadedFile: files, url: absolutePath } });
 });
+
 app.post('/api/upload/document/emission', document_upload.array('file', 5), (req, res) => {
   const files = req.body;
-
+  console.log(files)
   if (!files || files.length === 0) {
     const error = new Error('Please upload at least one file');
     error.httpStatusCode = 400;

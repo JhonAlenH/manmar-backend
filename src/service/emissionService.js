@@ -220,6 +220,16 @@ const paymentEjecutivo = async (paymentEjecutivo) => {
     return payment;
 }
 
+const paymentAgente = async (paymentAgente) => {
+    const payment = await Emission.paymentAgente(paymentAgente);
+    if (payment.error) {
+        return {
+            error: payment.error
+        }
+    }
+    return payment;
+}
+
 
 export default {
     getReceipt,
@@ -243,5 +253,6 @@ export default {
     createAbono,
     searchDistribution,
     paymentProductor,
-    paymentEjecutivo
+    paymentEjecutivo,
+    paymentAgente
 }

@@ -27,5 +27,6 @@ router
     .post("/search-distribution", emissionController.searchDistribution)
     .post("/add-paymentProductor", emissionController.paymentProductor)
     .post("/add-paymentEjecutivo", emissionController.paymentEjecutivo)
+    .post("/add-paymentAgente", emissionController.paymentAgente)
 
 export default router;
