@@ -333,7 +333,7 @@ const searchComplement = async (id) => {
         id_poliza: id,
         itipomov: 'C'
       },
-      attributes: ['fmovimiento', 'mpagado', 'crecibo', 'id_poliza'],
+      attributes: ['fmovimiento', 'mpagado', 'crecibo', 'id_poliza', 'xruta_tipomov'],
     });
     const complement = complementos.map((item) => item.get({ plain: true }));
     return complement
@@ -445,9 +445,10 @@ const searchFertilizers = async (searchFertilizers) => {
         crecibo: searchFertilizers.crecibo,
         itipomov: 'A'
       },
-      attributes: ['fmovimiento', 'mpagado', 'id_poliza', 'crecibo'],
+      attributes: ['fmovimiento', 'mpagado', 'id_poliza', 'crecibo', 'xruta_tipomov'],
     });
     const abonos = fer.map((item) => item.get({ plain: true }));
+    console.log(abonos)
     return abonos
   } catch (error) {
     return { error: error.message };
