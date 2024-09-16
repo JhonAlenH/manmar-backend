@@ -368,7 +368,7 @@ const getBankManmar = async () => {
       where: {
         ibanco_p: 'P'
       },
-      attributes: ['cbanco', 'xbanco'],
+      attributes: ['cbanco', 'xbanco', 'cmoneda'],
     });
     const bank = bancos.map((item) => item.get({ plain: true }));
     return bank;

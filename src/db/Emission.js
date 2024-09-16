@@ -598,20 +598,25 @@ const searchDistribution = async (searchDistribution) => {
         'crecibo',               // Recibo
         'ncuota',                // Número de cuota
         'id_poliza',             // ID de la póliza
-        'xproductor',            // Nombre del productor
-        'xejecutivo',            // Nombre del ejecutivo
-        'xagente',               // Nombre del agente
-        'cproductor',            // Código del productor
-        'cejecutivo',            // Código del ejecutivo
-        'cagente',               // Código del agente
         'itipomov',              // Tipo de movimiento
         'fmovimiento',           // Fecha de movimiento
         'mcomision_p',           // Comisión del productor
         'mcomision_e',           // Comisión del ejecutivo
-        'mcomision_a',            // Comisión del agente
-        'fpago_p',           // Comisión del productor
-        'fpago_e',           // Comisión del ejecutivo
-        'fpago_a'            // Comisión del agente
+        'mcomision_a',           // Comisión del agente
+        'fpago_p',               // Fecha de pago productor
+        'fpago_e',               // Fecha de pago ejecutivo
+        'fpago_a',               // Fecha de pago agente
+        'mcomision_pext',        // Comisión externa productor
+        'mcomision_eext',        // Comisión externa ejecutivo
+        'mcomision_aext',        // Comisión externa agente
+        'ccedente',              // Cedente
+        'ctomador',              // Código del tomador
+        'xpoliza',               // Nombre de la póliza
+        'xtomador',              // Nombre del tomador
+        'xproductor',            // Nombre del tomador
+        'xejecutivo',            // Nombre del tomador
+        'xagente',               // Nombre del tomador
+        'xcedente',              // Nombre del tomador
       ],
     });
 
@@ -624,67 +629,72 @@ const searchDistribution = async (searchDistribution) => {
 };
 
 const paymentProductor = async (data) => {
-  let pool;
   try {
-      pool = await sql.connect(sqlConfig);
-      if (Array.isArray(data.productores) && data.productores.length > 0) {
-        await Promise.all(data.productores.map(async (productores) => {
-          console.log(productores)
-          const keys = Object.keys(productores).filter(key => 
-            key !== 'id_poliza' &&
-            key !== 'crecibo' &&
-            key !== 'ncuota' &&
-            key !== 'xproductor' &&
-            key !== 'xejecutivo' &&
-            key !== 'xagente' &&
-            key !== 'cproductor' &&
-            key !== 'cejecutivo' &&
-            key !== 'cagente' &&
-            key !== 'itipomov' &&
-            key !== 'fmovimiento' &&
-            key !== 'mcomision_p' &&
-            key !== 'mcomision_e' &&
-            key !== 'mcomision_a' 
-          );
-          const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
-      
-          const queryUpdate = `UPDATE cbmovimientos SET ${setClause} WHERE id_poliza = @id_poliza AND crecibo = @crecibo AND ncuota = @ncuota AND fpago_p is null`;
-      
-          const updateRequest = pool.request();
-          keys.forEach((key, index) => {
-              const value = productores[key] === '' ? null : productores[key];
-              updateRequest.input(`param${index + 1}`, value);
-          });
-          updateRequest.input('id_poliza', productores.id_poliza);
-          updateRequest.input('crecibo', productores.crecibo);
-          updateRequest.input('ncuota', productores.ncuota);
-      
-          await updateRequest.query(queryUpdate);
-        }));
+    if (Array.isArray(data.productores) && data.productores.length > 0) {
+      for (const productores of data.productores) {
+        let pool = await sql.connect(sqlConfig);
 
-        // Retorna un mensaje de éxito o algún objeto si todo fue bien
-        return { message: 'Actualización exitosa' };
-      } else {
-        // Retorna un mensaje indicando que no se realizó ninguna actualización
-        return { message: 'No se realizaron actualizaciones' };
+        const keys = Object.keys(productores).filter(key => 
+          key !== 'id_poliza' &&
+          key !== 'crecibo' &&
+          key !== 'ncuota' &&
+          key !== 'xproductor' &&
+          key !== 'xejecutivo' &&
+          key !== 'xagente' &&
+          key !== 'cproductor' &&
+          key !== 'cejecutivo' &&
+          key !== 'cagente' &&
+          key !== 'itipomov' &&
+          key !== 'fmovimiento' &&
+          key !== 'mcomision_p' &&
+          key !== 'mcomision_e' &&
+          key !== 'mcomision_a'
+        );
+
+        const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
+
+        const queryUpdate = `
+          UPDATE cbmovimientos
+          SET ${setClause}
+          WHERE id_poliza = @id_poliza 
+            AND crecibo = @crecibo 
+            AND ncuota = @ncuota 
+            AND fpago_p IS NULL`;
+
+        const updateRequest = pool.request();
+        keys.forEach((key, index) => {
+          const value = productores[key] === '' ? null : productores[key];
+          updateRequest.input(`param${index + 1}`, value);
+        });
+        updateRequest.input('id_poliza', productores.id_poliza);
+        updateRequest.input('crecibo', productores.crecibo);
+        updateRequest.input('ncuota', productores.ncuota);
+
+        await updateRequest.query(queryUpdate);
+        await pool.close(); // Cerrar conexión
       }
+
+      return { message: 'Actualización exitosa' };
+    } else {
+      return { message: 'No se realizaron actualizaciones' };
+    }
   } catch (error) {
-      console.error(error.message);
-      return { error: error.message };
-  } finally {
-      if (pool) {
-          await pool.close();
-      }
+    console.error(error.message);
+    return { error: error.message };
   }
 };
+
+
+
 
 const paymentEjecutivo = async (data) => {
   let pool;
   try {
       pool = await sql.connect(sqlConfig);
       if (Array.isArray(data.ejecutivos) && data.ejecutivos.length > 0) {
-        await Promise.all(data.ejecutivos.map(async (ejecutivos) => {
-          console.log(ejecutivos)
+        for (const ejecutivos of data.ejecutivos) {
+          let pool = await sql.connect(sqlConfig);
+  
           const keys = Object.keys(ejecutivos).filter(key => 
             key !== 'id_poliza' &&
             key !== 'crecibo' &&
@@ -701,23 +711,30 @@ const paymentEjecutivo = async (data) => {
             key !== 'mcomision_e' &&
             key !== 'mcomision_a' 
           );
+  
           const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
-      
-          const queryUpdate = `UPDATE cbmovimientos SET ${setClause} WHERE id_poliza = @id_poliza AND crecibo = @crecibo AND ncuota = @ncuota AND fpago_e is null`;
-      
+  
+          const queryUpdate = `
+            UPDATE cbmovimientos
+            SET ${setClause}
+            WHERE id_poliza = @id_poliza 
+              AND crecibo = @crecibo 
+              AND ncuota = @ncuota 
+              AND fpago_e IS NULL`;
+  
           const updateRequest = pool.request();
           keys.forEach((key, index) => {
-              const value = ejecutivos[key] === '' ? null : ejecutivos[key];
-              updateRequest.input(`param${index + 1}`, value);
+            const value = ejecutivos[key] === '' ? null : ejecutivos[key];
+            updateRequest.input(`param${index + 1}`, value);
           });
           updateRequest.input('id_poliza', ejecutivos.id_poliza);
           updateRequest.input('crecibo', ejecutivos.crecibo);
           updateRequest.input('ncuota', ejecutivos.ncuota);
-      
+  
           await updateRequest.query(queryUpdate);
-        }));
+          await pool.close(); // Cerrar conexión
+        }
 
-        // Retorna un mensaje de éxito o algún objeto si todo fue bien
         return { message: 'Actualización exitosa' };
       } else {
         // Retorna un mensaje indicando que no se realizó ninguna actualización
@@ -738,8 +755,8 @@ const paymentAgente = async (data) => {
   try {
       pool = await sql.connect(sqlConfig);
       if (Array.isArray(data.agentes) && data.agentes.length > 0) {
-        await Promise.all(data.agentes.map(async (agentes) => {
-          console.log(agentes)
+        for (const agentes of data.agentes) {
+          let pool = await sql.connect(sqlConfig);
           const keys = Object.keys(agentes).filter(key => 
             key !== 'id_poliza' &&
             key !== 'crecibo' &&
@@ -756,23 +773,30 @@ const paymentAgente = async (data) => {
             key !== 'mcomision_e' &&
             key !== 'mcomision_a' 
           );
+  
           const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
-      
-          const queryUpdate = `UPDATE cbmovimientos SET ${setClause} WHERE id_poliza = @id_poliza AND crecibo = @crecibo AND ncuota = @ncuota AND fpago_e is null`;
-      
+  
+          const queryUpdate = `
+            UPDATE cbmovimientos
+            SET ${setClause}
+            WHERE id_poliza = @id_poliza 
+              AND crecibo = @crecibo 
+              AND ncuota = @ncuota 
+              AND fpago_a IS NULL`;
+  
           const updateRequest = pool.request();
           keys.forEach((key, index) => {
-              const value = agentes[key] === '' ? null : agentes[key];
-              updateRequest.input(`param${index + 1}`, value);
+            const value = agentes[key] === '' ? null : agentes[key];
+            updateRequest.input(`param${index + 1}`, value);
           });
           updateRequest.input('id_poliza', agentes.id_poliza);
           updateRequest.input('crecibo', agentes.crecibo);
           updateRequest.input('ncuota', agentes.ncuota);
-      
+  
           await updateRequest.query(queryUpdate);
-        }));
+          await pool.close(); // Cerrar conexión
+        }
 
-        // Retorna un mensaje de éxito o algún objeto si todo fue bien
         return { message: 'Actualización exitosa' };
       } else {
         // Retorna un mensaje indicando que no se realizó ninguna actualización
