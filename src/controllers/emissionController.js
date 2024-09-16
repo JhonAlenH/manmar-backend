@@ -303,7 +303,7 @@ const searchReceipt = async (req, res) => {
 }
 
 const searchComplement = async (req, res) => {
-    const complement = await emissionService.searchComplement(req.params.id);
+    const complement = await emissionService.searchComplement(req.body);
     if (complement.permissionError) {
         return res
             .status(403)

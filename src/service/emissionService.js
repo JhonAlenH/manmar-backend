@@ -110,8 +110,8 @@ const searchReceipt = async (id) => {
     return receipt;
 }
 
-const searchComplement = async (id) => {
-    const complement = await Emission.searchComplement(id);
+const searchComplement = async (data) => {
+    const complement = await Emission.searchComplement(data);
     if (complement.error) {
         return {
             error: complement.error

@@ -326,11 +326,12 @@ const searchReceipt = async (id) => {
   }
 };
 
-const searchComplement = async (id) => {
+const searchComplement = async (data) => {
   try {
     const complementos = await Complement.findAll({
       where:{ 
-        id_poliza: id,
+        id_poliza: data.id_poliza,
+        crecibo: data.crecibo,
         itipomov: 'C'
       },
       attributes: ['fmovimiento', 'mpagado', 'crecibo', 'id_poliza', 'xruta_tipomov'],

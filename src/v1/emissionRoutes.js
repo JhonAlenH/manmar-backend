@@ -16,7 +16,7 @@ router
     .post("/update", emissionController.updateContract)
     .post("/policy/:xpoliza", emissionController.searchPolicy)
     .post("/search-receipt/:id", emissionController.searchReceipt)
-    .post("/search-complement/:id", emissionController.searchComplement)
+    .post("/search-complement", emissionController.searchComplement)
     .post("/update-receipt", emissionController.updateReceipt)
     .post("/receipt-due", emissionController.searchDueReceipt)
     .post("/update-receipt-premium", emissionController.updateReceiptPremium)
