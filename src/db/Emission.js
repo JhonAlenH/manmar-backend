@@ -73,6 +73,13 @@ import nodemailer from 'nodemailer';
 
   const Document = sequelize.define('podocumentos', {});
 
+  const Tarifas = sequelize.define('popolizas', {
+    id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        allowNull: true,
+    },
+  });
 
   const getReceipt = async (getReceipt) => {
       const strPrecio = getReceipt.mprima; // El string que contiene el precio
@@ -614,10 +621,15 @@ const searchDistribution = async (searchDistribution) => {
         'ctomador',              // Código del tomador
         'xpoliza',               // Nombre de la póliza
         'xtomador',              // Nombre del tomador
-        'xproductor',            // Nombre del tomador
-        'xejecutivo',            // Nombre del tomador
-        'xagente',               // Nombre del tomador
-        'xcedente',              // Nombre del tomador
+        'cproductor',            // Código del Productor
+        'cejecutivo',            // Código del Ejecutivo
+        'cagente',               // Código del Agente
+        'xproductor',            // Nombre del Productor
+        'xejecutivo',            // Nombre del Ejecutivo
+        'xagente',               // Nombre del Agente
+        'xcedente',              // Nombre del Cedente
+        'mcomision',             // Comisión Bolívares
+        'mcomisionext',          // Comisión Dólares
       ],
     });
 
@@ -813,6 +825,18 @@ const paymentAgente = async (data) => {
   }
 };
 
+const buscarTarifasDist = async (id) => {
+  try {
+    const tarifas = await Tarifas.findOne({
+      where: {id},
+      attributes: ['pcomision_p', 'pcomision_e', 'pcomision_a'],
+    });
+    return tarifas ? tarifas.get({ plain: true }) : {};;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
 
 // async function checkExpiringContracts() {
 //   let pool;
@@ -936,5 +960,6 @@ export default {
     searchDistribution,
     paymentProductor,
     paymentEjecutivo,
-    paymentAgente
+    paymentAgente,
+    buscarTarifasDist
 }

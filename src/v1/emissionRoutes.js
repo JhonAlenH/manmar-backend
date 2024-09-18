@@ -28,5 +28,6 @@ router
     .post("/add-paymentProductor", emissionController.paymentProductor)
     .post("/add-paymentEjecutivo", emissionController.paymentEjecutivo)
     .post("/add-paymentAgente", emissionController.paymentAgente)
+    .post("/tarifas/:id", emissionController.buscarTarifasDist)
 
 export default router;

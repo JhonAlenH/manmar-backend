@@ -230,6 +230,16 @@ const paymentAgente = async (paymentAgente) => {
     return payment;
 }
 
+const buscarTarifasDist = async (id) => {
+    const tarifas = await Emission.buscarTarifasDist(id);
+    if (tarifas.error) {
+        return {
+            error: tarifas.error
+        }
+    }
+    return tarifas;
+}
+
 
 export default {
     getReceipt,
@@ -254,5 +264,6 @@ export default {
     searchDistribution,
     paymentProductor,
     paymentEjecutivo,
-    paymentAgente
+    paymentAgente,
+    buscarTarifasDist
 }

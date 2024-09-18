@@ -646,6 +646,34 @@ const paymentAgente = async (req, res) => {
         });
 }
 
+const buscarTarifasDist = async (req, res) => {
+    const tarifas = await emissionService.buscarTarifasDist(req.params.id);
+    if (tarifas.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: tarifas.permissionError
+            });
+    }
+    if (tarifas.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: tarifas.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            ptasa_p: tarifas.pcomision_p,
+            ptasa_e: tarifas.pcomision_e,
+            ptasa_a: tarifas.pcomision_a,
+        });
+}
+
 export default {
     getReceipt,
     getReceiptUpdate,
@@ -668,5 +696,6 @@ export default {
     searchDistribution,
     paymentProductor,
     paymentEjecutivo,
-    paymentAgente
+    paymentAgente,
+    buscarTarifasDist
 }
