@@ -722,7 +722,12 @@ const paymentEjecutivo = async (data) => {
             key !== 'fmovimiento' &&
             key !== 'mcomision_p' &&
             key !== 'mcomision_e' &&
-            key !== 'mcomision_a' 
+            key !== 'mcomision_a' &&
+            key !== 'mcomisionext' &&
+            key !== 'xcedente' &&
+            key !== 'xtomador' &&
+            key !== 'xpoliza' &&
+            key !== 'ctomador' 
           );
   
           const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
@@ -784,7 +789,12 @@ const paymentAgente = async (data) => {
             key !== 'fmovimiento' &&
             key !== 'mcomision_p' &&
             key !== 'mcomision_e' &&
-            key !== 'mcomision_a' 
+            key !== 'mcomision_a' &&
+            key !== 'mcomisionext' &&
+            key !== 'xcedente' &&
+            key !== 'xtomador' &&
+            key !== 'xpoliza' &&
+            key !== 'ctomador' 
           );
   
           const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
