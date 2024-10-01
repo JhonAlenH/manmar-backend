@@ -4,6 +4,7 @@ const sequelize = new Sequelize(process.env.NAME_BD, process.env.USER_BD, proces
   host: process.env.SERVER_BD,
 
   dialect: 'mssql',
+  timezone: '+00:00', // Forzar el uso de UTC
   dialectOptions: {
     options: {
       encrypt: true,
