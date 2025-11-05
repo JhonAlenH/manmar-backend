@@ -83,7 +83,7 @@ import nodemailer from 'nodemailer';
 
   const getReceipt = async (getReceipt) => {
     console.log(getReceipt)
-      const strPrecio = getReceipt.mprima; // El string que contiene el precio
+      const strPrecio = getReceipt.mprima || '0,00'; // El string que contiene el precio
       const precioNumerico = parseFloat(strPrecio.replace(',', '.')); // Convertir a número con decimales
       try{
 

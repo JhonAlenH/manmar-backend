@@ -182,6 +182,7 @@ const getModel = async (getModel) => {
 };
 
 const getVersion = async (getVersion) => {
+  console.log(getVersion)
   try {
     const versions = await Version.findAll({
       where: getVersion,
