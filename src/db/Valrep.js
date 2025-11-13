@@ -1,22 +1,22 @@
 import { Sequelize, DataTypes } from 'sequelize';
 import sequelize from '../config/database.js';
+import initModels  from "../models/init-models.js";
+const models = initModels(sequelize)
 
-const Cedents = sequelize.define('macedentes', {});
-const Trade = sequelize.define('maramos', {});
-const Coin = sequelize.define('mamonedas', {});
+
+const Trade =  models.maramos //sequelize.define('maramos', {});
+const User = models.seusuarios
+const Coin =  models.mamonedas //sequelize.define('mamonedas', {});
 const Clients = sequelize.define('maclientes', {});
-const Color = sequelize.define('macolores', {});
-const Payment = sequelize.define('mametodologiapago', {}, { tableName: 'mametodologiapago' });
+const Persons = models.mapersonas //sequelize.define('maclientes', {});
+const Color = models.macolores //sequelize.define('macolores', {});
+const Payment = models.mametodologiapago //sequelize.define('mametodologiapago', {}, { tableName: 'mametodologiapago' });
+const Intermediaries = models.maintermediarios //sequelize.define('mametodologiapago', {}, { tableName: 'mametodologiapago' });
 const Executive = sequelize.define('maejecutivos', {});
 const Agents = sequelize.define('maagentes', {});
-const Insurance = sequelize.define('maasegurados', {});
-const Bank = sequelize.define('mabancos', {});
-const Takers = sequelize.define('maVtomadores', 
-{  ctomador: {
-  type: Sequelize.INTEGER,
-  primaryKey: true,
-  allowNull: true,
-},});
+const Insurance = models.maasegurados //sequelize.define('maasegurados', {});
+const Bank = models.mabancos //sequelize.define('mabancos', {});
+const Takers = models.matomadores 
 const Brand = sequelize.define('mainma', {  
   qano: {
     type: Sequelize.INTEGER,
@@ -65,54 +65,25 @@ const Version = sequelize.define('mainma', {
     allowNull: false,
   },
 }, { tableName: 'mainma' });
-const State = sequelize.define('maestados', {
-  cestado: {
-    type: Sequelize.INTEGER,
-    primaryKey: true,
-    allowNull: false,
-  },
-  cpais: {
-    type: Sequelize.INTEGER,
-    allowNull: false,
-  },
-  xestado: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-},);
-const City = sequelize.define('maciudades', {
-  cciudad: {
-    type: Sequelize.INTEGER,
-    primaryKey: true,
-    allowNull: false,
-  },
-  cpais: {
-    type: Sequelize.INTEGER,
-    allowNull: false,
-  },
-  cestado: {
-    type: Sequelize.INTEGER,
-    allowNull: false,
-  },
-  xciudad: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-},);
-const Coverage = sequelize.define('macoberturas', 
-  {  ccobertura: {
-    type: Sequelize.INTEGER,
-    primaryKey: true,
-    allowNull: true,
-  },});
+const State = models.maestados
+const City = models.maciudades
+const Coverage = models.macoberturas
 
 
 const getCedents = async () => {
   try {
-    const cedent = await Cedents.findAll({
-      attributes: ['ccedente', 'xcedente'],
-    });
-    const cedents = cedent.map((item) => item.get({ plain: true }));
+    const cedentArray = await models.macedentes.findAll({
+      attributes: ['ccedente'],
+      include: [
+        {
+          model: models.mapersonas,
+          as: 'persona',
+          attributes: ['xnombre','xapellido']
+        },
+      ]
+    })
+
+    const cedents = cedentArray.map((item) => item.get({ plain: true }));
     return cedents;
   } catch (error) {
     return { error: error.message };
@@ -363,16 +334,52 @@ const getBank = async () => {
   }
 };
 
-const getBankManmar = async () => {
+const getBankProductor = async (data) => {
   try {
-    const bancos = await Bank.findAll({
+    const banco = await Intermediaries.findOne({
       where: {
-        ibanco_p: 'P'
+        id: data.cintermediario
+      },
+      attributes: ['id', 'cprod_rel'],
+      include: [
+        {
+          association: 'usuario',
+          attributes: ['cusuario','cpersona', 'crol'],
+          include:['persona']
+        },
+        {
+          association: 'datos_bancarios',
+          include:['banco']
+        }
+      ]
+    });
+    return banco;
+  } catch (error) {
+    console.log(error)
+    console.log('await', error.parent.message)
+      return { error: error.parent.message };
+  }
+};
+const getDataUser = async (data) => {
+  try {
+    const user = await User.findOne({
+      where: {
+        cusuario: data.cusuario
       },
       attributes: ['cbanco', 'xbanco', 'cmoneda'],
+      include: [
+        {
+          association: 'intermediario',
+          include: [
+            {
+              association: 'datos_bancarios',
+              include:['banco']
+            }
+          ],
+        },
+      ]
     });
-    const bank = bancos.map((item) => item.get({ plain: true }));
-    return bank;
+    return user;
   } catch (error) {
     return { error: error.message };
   }
@@ -397,5 +404,6 @@ export default {
   getInsurance,
   getCoverage,
   getBank,
-  getBankManmar
+  getBankProductor,
+  getDataUser
 };

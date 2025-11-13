@@ -24,6 +24,7 @@ router
     .post("/insurance", valrepController.getInsurance)
     .post("/coverage/:cramo", valrepController.getCoverage)
     .post("/bank", valrepController.getBank)
-    .post("/bank-manmar", valrepController.getBankManmar)
+    .post("/bank-manmar", valrepController.getBankProductor)
+    .post("/dataProductor", valrepController.getDataUser)
 
 export default router;

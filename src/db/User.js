@@ -1,86 +1,115 @@
-import sql from "mssql";
+import initModels  from "../models/init-models.js";
+import sequelize from "../config/database.js";
+const models = initModels(sequelize)
 
-const sqlConfig = {
-    user: process.env.USER_BD,
-    password: process.env.PASSWORD_BD,
-    server: process.env.SERVER_BD,
-    database: process.env.NAME_BD,
-    requestTimeout: 60000,
-    options: {
-        encrypt: true,
-        trustServerCertificate: true
-    }
-}
 
-const verifyIfUsernameExists = async (xlogin) => {
-    try {
-        let pool = await sql.connect(sqlConfig);
-        let result = await pool.request()
-            .input('xlogin', sql.NVarChar, xlogin)
-            .query('select cusuario, xlogin, xusuario from seusuarios where xlogin = @xlogin')
-            await pool.close();
-        return { 
-            result: result 
-        };
-    }
-    catch (error) {
-        console.log(error.message)
-        return { error: error.message }
-    }
-}
-
-const verifyIfPasswordMatchs = async (xlogin, xcontrasena) => {
-    try {
-        let pool = await sql.connect(sqlConfig);
-        let result = await pool.request()
-            .input('xlogin', sql.NVarChar, xlogin)
-            .input('xcontrasena', sql.NVarChar, xcontrasena)
-            .query('select cusuario from seusuarios where xlogin = @xlogin and xcontrasena = @xcontrasena')
-            await pool.close();
-        return { result: result };
-    }
-    catch (error) {
-        console.log(error.message)
-        return { error: error.message };
-    }
-}
-
-const getOneUser = async (xlogin) => {
-    try {
-        let pool = await sql.connect(sqlConfig);
-        let result = await pool.request()
-           .input('xlogin', sql.NVarChar, xlogin)
-           .query('select * from seusuarios where xlogin = @xlogin')
-        if (result.rowsAffected < 1) {
-            return false;
+const verifyUser = async (data) => {
+  try {
+    const user = await models.seusuarios.findOne({
+      attributes: ['cusuario', 'xusuario', 'crol'],
+      where: {
+        xusuario: data.username,
+        xcontrasena: data.password
+      },
+      include: [
+        'productor',
+        {
+          model: models.mapersonas,
+          as: 'persona',
+          attributes: ['xnombre','xapellido']
+        },
+        {
+          association: 'intermediario',
+          include: [
+            'tipo_intermediario',
+            {
+              association: 'productor',
+              include: ['tipo_productor']
+            }
+          ],
         }
-        await pool.close();
-        return result.recordset[0];
-    }
-    catch (error) {
-        console.log(error.message)
-        return { error: error.message };
-    }
+        // 'intermediario'
+      ]
+    });
+    console.log('user',user)
+    if(user){
+      return user;
+    } else {
+      return { error: 'Usuario o Contraseña invalidos' }
+    } 
+  }
+  catch (error) {
+    return { error: error.message }
+  }
 }
 
-const getExecutive = async (xcorreo) => {
-    try {
-        let pool = await sql.connect(sqlConfig);
-        let result = await pool.request()
-           .input('xcorreo', sql.NVarChar, xcorreo)
-           .query('select cejecutivo from maejecutivos where xcorreo = @xcorreo')
-        await pool.close();
-        return result.recordset[0];
+const getProductor = async (cusuario) => {
+  try {
+    const data = await models.maproductores.findOne({
+      attributes: ['cproductor', 'csuper', 'ctipo'],
+      where: {
+        cusuario: cusuario
+      },
+      include: ['tipo_produc']
+    });
+    if(data){
+      return data;
+    } else {
+      return { error: 'Codigo errado' };
     }
-    catch (error) {
-        console.log(error.message)
-        return { error: error.message };
+  }
+  catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+}
+const getExecutive = async (cusuario) => {
+  try {
+    const data = await models.maejecutivos.findOne({
+      attributes: ['cejecutivo', 'csuper'],
+      where: {
+          cusuario: cusuario
+      },
+      include: ['productor']
+    });
+    if(data){
+      return data;
+    } else {
+      return { error: 'Codigo errado' };
     }
+  }
+  catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+}
+const getAgent = async (cusuario) => {
+  try {
+    const data = await models.maagentes.findOne({
+      attributes: ['cagente'],
+      where: {
+        cusuario: cusuario
+      },
+      include: [{
+        association: 'ejecutivo',
+        include: ['productor'],
+      }]
+    });
+    if(data){
+      return data;
+    } else {
+      return { error: 'Codigo errado' };
+    }
+  }
+  catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
 }
 
 export default {
-    verifyIfUsernameExists,
-    verifyIfPasswordMatchs,
-    getOneUser,
-    getExecutive
+  verifyUser,
+  getProductor,
+  getExecutive,
+  getAgent
 }

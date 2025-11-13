@@ -506,22 +506,22 @@ const getBank = async (req, res) => {
         });
 }
 
-const getBankManmar = async (req, res) => {
-    const bank = await valrepService.getBankManmar();
-    if (bank.permissionError) {
+const getBankProductor = async (req, res) => {
+    const productor = await valrepService.getBankProductor(req.body);
+    if (productor.permissionError) {
         return res
             .status(403)
             .send({
                 status: false,
-                message: bank.permissionError
+                message: productor.permissionError
             });
     }
-    if (bank.error) {
+    if (productor.error) {
         return res
             .status(500)
             .send({
                 status: false,
-                message: bank.error
+                message: productor.error
             });
     }
     return res
@@ -529,8 +529,33 @@ const getBankManmar = async (req, res) => {
         .send({
             status: true,
             data: {
-                bank: bank
+                productor:productor
             }
+        });
+}
+const getDataUser = async (req, res) => {
+    const data = await valrepService.getDataUser(req.body);
+    if (data.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: data.permissionError
+            });
+    }
+    if (data.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: data.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            data
         });
 }
 
@@ -553,5 +578,6 @@ export default {
     getInsurance,
     getCoverage,
     getBank,
-    getBankManmar
+    getBankProductor,
+    getDataUser
 }

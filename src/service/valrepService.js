@@ -175,14 +175,24 @@ const getBank = async () => {
     return bank;
 }
 
-const getBankManmar = async () => {
-    const bank = await Valrep.getBankManmar();
+const getBankProductor = async (body) => {
+    const bank = await Valrep.getBankProductor(body);
     if (bank.error) {
         return {
             error: bank.error
         }
     }
     return bank;
+}
+
+const getDataUser = async (body) => {
+    const data = await Valrep.getDataUser(body);
+    if (data.error) {
+        return {
+            error: data.error
+        }
+    }
+    return data;
 }
 
 export default {
@@ -204,5 +214,6 @@ export default {
     getInsurance,
     getCoverage,
     getBank,
-    getBankManmar
+    getBankProductor,
+    getDataUser
 }

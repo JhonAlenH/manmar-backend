@@ -1,61 +1,25 @@
 import authService from '../service/authService.js';
 
 const createJWT = async (req, res) => {
-    const xlogin = req.body.xlogin;
-    const verifiedUsername = await authService.verifyIfUsernameExists(xlogin);
-    if (verifiedUsername.error) { 
+    const verifiedUser = await authService.verifyUser(req.body);
+    if (verifiedUser.error) { 
         res
-            .status(verifiedUsername.code)
+            .status(verifiedUser.code)
             .send({ 
                 status: false,
-                message: verifiedUsername.error
+                message: verifiedUser.error
             });
         return;
     }
-    const xcontrasena = req.body.xcontrasena;
-    const verifiedPassword = await authService.verifyIfPasswordMatchs(xlogin, xcontrasena);
-    if (verifiedPassword.error) { 
-        res
-            .status(verifiedPassword.code)
-            .send({ 
-                status: false,
-                message: verifiedPassword.error
-            });
-        return;
-    }
-    const user = await authService.getOneUser(xlogin);
-    if (user.error) {
-        return res
-            .status(user.code)
-            .send({
-                status: false,
-                message: user.error
-            });
-    }
-
-    const executive = await authService.getExecutive(user.xcorreo);
-
-    const jwt = authService.createJWT(user);
-    
-    res
-        .status(201).send({ 
-            status: true, 
-            message: 'Usuario Autenticado',
-            data: {
-                cusuario: user.cusuario,
-                xusuario: user.xusuario,
-                cdepartamento: user.cdepartamento,
-                crol: user.crol,
-                bcrear: user.bcrear,
-                bconsultar: user.bconsultar,
-                bmodificar: user.bmodificar,
-                beliminar: user.beliminar,
-                ccorredor: user.ccorredor,
-                xcorredor: user.xcorredor,
-                cejecutivo: executive ? executive.cejecutivo : null,
-                token: 'Bearer ' + jwt
-            }
-        });
+    const jwt = authService.createJWT(verifiedUser);
+    res.status(201).send({ 
+        status: true, 
+        message: 'Usuario Autenticado',
+        data: {
+            user: verifiedUser,
+            token: 'Bearer ' + jwt
+        }
+    });
     return;
 };
 

@@ -40,8 +40,8 @@ const getTariffs = async (getTariffs) => {
     return tariffs;
 }
 
-const searchContract = async (searchContract) => {
-    const contracts = await Emission.searchContract(searchContract);
+const searchContract = async (data) => {
+    const contracts = await Emission.searchContract(data);
     if (contracts.error) {
         return {
             error: contracts.error

@@ -1,8 +1,8 @@
 import sql from "mssql";
 import { Sequelize, Op } from 'sequelize';
 import sequelize from '../config/database.js';
-import cron from 'node-cron';
-import nodemailer from 'nodemailer';
+import initModels  from "../models/init-models.js";
+const models = initModels(sequelize)
 
   const sqlConfig = {
       user: process.env.USER_BD,
@@ -152,21 +152,38 @@ import nodemailer from 'nodemailer';
     }
   };
 
-  const searchContract = async (searchContract) => {
+  const searchContract = async (data) => {
     try {
       const whereClause = {};
-  
-      if (searchContract.ccedente) {
-        whereClause.ccedente = searchContract.ccedente;
+      if(data.cprod_rel) {
+        whereClause.cprod_rel = data.cprod_rel;
       }
-  
-      if (searchContract.cramo) {
-        whereClause.cramo = searchContract.cramo;
+      if (data.ccedente) {
+        whereClause.ccedente = data.ccedente;
       }
-  
-      const contratos = await Contracts.findAll({
+      if (data.cramo) {
+        whereClause.cramo = data.cramo;
+      }
+      
+      const contratos = await models.popolizas.findAll({
         where: whereClause,
-        attributes: ['id', 'xpoliza', 'xcedente', 'xramo', 'xasegurado', 'fdesde', 'fhasta'],
+        attributes: ['id', 'xpoliza', 'fdesde', 'fhasta'],
+        include: [
+          'ramo',
+          {
+            association: 'asegurado',
+            include: ['persona'],
+          },
+          {
+            association: 'cedente',
+            include: ['persona'],
+          },
+          {
+            association: 'asegurado',
+            include: ['persona'],
+          }
+          //  'xcedente', 'xramo', 'xasegurado'
+        ]
       });
   
       const contracts = contratos.map((item) => item.get({ plain: true }));
