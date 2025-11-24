@@ -29,10 +29,6 @@ export default class cbrecibos extends Model {
       type: DataTypes.INTEGER,
       allowNull: true
     },
-    cmoneda: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    },
     fdesde_rec: {
       type: DataTypes.DATEONLY,
       allowNull: true
@@ -81,14 +77,6 @@ export default class cbrecibos extends Model {
       type: DataTypes.DECIMAL(18,2),
       allowNull: true
     },
-    mcomision_n: {
-      type: DataTypes.DECIMAL(18,2),
-      allowNull: true
-    },
-    mcomision_next: {
-      type: DataTypes.DECIMAL(18,2),
-      allowNull: true
-    },
     fcobro: {
       type: DataTypes.DATE,
       allowNull: true
@@ -99,10 +87,6 @@ export default class cbrecibos extends Model {
     },
     iestadorec: {
       type: DataTypes.CHAR(1),
-      allowNull: true
-    },
-    iestado: {
-      type: DataTypes.CHAR(2),
       allowNull: true
     }
   }, {

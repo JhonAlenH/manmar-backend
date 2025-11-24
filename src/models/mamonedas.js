@@ -17,6 +17,10 @@ export default class mamonedas extends Model {
       type: DataTypes.STRING(20),
       allowNull: true
     },
+    xrepresentacion: {
+      type: DataTypes.CHAR(4),
+      allowNull: true
+    },
     bactivo: {
       type: DataTypes.BOOLEAN,
       allowNull: true

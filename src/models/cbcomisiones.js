@@ -5,30 +5,26 @@ export default class cbcomisiones extends Model {
   static init(sequelize, DataTypes) {
   return sequelize.define('cbcomisiones', {
     id: {
-      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,
+      autoIncrement: true
     },
     crecibo: {
       type: DataTypes.DECIMAL(18,0),
-      allowNull: false,
-      references: {
-        model: 'cbrecibos',
-        key: 'crecibo'
-      }
-    },
-    nrecibo: {
-      type: DataTypes.INTEGER,
       allowNull: false
     },
-    cprod_rel: {
-      type: DataTypes.STRING(70),
-      allowNull: false,
-      references: {
-        model: 'maintermediarios',
-        key: 'cprod_rel'
-      }
+    cproductor: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    cmoneda: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    ptasamon: {
+      type: DataTypes.DECIMAL(18,2),
+      allowNull: true
     },
     pcomision: {
       type: DataTypes.DECIMAL(18,2),
@@ -40,6 +36,10 @@ export default class cbcomisiones extends Model {
     },
     mcomisionext: {
       type: DataTypes.DECIMAL(18,2),
+      allowNull: true
+    },
+    cmovimiento: {
+      type: DataTypes.INTEGER,
       allowNull: true
     },
     fliquidacion: {

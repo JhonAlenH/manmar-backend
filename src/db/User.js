@@ -18,20 +18,10 @@ const verifyUser = async (data) => {
           as: 'persona',
           attributes: ['xnombre','xapellido']
         },
-        {
-          association: 'intermediario',
-          include: [
-            'tipo_intermediario',
-            {
-              association: 'productor',
-              include: ['tipo_productor']
-            }
-          ],
-        }
-        // 'intermediario'
+        'productor_usuario',
+        'rol'
       ]
     });
-    console.log('user',user)
     if(user){
       return user;
     } else {
@@ -39,7 +29,8 @@ const verifyUser = async (data) => {
     } 
   }
   catch (error) {
-    return { error: error.message }
+    console.log(await error)
+    return { error: error.parent.message };
   }
 }
 

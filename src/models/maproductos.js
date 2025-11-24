@@ -1,42 +1,53 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class maintermediarios extends Model {
+export default class maproductos extends Model {
   static init(sequelize, DataTypes) {
-  return sequelize.define('maintermediarios', {
+  return sequelize.define('maproductos', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    cprod_rel: {
-      type: DataTypes.STRING(70),
-      allowNull: false,
-      unique: "IX_maintermediarios"
+    xproducto: {
+      type: DataTypes.STRING(100),
+      allowNull: true
     },
-    ctipo: {
+    cmoneda: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'matipo_intermediario',
-        key: 'id'
+        model: 'mamonedas',
+        key: 'cmoneda'
       }
     },
-    csuper: {
-      type: DataTypes.STRING(10),
-      allowNull: true
-    },
-    cdatos_bancarios: {
+    cramo: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: true,
+      references: {
+        model: 'maramos',
+        key: 'cramo'
+      }
+    },
+    cproductor: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'maproductores',
+        key: 'cproductor'
+      }
+    },
+    ccedente: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'macedentes',
+        key: 'ccedente'
+      }
     },
     pcomision: {
       type: DataTypes.DECIMAL(18,2),
-      allowNull: true
-    },
-    cusuario: {
-      type: DataTypes.INTEGER,
       allowNull: true
     },
     bactivo: {
@@ -44,7 +55,7 @@ export default class maintermediarios extends Model {
       allowNull: true
     },
     fcreacion: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: true
     },
     cusuario_creacion: {
@@ -52,19 +63,12 @@ export default class maintermediarios extends Model {
       allowNull: true
     }
   }, {
-    tableName: 'maintermediarios',
+    tableName: 'maproductos',
     schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "IX_maintermediarios",
-        unique: true,
-        fields: [
-          { name: "cprod_rel" },
-        ]
-      },
-      {
-        name: "PK_maintermediarios",
+        name: "PK_maproductos",
         unique: true,
         fields: [
           { name: "id" },

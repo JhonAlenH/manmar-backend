@@ -1,7 +1,7 @@
 import valrepService from '../service/valrepService.js';
 
 const getCedents = async (req, res) => {
-    const cedents = await valrepService.getCedents();
+    const cedents = await valrepService.getCedents(req.body);
     if (cedents.permissionError) {
         return res
             .status(403)

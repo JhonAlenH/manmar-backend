@@ -12,11 +12,7 @@ export default class maasegurados extends Model {
     },
     cpersona: {
       type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'mapersonas',
-        key: 'id'
-      }
+      allowNull: true
     },
     bactivo: {
       type: DataTypes.BOOLEAN,

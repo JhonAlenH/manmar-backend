@@ -21,16 +21,32 @@ export default class popolizas extends Model {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'maasegurados',
-        key: 'casegurado'
+        model: 'mapersonas',
+        key: 'id'
       }
     },
     ctomador: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'matomadores',
-        key: 'ctomador'
+        model: 'mapersonas',
+        key: 'id'
+      }
+    },
+    cproductor: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'maproductores',
+        key: 'cproductor'
+      }
+    },
+    cproductor_emisor: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'maproductores',
+        key: 'cproductor'
       }
     },
     cmoneda: {
@@ -53,15 +69,19 @@ export default class popolizas extends Model {
       type: DataTypes.STRING(30),
       allowNull: true
     },
-    ccobertura: {
+    cproducto: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: true,
+      references: {
+        model: 'maproductos',
+        key: 'id'
+      }
     },
-    fdesde_pol: {
+    fdesde: {
       type: DataTypes.DATEONLY,
       allowNull: true
     },
-    fhasta_pol: {
+    fhasta: {
       type: DataTypes.DATEONLY,
       allowNull: true
     },
@@ -76,10 +96,6 @@ export default class popolizas extends Model {
         model: 'mametodologiapago',
         key: 'cmetodologiapago'
       }
-    },
-    ptasa_cambio: {
-      type: DataTypes.DECIMAL(17,2),
-      allowNull: true
     },
     iestado: {
       type: DataTypes.CHAR(1),
@@ -99,10 +115,6 @@ export default class popolizas extends Model {
     },
     mprimaext: {
       type: DataTypes.DECIMAL(17,2),
-      allowNull: true
-    },
-    cprod_rel: {
-      type: DataTypes.STRING(70),
       allowNull: true
     },
     cusuario: {

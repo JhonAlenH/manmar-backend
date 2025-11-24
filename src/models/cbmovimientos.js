@@ -10,13 +10,13 @@ export default class cbmovimientos extends Model {
       allowNull: false,
       primaryKey: true
     },
-    citem: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
     ctomador: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: true,
+      references: {
+        model: 'mapersonas',
+        key: 'id'
+      }
     },
     itipomov: {
       type: DataTypes.CHAR(1),
@@ -56,10 +56,6 @@ export default class cbmovimientos extends Model {
     },
     iestado: {
       type: DataTypes.CHAR(2),
-      allowNull: true
-    },
-    bactivo: {
-      type: DataTypes.BOOLEAN,
       allowNull: true
     },
     cusuario_creacion: {

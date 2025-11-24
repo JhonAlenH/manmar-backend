@@ -1,41 +1,33 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class serol extends Model {
+export default class macedentes_maproductores extends Model {
   static init(sequelize, DataTypes) {
-  return sequelize.define('serol', {
-    crol: {
+  return sequelize.define('macedentes_maproductores', {
+    id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    xrol: {
-      type: DataTypes.STRING(50),
+    ccedente: {
+      type: DataTypes.INTEGER,
       allowNull: true
     },
-    bactivo: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true
-    },
-    fcreacion: {
-      type: DataTypes.DATE,
-      allowNull: true
-    },
-    cusuario_creacion: {
-      type: DataTypes.DECIMAL(11,0),
+    cproductor: {
+      type: DataTypes.INTEGER,
       allowNull: true
     }
   }, {
-    tableName: 'serol',
+    tableName: 'macedentes_maproductores',
     schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PK_serol",
+        name: "PK_macedentes_maproductores",
         unique: true,
         fields: [
-          { name: "crol" },
+          { name: "id" },
         ]
       },
     ]

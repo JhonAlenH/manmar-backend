@@ -1,41 +1,33 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class serol extends Model {
+export default class cbmovientos_cbcomisiones extends Model {
   static init(sequelize, DataTypes) {
-  return sequelize.define('serol', {
-    crol: {
+  return sequelize.define('cbmovientos_cbcomisiones', {
+    id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    xrol: {
-      type: DataTypes.STRING(50),
+    cmovimiento: {
+      type: DataTypes.INTEGER,
       allowNull: true
     },
-    bactivo: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true
-    },
-    fcreacion: {
-      type: DataTypes.DATE,
-      allowNull: true
-    },
-    cusuario_creacion: {
-      type: DataTypes.DECIMAL(11,0),
+    ccomision: {
+      type: DataTypes.INTEGER,
       allowNull: true
     }
   }, {
-    tableName: 'serol',
+    tableName: 'cbmovientos_cbcomisiones',
     schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PK_serol",
+        name: "PK_cbmovientos_cbcomisiones",
         unique: true,
         fields: [
-          { name: "crol" },
+          { name: "id" },
         ]
       },
     ]

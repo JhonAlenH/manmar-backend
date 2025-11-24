@@ -155,9 +155,6 @@ const models = initModels(sequelize)
   const searchContract = async (data) => {
     try {
       const whereClause = {};
-      if(data.cprod_rel) {
-        whereClause.cprod_rel = data.cprod_rel;
-      }
       if (data.ccedente) {
         whereClause.ccedente = data.ccedente;
       }
@@ -170,19 +167,12 @@ const models = initModels(sequelize)
         attributes: ['id', 'xpoliza', 'fdesde', 'fhasta'],
         include: [
           'ramo',
-          {
-            association: 'asegurado',
-            include: ['persona'],
-          },
+          'asegurado',
           {
             association: 'cedente',
             include: ['persona'],
           },
-          {
-            association: 'asegurado',
-            include: ['persona'],
-          }
-          //  'xcedente', 'xramo', 'xasegurado'
+          'tomador',
         ]
       });
   

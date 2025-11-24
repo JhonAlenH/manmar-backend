@@ -1,7 +1,7 @@
 import Valrep from '../db/Valrep.js';
 
-const getCedents = async () => {
-    const cedents = await Valrep.getCedents();
+const getCedents = async (data) => {
+    const cedents = await Valrep.getCedents(data);
     if (cedents.error) {
         return {
             error: cedents.error

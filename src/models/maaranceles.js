@@ -12,19 +12,15 @@ export default class maaranceles extends Model {
     },
     ccedente: {
       type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'macedentes',
-        key: 'ccedente'
-      }
+      allowNull: true
+    },
+    cproductor: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     },
     cramo: {
       type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'maramos',
-        key: 'cramo'
-      }
+      allowNull: true
     },
     pcomision: {
       type: DataTypes.DECIMAL(18,2),

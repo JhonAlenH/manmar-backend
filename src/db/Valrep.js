@@ -1,4 +1,4 @@
-import { Sequelize, DataTypes } from 'sequelize';
+import { Sequelize, DataTypes, Op } from 'sequelize';
 import sequelize from '../config/database.js';
 import initModels  from "../models/init-models.js";
 const models = initModels(sequelize)
@@ -8,13 +8,13 @@ const Trade =  models.maramos //sequelize.define('maramos', {});
 const User = models.seusuarios
 const Coin =  models.mamonedas //sequelize.define('mamonedas', {});
 const Clients = sequelize.define('maclientes', {});
-const Persons = models.mapersonas //sequelize.define('maclientes', {});
 const Color = models.macolores //sequelize.define('macolores', {});
 const Payment = models.mametodologiapago //sequelize.define('mametodologiapago', {}, { tableName: 'mametodologiapago' });
 const Intermediaries = models.maintermediarios //sequelize.define('mametodologiapago', {}, { tableName: 'mametodologiapago' });
 const Executive = sequelize.define('maejecutivos', {});
 const Agents = sequelize.define('maagentes', {});
-const Insurance = models.maasegurados //sequelize.define('maasegurados', {});
+const Insurance = models.mapersonas //sequelize.define('maasegurados', {});
+const Persons = models.mapersonas //sequelize.define('maasegurados', {});
 const Bank = models.mabancos //sequelize.define('mabancos', {});
 const Takers = models.matomadores 
 const Brand = sequelize.define('mainma', {  
@@ -70,23 +70,25 @@ const City = models.maciudades
 const Coverage = models.macoberturas
 
 
-const getCedents = async () => {
+const getCedents = async (data) => {
   try {
-    const cedentArray = await models.macedentes.findAll({
-      attributes: ['ccedente'],
+    const productor = await models.maproductores.findOne({
+      where: data,
+      attributes: ['cproductor'],
       include: [
         {
-          model: models.mapersonas,
-          as: 'persona',
-          attributes: ['xnombre','xapellido']
+          association: 'cedentes',
+          include: ['persona']
         },
-      ]
+        
+      ],
+      
     })
 
-    const cedents = cedentArray.map((item) => item.get({ plain: true }));
+    const cedents = productor.cedentes;
     return cedents;
   } catch (error) {
-    return { error: error.message };
+    return { error: await error.parent.message };
   }
 };
 
@@ -98,7 +100,12 @@ const getTrade = async () => {
     const trades = trade.map((item) => item.get({ plain: true }));
     return trades;
   } catch (error) {
-    return { error: error.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 
@@ -110,7 +117,12 @@ const getCoins = async () => {
     const coins = coin.map((item) => item.get({ plain: true }));
     return coins;
   } catch (error) {
-    return { error: error.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 
@@ -122,47 +134,67 @@ const getClients = async () => {
     const clients = client.map((item) => item.get({ plain: true }));
     return clients;
   } catch (error) {
-    return { error: error.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 
-const getBrand = async (getBrand) => {
+const getBrand = async (data) => {
   try {
     const marca = await Brand.findAll({
-      where: getBrand,
+      where: data,
       attributes: [[sequelize.fn('DISTINCT', sequelize.col('xmarca')), 'xmarca']]
     });
     const brand = marca.map((item) => item.get({ plain: true }));
     return brand;
   } catch (error) {
-    return { error: error.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 
-const getModel = async (getModel) => {
+const getModel = async (data) => {
   try {
     const modelo = await Model.findAll({
-      where: getModel,
+      where: data,
       attributes: [[sequelize.fn('DISTINCT', sequelize.col('xmodelo')), 'xmodelo']]
     });
     const model = modelo.map((item) => item.get({ plain: true }));
     return model;
   } catch (error) {
-    return { error: error.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 
-const getVersion = async (getVersion) => {
-  console.log(getVersion)
+const getVersion = async (data) => {
+  console.log(data)
   try {
     const versions = await Version.findAll({
-      where: getVersion,
+      where: data,
       attributes: ['xversion', 'npasajero', 'xclasificacion', 'id', 'xclase_rcv', 'msum', 'ctarifa_exceso', 'xuso', 'npesovacio', 'ncapcarga'],
     });
     const version = versions.map((item) => item.get({ plain: true }));
     return version;
   } catch (error) {
-    return { error: error.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 
@@ -174,7 +206,12 @@ const getColor = async () => {
     const color = colores.map((item) => item.get({ plain: true }));
     return color;
   } catch (error) {
-    return { error: error.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 
@@ -186,40 +223,48 @@ const getMethodOfPayment = async () => {
     const result = metodologia.map((item) => item.get({ plain: true }));
     return result;
   } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 
 const getTakers = async () => {
   try {
-    const tomador = await Takers.findAll({
-      attributes: ['ctomador', 
-                   'xtomador', 
-                   'xprofesion', 
-                   'icedula', 
-                   'xcedula', 
-                   'xrif', 
-                   'xdomicilio', 
-                   'xpais', 
-                   'xestado',
-                   'xciudad',
-                   'xzona_postal',
-                   'xdireccion',
-                   'xcorreo'],
+    const tomador = await Persons.findAll({
+      attributes: ['id', 'xnombre', 'xapellido', 'cci_rif'],
+      include: [{
+        association: 'usuario',
+      }],
+      where: {
+        [Op.or]: {
+          '$usuario.cusuario$': null,
+          '$usuario.crol$': {
+            [Op.not]: 1
+          }
+        }
+      }
     });
     const result = tomador.map((item) => item.get({ plain: true }));
     return result;
   } catch (error) {
-    return { error: error.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 
-const getTakersId = async (getTakersId) => {
-  console.log(getTakersId)
+const getTakersId = async (data) => {
+  console.log(data)
   try {
     const result = await Takers.findOne({
-      where: {xcedula: getTakersId},
+      where: {xcedula: data},
       attributes: ['ctomador', 
                    'xtomador', 
                    'xprofesion', 
@@ -237,36 +282,48 @@ const getTakersId = async (getTakersId) => {
 
     return result ? result.get({ plain: true }) : null;
   } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 
-const getState = async (getState) => {
+const getState = async (data) => {
   try {
     const items = await State.findAll({
-      where: getState,
+      where: data,
       attributes: ['cestado', 'xestado'],
     });
     const result = items.map((item) => item.get({ plain: true }));
     return result;
   } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 
-const getCity = async (getCity) => {
+const getCity = async (data) => {
   try {
     const items = await City.findAll({
-      where: getCity,
+      where: data,
       attributes: ['cciudad', 'xciudad'],
     });
     const result = items.map((item) => item.get({ plain: true }));
     return result;
   } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 
@@ -278,8 +335,12 @@ const getExecutive = async () => {
     const executive = exec.map((item) => item.get({ plain: true }));
     return executive;
   } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 
@@ -292,20 +353,41 @@ const getAgents = async (cejecutivo) => {
     const agents = agent.map((item) => item.get({ plain: true }));
     return agents;
   } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 
 const getInsurance = async () => {
   try {
-    const asegurados = await Insurance.findAll({
-      attributes: ['casegurado', 'xnombre', 'xapellido', 'itipodoc', 'xcedula'],
+    const asegurados = await Persons.findAll({
+      attributes: ['id', 'xnombre', 'xapellido', 'cci_rif'],
+      include: [{
+        association: 'usuario',
+      }],
+      where: {
+        [Op.or]: {
+          '$usuario.cusuario$': null,
+          '$usuario.crol$': {
+            [Op.not]: 1
+          }
+        }
+      }
+      
     });
     const insurances = asegurados.map((item) => item.get({ plain: true }));
     return insurances;
   } catch (error) {
-    return { error: error.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 
@@ -318,7 +400,12 @@ const getCoverage = async (cramo) => {
     const coverage = coberturas.map((item) => item.get({ plain: true }));
     return coverage;
   } catch (error) {
-    return { error: error.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 
@@ -330,7 +417,12 @@ const getBank = async () => {
     const bank = bancos.map((item) => item.get({ plain: true }));
     return bank;
   } catch (error) {
-    return { error: error.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 
@@ -357,7 +449,12 @@ const getBankProductor = async (data) => {
   } catch (error) {
     console.log(error)
     console.log('await', error.parent.message)
-      return { error: error.parent.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 const getDataUser = async (data) => {
@@ -381,7 +478,12 @@ const getDataUser = async (data) => {
     });
     return user;
   } catch (error) {
-    return { error: error.message };
+    let errors = []
+    for (const errorA of await error.parent.errors) {
+      errors.push(errorA)
+    }
+    return { error: errors.join(`
+    `) };
   }
 };
 

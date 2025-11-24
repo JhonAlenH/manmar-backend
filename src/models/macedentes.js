@@ -16,7 +16,7 @@ export default class macedentes extends Model {
     },
     cpersona: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       references: {
         model: 'mapersonas',
         key: 'id'

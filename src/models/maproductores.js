@@ -17,17 +17,25 @@ export default class maproductores extends Model {
         key: 'id'
       }
     },
-    cintermediario: {
+    cusuario: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'maintermediarios',
-        key: 'id'
+        model: 'seusuarios',
+        key: 'cusuario'
       }
     },
     bactivo: {
       type: DataTypes.BOOLEAN,
       allowNull: true
+    },
+    cdatos_bancarios: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'madatos_bancarios',
+        key: 'id'
+      }
     },
     fcreacion: {
       type: DataTypes.DATE,
