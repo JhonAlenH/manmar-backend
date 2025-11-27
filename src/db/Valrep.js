@@ -448,13 +448,9 @@ const getBankProductor = async (data) => {
     return banco;
   } catch (error) {
     console.log(error)
-    console.log('await', error.parent.message)
-    let errors = []
-    for (const errorA of await error.parent.errors) {
-      errors.push(errorA)
-    }
-    return { error: errors.join(`
-    `) };
+    console.log('await', error.message)
+    
+    return { error: error};
   }
 };
 const getDataUser = async (data) => {
