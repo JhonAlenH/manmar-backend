@@ -245,7 +245,7 @@ const updateContract = async (req, res) => {
 }
 
 const searchPolicy = async (req, res) => {
-    const policy = await emissionService.searchPolicy(req.params.xpoliza);
+    const policy = await emissionService.searchPolicy(req.params.xpoliza, req.body.ccedente);
     if (policy.permissionError) {
         return res
             .status(403)

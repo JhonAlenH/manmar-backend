@@ -307,10 +307,14 @@ import nodemailer from 'nodemailer';
     }
   };
 
-const searchPolicy = async (xpoliza) => {
+const searchPolicy = async (xpoliza, ccedente) => {
   try {
+    const data = {
+      xpoliza: xpoliza,
+      ccedente: ccedente
+    }
     const producers = await Policy.findOne({
-      where:{ xpoliza: xpoliza},
+      where: data,
       attributes: ['xpoliza'],
     });
     return producers ? producers.get({ plain: true }) : {};;

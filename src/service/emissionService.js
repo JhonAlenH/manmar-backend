@@ -90,8 +90,8 @@ const updateContract = async (updateContract) => {
     return update;
 }
 
-const searchPolicy = async (xpoliza) => {
-    const policy = await Emission.searchPolicy(xpoliza);
+const searchPolicy = async (xpoliza, ccedente) => {
+    const policy = await Emission.searchPolicy(xpoliza,ccedente);
     if (policy.error) {
         return {
             error: policy.error
