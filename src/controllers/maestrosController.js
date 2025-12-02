@@ -54,7 +54,7 @@ const getMaPaises = async (req, res) => {
 }
 const getMaCiudades = async (req, res) => {
   try {
-    const gettedCiudades = await Maestros.getMaCiudades(req.params.pais, req.params.estado);
+    const gettedCiudades = await Maestros.getMaCiudades(req.params.estado);
     // console.log(gettedCiudades.result)
     if (gettedCiudades.error) {
       return res.status(gettedCiudades.code).send({
@@ -64,10 +64,11 @@ const getMaCiudades = async (req, res) => {
     }
     const formatData = gettedCiudades.result.recordset.map(item => {
       return{
-        text: item.xdescripcion_l,
+        text: item.xciudad,
         value: `${item.cciudad}`
       }
     })
+    formatData.unshift({text:'Seleccione una opcion...',value:''})
     res.status(201).send({
       status: true, 
       message: 'Ciudades Obtenidas',
@@ -78,6 +79,7 @@ const getMaCiudades = async (req, res) => {
     
   }
 }
+
 const getMaEstados = async (req, res) => {
   try {
     const gettedEstados = await Maestros.getMaEstados(req.params.pais);
@@ -94,6 +96,7 @@ const getMaEstados = async (req, res) => {
         value: `${item.cestado}`
       }
     })
+    formatData.unshift({text:'Seleccione una opcion...',value:''})
     res.status(201).send({
       status: true, 
       message: 'Estados Obtenidos',

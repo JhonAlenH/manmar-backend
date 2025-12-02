@@ -71,7 +71,7 @@ router
 .get("/marcas/get/:id", maestrosController.searchMarca)
 .post("/marcas/edit/:id", maestrosController.updateMarcas)
 
-.get("/ciudades/:estado/:pais", maestrosController.getMaCiudades)
+.get("/ciudades/:estado", maestrosController.getMaCiudades)
 .get("/estados/:pais", maestrosController.getMaEstados)
     
 
