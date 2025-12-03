@@ -105,13 +105,13 @@ const getReceipt = async (getReceipt) => {
 
     // Convertir a número
     const mprimaNumeric = parseFloat(mprimaNumericString);
-
+    console.log(getReceipt)
     try {
       let pool = await sql.connect(sqlConfig);
       let result = await pool.request()
         .input('fdesde_pol', sql.DateTime, getReceipt.fdesde)
         .input('fhasta_pol', sql.DateTime, getReceipt.fhasta)
-        .input('mprima', sql.Numeric(18, 2), mprimaNumeric) // Ahora pasa el valor numérico correcto
+        .input('mprima', sql.Numeric(18, 2), getReceipt.mprima) // Ahora pasa el valor numérico correcto
         .input('cmetodologiapago', sql.Int, getReceipt.cmetodologiapago)
         .execute('tmBRecibos');
 
