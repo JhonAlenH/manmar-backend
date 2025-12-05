@@ -85,8 +85,35 @@ const getDistribution = async (req, res) => {
         });
 }
 
+const createRenovation = async (req, res) => {
+    const reanovation = await Renovations.createRenovation(req.body,req.params.id);
+    if (reanovation.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: reanovation.permissionError
+            });
+    }
+    if (reanovation.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: reanovation.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            message: `La póliza ${req.body.xpoliza} ha sido renovada correctamente.`
+        });
+}
+
 export default {
     searchRenovations,
     getReceipt,
-    getDistribution
+    getDistribution,
+    createRenovation
 }

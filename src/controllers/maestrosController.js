@@ -187,7 +187,7 @@ const getMaBancos = async (req, res) => {
 
 const getMaMarcas = async (req, res) => {
   try {
-    const gettedMarcas = await Maestros.getMaMarcas(req.body);
+    const gettedMarcas = await Maestros.getMaMarcas();
     // console.log(gettedProveedores.result)
     if (gettedMarcas.error) {
       return res.status(gettedMarcas.code).send({
@@ -198,12 +198,69 @@ const getMaMarcas = async (req, res) => {
     const formatData = gettedMarcas.result.recordset.map(item => {
       return{
         text: item.xmarca,
-        value: `${item.id}`
+        value: `${item.cmarca}`
       }
     })
+    formatData.unshift({text:'Nueva Marca...',value:''})
     res.status(201).send({
       status: true, 
       message: 'Marcas Obtenidas',
+      data: [...formatData]
+    });
+    
+  } catch (error) {
+    
+  }
+}
+
+const getMaModelos = async (req, res) => {
+  try {
+    const gettedModelos = await Maestros.getMaModelos(req.params.cmarca);
+    // console.log(gettedProveedores.result)
+    if (gettedModelos.error) {
+      return res.status(gettedModelos.code).send({
+        status: false,
+        message: gettedModelos.error
+      });
+    }
+    const formatData = gettedModelos.result.recordset.map(item => {
+      return{
+        text: item.xmodelo,
+        value: `${item.cmodelo}`
+      }
+    })
+    formatData.unshift({text:'Nuevo Modelo...',value:''})
+    res.status(201).send({
+      status: true, 
+      message: 'Modelos Obtenidos',
+      data: [...formatData]
+    });
+    
+  } catch (error) {
+    
+  }
+}
+
+const getMaVersiones = async (req, res) => {
+  try {
+    const gettedVersiones = await Maestros.getMaVersiones(req.params.cmarca, req.params.cmodelo);
+    // console.log(gettedProveedores.result)
+    if (gettedVersiones.error) {
+      return res.status(gettedVersiones.code).send({
+        status: false,
+        message: gettedVersiones.error
+      });
+    }
+    const formatData = gettedVersiones.result.recordset.map(item => {
+      return{
+        text: item.xversion,
+        value: `${item.cversion}`
+      }
+    })
+    formatData.unshift({text:'Nueva Versión...',value:''})
+    res.status(201).send({
+      status: true, 
+      message: 'Versiones Obtenidas',
       data: [...formatData]
     });
     
@@ -371,7 +428,7 @@ const updateBancos = async (req, res) => {
 }
 
 
-const searchMetodologiapago = async (req, res) => {
+const searchMetodologiapagos = async (req, res) => {
   try {
     const metodologiapago = await Maestros.searchMetodologiapago();
     if (metodologiapago.error) {
@@ -410,7 +467,7 @@ const createMetodologiapago = async (req, res) => {
     
   }
 }
-const searchMetodologiapago1 = async (req, res) => {
+const searchMetodologiapago = async (req, res) => {
   try {
     const findedMetodologiapago = await Maestros.searchMetodologiapagoById(req.params.id);
     if (findedMetodologiapago.error) {
@@ -1096,77 +1153,77 @@ const updateRamos = async (req, res) => {
     
   }
 }
-const searchMarcas = async (req, res) => {
+const searchVehiculos = async (req, res) => {
   try {
-    const marcas = await Maestros.searchMarcas();
-    if (marcas.error) {
-      return res.status(marcas.code).send({
+    const vehiculos = await Maestros.searchVehiculos();
+    if (vehiculos.error) {
+      return res.status(vehiculos.code).send({
         status: false,
-        message: marcas.error
+        message: vehiculos.error
       });
       
     }
     res.status(201).send({
       status: true, 
-      message: 'Marcas Obtenidas',
-      data: marcas
+      message: 'Vehículos Obtenidos',
+      data: vehiculos
     });
   } catch (error){
 
   }
 }
-const createMarcas = async (req, res) => {
+const createVehiculo = async (req, res) => {
   try {
-    const createdMarcas = await Maestros.createMarcas(req.body);
-    if (createdMarcas.error) {
-      return res.status(createdMarcas.code).send({
+    const createdVehiculo = await Maestros.createVehiculo(req.body);
+    if (createdVehiculo.error) {
+      return res.status(createdVehiculo.code).send({
         status: false,
-        message: createdMarcas.error
+        message: createdVehiculo.error
       });
     }
     res.status(201).send({
       status: true, 
-      message: 'Marca Creada',
-      data: createdMarcas
+      message: 'Vehículo Creado',
+      data: createdVehiculo
     });
     
   } catch (error) {
     
   }
 }
-const searchMarca = async (req, res) => {
+const searchVehiculo = async (req, res) => {
   try {
-    const findedMarcas = await Maestros.searchMarcasById(req.params.id);
-    console.log(findedMarcas)
-    if (findedMarcas.error) {
-      return res.status(findedMarcas.code).send({
+    const findedVehiculo = await Maestros.searchVehiculoById(req.params.id);
+    console.log(findedVehiculo)
+    if (findedVehiculo.error) {
+      return res.status(findedVehiculo.code).send({
         status: false,
-        message: findedMarcas.error
+        message: findedVehiculo.error
       });
     }
     res.status(201).send({
       status: true, 
-      message: 'Marca Obtenida',
-      data: findedMarcas
+      message: 'Vehículo Obtenido',
+      data: findedVehiculo
     });
     
   } catch (error) {
     
   }
 }
-const updateMarcas = async (req, res) => {
+const updateVehiculos = async (req, res) => {
   try {
-    const updatedMarcas = await Maestros.updateMarcas(req.params.id, req.body);
-    if (updatedMarcas.error) {
-      return res.status(updatedMarcas.code).send({
+    const updatedVehiculos = await Maestros.updateVehiculos(req.params.id, req.body);
+    if (updatedVehiculos.error) {
+      return res.status(updatedVehiculos.code).send({
         status: false,
-        message: updatedMarcas.error
+        message: updatedVehiculos.error
       });
     }
     res.status(201).send({
       status: true, 
-      message: 'Marca Actualizado',
-      data: updatedMarcas
+      message: 'Vehículo Actualizado',
+      data: updatedVehiculos
     });
     
   } catch (error) {
@@ -1181,6 +1238,8 @@ export default {
   getMaCedentes,
   getMaBancos,
   getMaMarcas, 
+  getMaModelos, 
+  getMaVersiones, 
   getMaMetodologiapago, 
   searchPais,
   updatePaises,
@@ -1191,9 +1250,9 @@ export default {
   createBancos,
   searchBancos,
   updateMetodologiapago,
-  searchMetodologiapago1,
-  createMetodologiapago,
   searchMetodologiapago,
+  createMetodologiapago,
+  searchMetodologiapagos,
   createMonedas,
   searchMonedas,
   searchMoneda,
@@ -1227,8 +1286,8 @@ export default {
   searchRamos,
   searchRamo,
   updateRamos,
-  createMarcas,
-  searchMarcas,
-  searchMarca,
-  updateMarcas
+  createVehiculo,
+  searchVehiculos,
+  searchVehiculo,
+  updateVehiculos
 }

@@ -26,7 +26,7 @@ const Ejecutivos = sequelize.define('maejecutivos', {},{tableName: 'maejecutivos
 const Productores = sequelize.define('maproductores', {},{tableName: 'maproductores'});
 const Tomadores = sequelize.define('matomadores', {});
 const Ramos = sequelize.define('maramos', {});
-const Marcas = sequelize.define('mainma', {},{tableName: 'mainma'});
+const Vehiculos = sequelize.define('mainma', {},{tableName: 'mainma'});
 
 const getMaMonedas = async() => {
   try {
@@ -96,10 +96,36 @@ const getMaBancos = async(getMaBancos) => {
   }
 }
 
-const getMaMarcas = async(id) => {
+const getMaMarcas = async() => {
   try {
     let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`SELECT id, cmarca,xmarca, cmodelo,xmodelo,cversion, xversion,xtrans,xmotor,qano, npasajero from MAINMA where id = ${id.toString()}`)
+    let result = await pool.request().query(`select cmarca, xmarca from mainma group by cmarca, xmarca order by xmarca`)
+    await pool.close();
+    return { 
+      result: result
+    };
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+}
+const getMaModelos = async(cmarca) => {
+  try {
+    let pool = await sql.connect(sqlConfig);
+    let result = await pool.request().query(`select cmodelo, xmodelo from mainma where cmarca = '${cmarca}' group by cmodelo, xmodelo order by xmodelo`)
+    await pool.close();
+    return { 
+      result: result
+    };
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+}
+const getMaVersiones = async(cmarca,cmodelo) => {
+  try {
+    let pool = await sql.connect(sqlConfig);
+    let result = await pool.request().query(`select cversion, xversion from mainma where cmarca = '${cmarca}' and cmodelo = '${cmodelo}' group by cversion, xversion order by xversion`)
     await pool.close();
     return { 
       result: result
@@ -811,9 +837,9 @@ const updateRamos = async(id, data) => {
     return { error: error.message };
   }
 }
-const searchMarcas = async () => {
+const searchVehiculos = async () => {
   try {
-    const items = await Marcas.findAll({
+    const items = await Vehiculos.findAll({
       attributes: ['ccodigo','cmarca','xmarca','cmodelo', 'xmodelo','cversion','xversion','xtrans', 'xmotor','qano']
     });
     const result = items.map((item) => item.get({ plain: true }));
@@ -823,7 +849,7 @@ const searchMarcas = async () => {
     return { error: error.message };
   }
 };
-const searchMarcasById = async (id) => {
+const searchVehiculoById = async (id) => {
   try {
     let pool = await sql.connect(sqlConfig);
     let result = await pool.request().query(`SELECT ccodigo,cmarca,xmarca,cmodelo, xmodelo,cversion,xversion,xtrans, xmotor,qano from MAINMA WHERE ccodigo = ${parseInt(id)}`)
@@ -837,14 +863,40 @@ const searchMarcasById = async (id) => {
   }
 };
 
-const createMarcas = async(data) => {
+const createVehiculo = async(data) => {
+
+  const dataArray = Object.entries(data)
+  for (const item of dataArray) {
+    const key = item[0]
+    const valueNoTrimmed = item[1]
+    const value = valueNoTrimmed.split('[]')[0]
+    console.log(value)
+    if(value === ''){
+      if(key === 'cmarca') {
+        const check = await checkItem(data['xmarca'], 'xmarca', key, 'MAINMA')
+        data[key] = check.value +'[]'+ valueNoTrimmed.split('[]')[1]
+      }
+      if(key === 'cmodelo') {
+        const check = await checkItem(data['xmodelo'], 'xmodelo', key, 'MAINMA')
+        data[key] = check.value +'[]'+ valueNoTrimmed.split('[]')[1]
+      }
+      if(key === 'cversion') {
+        const check = await checkItem(data['xversion'], 'xversion', key, 'MAINMA')
+        data[key] = check.value +'[]'+ valueNoTrimmed.split('[]')[1]
+      }
+      // data[key] = check.value
+    }
+
+  }
+  console.log(data)
 
   const rData = insert.formatCreateData(data)
-
+  // checkItem(data)
   try {
     let pool = await sql.connect(sqlConfig);
     let result = await pool.request().query(`
     INSERT INTO MAINMA (${rData.keys}) VALUES (${rData.values})`)
+    
     await pool.close();
     return { 
       result: result
@@ -854,9 +906,8 @@ const createMarcas = async(data) => {
     return { error: error.message };
   }
 }
-const updateMarcas = async(id, data) => {
+const updateVehiculos = async(id, data) => {
   const rData = insert.formatEditData(data)
-
   try {
     let pool = await sql.connect(sqlConfig);
     let result = await pool.request().query(`
@@ -870,6 +921,25 @@ const updateMarcas = async(id, data) => {
     return { error: error.message };
   }
 }
+const checkItem = async(otherValue, otherKey, key, table) => {
+  try {
+    let pool = await sql.connect(sqlConfig);
+    let result = await pool.request().query(`SELECT ${key} from ${table} WHERE ${otherKey} = '${otherValue}'`)
+    console.log(result)
+    if(result.recordset.length > 0){
+      const valueReturn = result.recordset[0][key]
+      return { exists: true, value: valueReturn }
+    } else {
+      let result = await pool.request().query(`SELECT max(CAST(${key}as int)) + 1 as ${key} from ${table}`)
+      const valueReturn = result.recordset[0][key]
+      return { exists: false, value: valueReturn}
+    }
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+}
+
 export default {
   getMaMonedas,
   getMaPaises,
@@ -878,6 +948,8 @@ export default {
   getMaCedentes,
   getMaCiudades,
   getMaMarcas,
+  getMaModelos,
+  getMaVersiones,
   getMaCedentes,
   getMaMetodologiapago,
   createPaises,
@@ -925,8 +997,8 @@ export default {
   createRamos,
   updateRamos,
   searchRamosById,
-  searchMarcas,
-  createMarcas,
-  updateMarcas,
-  searchMarcasById
+  searchVehiculos,
+  createVehiculo,
+  updateVehiculos,
+  searchVehiculoById
 }

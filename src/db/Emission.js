@@ -237,7 +237,7 @@ import nodemailer from 'nodemailer';
         },
         attributes: [
           'id', 'ccedente', 'xcedente', 'casegurado', 'ctomador', 'xnombre', 
-          'cramo', 'xramo', 'xpoliza', 'fdesde_pol', 'fhasta_pol', 
+          'cramo', 'xramo', 'xpoliza', 'fdesde_pol', 'fhasta_pol', 'cproductor',
           'cmetodologiapago', 'xmetodologiapago', 'msumaext', 'msuma', 
           'mprimaext', 'mprima', 'xtomador', 'cmoneda', 'xmoneda'
         ],
