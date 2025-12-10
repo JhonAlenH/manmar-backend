@@ -24,13 +24,7 @@ import nodemailer from 'nodemailer';
       },
   });
 
-  const Tariffs = sequelize.define('maaranceles', {
-    carancel: {
-      type: Sequelize.INTEGER,
-      primaryKey: true,
-      allowNull: true,
-    },
-  });
+  const Tariffs = sequelize.define('maproductos', {});
 
   const DetailContract = sequelize.define('poVpolizasDetalle', {
     id: {
@@ -137,13 +131,10 @@ import nodemailer from 'nodemailer';
     }
   };
 
-  const getTariffs = async (getTariffs) => {
+  const getTariffs = async (data) => {
     try {
       const tariffs = await Tariffs.findOne({
-        where:{
-                ccedente: getTariffs.ccedente, 
-                cramo: getTariffs.cramo
-              },
+        where:data,
         attributes: ['pcomision'],
       });
       return tariffs ? tariffs.get({ plain: true }) : {};;

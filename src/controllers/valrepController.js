@@ -56,6 +56,34 @@ const getTrade = async (req, res) => {
         });
 }
 
+const getProduct = async (req, res) => {
+    const products = await valrepService.getProduct(req.body);
+    if (products.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: products.permissionError
+            });
+    }
+    if (products.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: products.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            data: {
+                product: products
+            }
+        });
+}
+
 const getCoins = async (req, res) => {
     const coins = await valrepService.getCoins();
     if (coins.permissionError) {
@@ -537,6 +565,7 @@ const getBankManmar = async (req, res) => {
 export default {
     getCedents,
     getTrade,
+    getProduct,
     getCoins,
     getClients,
     getBrand,

@@ -3,6 +3,7 @@ import sequelize from '../config/database.js';
 
 const Cedents = sequelize.define('macedentes', {});
 const Trade = sequelize.define('maramos', {});
+const Product = sequelize.define('maproductos', {});
 const Coin = sequelize.define('mamonedas', {});
 const Clients = sequelize.define('maclientes', {});
 const Color = sequelize.define('macolores', {});
@@ -126,6 +127,19 @@ const getTrade = async () => {
     });
     const trades = trade.map((item) => item.get({ plain: true }));
     return trades;
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+const getProduct = async (data) => {
+  try {
+    const product = await Product.findAll({
+      where: data,
+      attributes: ['id', 'xproducto'],
+    });
+    const products = product.map((item) => item.get({ plain: true }));
+    return products;
   } catch (error) {
     return { error: error.message };
   }
@@ -381,6 +395,7 @@ const getBankManmar = async () => {
 export default {
   getCedents,
   getTrade,
+  getProduct,
   getCoins,
   getClients,
   getBrand,
