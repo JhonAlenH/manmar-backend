@@ -870,32 +870,41 @@ const createVehiculo = async(data) => {
     const key = item[0]
     const valueNoTrimmed = item[1]
     const value = valueNoTrimmed.split('[]')[0]
-    console.log(value)
+
     if(value === ''){
       if(key === 'cmarca') {
-        const check = await checkItem(data['xmarca'], 'xmarca', key, 'MAINMA')
-        data[key] = check.value +'[]'+ valueNoTrimmed.split('[]')[1]
+        const check = await checkItem(data['xmarca'].split('[]')[0], 'xmarca', key, 'MAINMA')
+        if(check.error){
+          return { error: error.message };
+        } else {
+          data[key] = check.value +'[]'+ valueNoTrimmed.split('[]')[1]
+        }
       }
       if(key === 'cmodelo') {
-        const check = await checkItem(data['xmodelo'], 'xmodelo', key, 'MAINMA')
-        data[key] = check.value +'[]'+ valueNoTrimmed.split('[]')[1]
+        const check = await checkItem(data['xmodelo'].split('[]')[0], 'xmodelo', key, 'MAINMA')
+        if(check.error){
+          return { error: error.message };
+        } else {
+          data[key] = check.value +'[]'+ valueNoTrimmed.split('[]')[1]
+        }
       }
       if(key === 'cversion') {
-        const check = await checkItem(data['xversion'], 'xversion', key, 'MAINMA')
-        data[key] = check.value +'[]'+ valueNoTrimmed.split('[]')[1]
+        const check = await checkItem(data['xversion'].split('[]')[0], 'xversion', key, 'MAINMA')
+        if(check.error){
+          return { error: error.message };
+        } else {
+          data[key] = check.value +'[]'+ valueNoTrimmed.split('[]')[1]
+        }
       }
       // data[key] = check.value
     }
 
   }
-  console.log(data)
 
   const rData = insert.formatCreateData(data)
-  // checkItem(data)
   try {
     let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    INSERT INTO MAINMA (${rData.keys}) VALUES (${rData.values})`)
+    let result = await pool.request().query(`INSERT INTO MAINMA (${rData.keys}) VALUES (${rData.values})`)
     
     await pool.close();
     return { 
@@ -925,12 +934,11 @@ const checkItem = async(otherValue, otherKey, key, table) => {
   try {
     let pool = await sql.connect(sqlConfig);
     let result = await pool.request().query(`SELECT ${key} from ${table} WHERE ${otherKey} = '${otherValue}'`)
-    console.log(result)
     if(result.recordset.length > 0){
       const valueReturn = result.recordset[0][key]
       return { exists: true, value: valueReturn }
     } else {
-      let result = await pool.request().query(`SELECT max(CAST(${key}as int)) + 1 as ${key} from ${table}`)
+      let result = await pool.request().query(`SELECT (max(CAST(${key} as int)) + 1) as ${key} from ${table}`)
       const valueReturn = result.recordset[0][key]
       return { exists: false, value: valueReturn}
     }
