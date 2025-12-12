@@ -1,6 +1,7 @@
 import sql from "mssql";
 import { Sequelize, Op } from 'sequelize';
 import sequelize from '../config/database.js';
+import Emission from "./Emission.js";
 
 const sqlConfig = {
   user: process.env.USER_BD,
@@ -105,13 +106,13 @@ const getReceipt = async (getReceipt) => {
 
     // Convertir a número
     const mprimaNumeric = parseFloat(mprimaNumericString);
-
+    console.log(getReceipt)
     try {
       let pool = await sql.connect(sqlConfig);
       let result = await pool.request()
         .input('fdesde_pol', sql.DateTime, getReceipt.fdesde)
         .input('fhasta_pol', sql.DateTime, getReceipt.fhasta)
-        .input('mprima', sql.Numeric(18, 2), mprimaNumeric) // Ahora pasa el valor numérico correcto
+        .input('mprima', sql.Numeric(18, 2), getReceipt.mprima) // Ahora pasa el valor numérico correcto
         .input('cmetodologiapago', sql.Int, getReceipt.cmetodologiapago)
         .execute('tmBRecibos');
 
@@ -148,6 +149,19 @@ const getReceipt = async (getReceipt) => {
   }
 };
 
+const createRenovation = async (data,id) => {
+  try {
+    const poliza = await Emission.createContract(data);
+    if(poliza.rowsAffected[0] > 0){
+      let pool = await sql.connect(sqlConfig);
+      let result = await pool.request().query(`UPDATE popolizas SET iestado_poliza = 'R' WHERE id = ${id}`);
+    }
+    return true;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
 const getDistribution = async (id_poliza) => {
   try {
     const distribution = await Distribution.findOne({
@@ -180,5 +194,6 @@ const getDistribution = async (id_poliza) => {
 export default {
     searchRenovations,
     getReceipt,
-    getDistribution
+    getDistribution,
+    createRenovation
 }

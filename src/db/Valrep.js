@@ -109,6 +109,19 @@ const getTrade = async () => {
   }
 };
 
+const getProduct = async (data) => {
+  try {
+    const product = await Product.findAll({
+      where: data,
+      attributes: ['id', 'xproducto'],
+    });
+    const products = product.map((item) => item.get({ plain: true }));
+    return products;
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
 const getCoins = async () => {
   try {
     const coin = await Coin.findAll({
@@ -486,6 +499,7 @@ const getDataUser = async (data) => {
 export default {
   getCedents,
   getTrade,
+  getProduct,
   getCoins,
   getClients,
   getBrand,

@@ -20,6 +20,16 @@ const getTrade = async () => {
     return trades;
 }
 
+const getProduct = async (data) => {
+    const products = await Valrep.getProduct(data);
+    if (products.error) {
+        return {
+            error: products.error
+        }
+    }
+    return products;
+}
+
 const getCoins = async () => {
     const coins = await Valrep.getCoins();
     if (coins.error) {
@@ -198,6 +208,7 @@ const getDataUser = async (body) => {
 export default {
     getCedents,
     getTrade,
+    getProduct,
     getCoins,
     getClients,
     getBrand,

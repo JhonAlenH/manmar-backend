@@ -24,13 +24,7 @@ const models = initModels(sequelize)
       },
   });
 
-  const Tariffs = sequelize.define('maaranceles', {
-    carancel: {
-      type: Sequelize.INTEGER,
-      primaryKey: true,
-      allowNull: true,
-    },
-  });
+  const Tariffs = sequelize.define('maproductos', {});
 
   const DetailContract = sequelize.define('poVpolizasDetalle', {
     id: {
@@ -137,13 +131,10 @@ const models = initModels(sequelize)
     }
   };
 
-  const getTariffs = async (getTariffs) => {
+  const getTariffs = async (data) => {
     try {
       const tariffs = await Tariffs.findOne({
-        where:{
-                ccedente: getTariffs.ccedente, 
-                cramo: getTariffs.cramo
-              },
+        where:data,
         attributes: ['pcomision'],
       });
       return tariffs ? tariffs.get({ plain: true }) : {};;
@@ -243,8 +234,8 @@ const models = initModels(sequelize)
           id: id
         },
         attributes: [
-          'id', 'ccedente', 'xcedente', 'casegurado', 'xnombre', 
-          'cramo', 'xramo', 'xpoliza', 'fdesde_pol', 'fhasta_pol', 
+          'id', 'ccedente', 'xcedente', 'casegurado', 'ctomador', 'xnombre', 
+          'cramo', 'xramo', 'xpoliza', 'fdesde_pol', 'fhasta_pol', 'cproductor',
           'cmetodologiapago', 'xmetodologiapago', 'msumaext', 'msuma', 
           'mprimaext', 'mprima', 'xtomador', 'cmoneda', 'xmoneda'
         ],
@@ -314,10 +305,14 @@ const models = initModels(sequelize)
     }
   };
 
-const searchPolicy = async (xpoliza) => {
+const searchPolicy = async (xpoliza, ccedente) => {
   try {
+    const data = {
+      xpoliza: xpoliza,
+      ccedente: ccedente
+    }
     const producers = await Policy.findOne({
-      where:{ xpoliza: xpoliza},
+      where: data,
       attributes: ['xpoliza'],
     });
     return producers ? producers.get({ plain: true }) : {};;

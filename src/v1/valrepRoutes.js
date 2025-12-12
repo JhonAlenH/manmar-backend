@@ -8,6 +8,7 @@ router
 
     .post("/cedents", valrepController.getCedents)
     .post("/trade", valrepController.getTrade)
+    .post("/product", valrepController.getProduct)
     .post("/coins", valrepController.getCoins)
     .post("/clients", valrepController.getClients)
     .post("/takers", valrepController.getTakers)

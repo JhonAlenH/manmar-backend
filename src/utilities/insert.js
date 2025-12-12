@@ -1,10 +1,9 @@
 
-const formatCreateData = (data) => {
+  const formatCreateData = (data) => {
     var keys = Object.keys(data)
     var valuesAndTypes = Object.values(data)
     var values = []
-    var i = 0
-  
+    var i = 0  
   
     for (const value of valuesAndTypes) {
       const valueSplited = value.split('[]')

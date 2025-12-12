@@ -15,9 +15,9 @@ router
 .get("/paises/get/:id", maestrosController.searchPais)
 .post("/paises/edit/:id", maestrosController.updatePaises)
 
-.post("/metodologiapago/search", maestrosController.searchMetodologiapago)
+.post("/metodologiapago/search", maestrosController.searchMetodologiapagos)
 .post("/metodologiapago/create", maestrosController.createMetodologiapago)
-.get("/metodologiapago/get/:id", maestrosController.searchMetodologiapago1)
+.get("/metodologiapago/get/:id", maestrosController.searchMetodologiapago)
 .post("/metodologiapago/edit/:id", maestrosController.updateMetodologiapago)
 
 .post("/monedas/search", maestrosController.searchMonedas)
@@ -25,10 +25,20 @@ router
 .get("/monedas/get/:id", maestrosController.searchMoneda)
 .post("/monedas/edit/:id", maestrosController.updateMonedas)
 
+// Rutas para obtener los maestros en formulario de item
 .post("/paises", maestrosController.getMaPaises)
 .post("/bancos", maestrosController.getMaBancos)
 .get("/metodologiapago", maestrosController.getMaMetodologiapago)
 .post("/monedas", maestrosController.getMaMonedas)
+.get("/ejecutivos/searchMaestros", maestrosController.searchEjecutivosMaestros)
+
+.get("/ciudades/:estado", maestrosController.getMaCiudades)
+.get("/estados/:pais", maestrosController.getMaEstados)
+
+.get("/marcas", maestrosController.getMaMarcas)
+.get("/modelos/:cmarca", maestrosController.getMaModelos)
+.get("/versiones/:cmarca/:cmodelo", maestrosController.getMaVersiones)
+// 
 
 .post("/cedentes/search", maestrosController.searchCedentes)
 .post("/cedentes/create", maestrosController.createCedentes)
@@ -49,7 +59,7 @@ router
 .post("/ejecutivos/create", maestrosController.createEjecutivos)
 .get("/ejecutivos/get/:id", maestrosController.searchEjecutivo)
 .post("/ejecutivos/edit/:id", maestrosController.updateEjecutivos)
-.get("/ejecutivos/searchMaestros", maestrosController.searchEjecutivosMaestros)
+
 
 .post("/productores/search", maestrosController.searchProductores)
 .post("/productores/create", maestrosController.createProductores)
@@ -66,13 +76,13 @@ router
 .get("/ramos/get/:id", maestrosController.searchRamo)
 .post("/ramos/edit/:id", maestrosController.updateRamos)
 
-.post("/marcas/search", maestrosController.searchMarcas)
-.post("/marcas/create", maestrosController.createMarcas)
-.get("/marcas/get/:id", maestrosController.searchMarca)
-.post("/marcas/edit/:id", maestrosController.updateMarcas)
+//Rutas de Vehiculos (Luego Cambio marcas por vehiculos)
+.post("/vehiculos/search", maestrosController.searchVehiculos)
+.post("/vehiculos/create", maestrosController.createVehiculo)
+.get("/vehiculos/get/:id", maestrosController.searchVehiculo)
+.post("/vehiculos/edit/:id", maestrosController.updateVehiculos)
+// 
 
-.get("/ciudades/:estado/:pais", maestrosController.getMaCiudades)
-.get("/estados/:pais", maestrosController.getMaEstados)
     
 
 

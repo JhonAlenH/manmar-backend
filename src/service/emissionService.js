@@ -30,8 +30,8 @@ const getProducers = async () => {
     return producers;
 }
 
-const getTariffs = async (getTariffs) => {
-    const tariffs = await Emission.getTariffs(getTariffs);
+const getTariffs = async (data) => {
+    const tariffs = await Emission.getTariffs(data);
     if (tariffs.error) {
         return {
             error: tariffs.error
@@ -90,8 +90,8 @@ const updateContract = async (updateContract) => {
     return update;
 }
 
-const searchPolicy = async (xpoliza) => {
-    const policy = await Emission.searchPolicy(xpoliza);
+const searchPolicy = async (xpoliza, ccedente) => {
+    const policy = await Emission.searchPolicy(xpoliza,ccedente);
     if (policy.error) {
         return {
             error: policy.error
