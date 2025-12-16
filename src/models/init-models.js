@@ -6,7 +6,6 @@ import _auoperaciones from  "./auoperaciones.js";
 import _cbcierre from  "./cbcierre.js";
 import _cbcomisiones from  "./cbcomisiones.js";
 import _cbmovientos_cbcomisiones from  "./cbmovientos_cbcomisiones.js";
-import _macedentes_maproductores from  "./macedentes_maproductores.js";
 import _cbmovimientos from  "./cbmovimientos.js";
 import _cbrecibos from  "./cbrecibos.js";
 import _insconfig from  "./insconfig.js";
@@ -14,11 +13,13 @@ import _maaranceles from  "./maaranceles.js";
 import _maasegurados from  "./maasegurados.js";
 import _mabancos from  "./mabancos.js";
 import _macedentes from  "./macedentes.js";
+import _macedentes_maproductores from  "./macedentes_maproductores.js";
 import _maciudades from  "./maciudades.js";
 import _macoberturas from  "./macoberturas.js";
 import _macolores from  "./macolores.js";
 import _macontadores from  "./macontadores.js";
 import _madatos_bancarios from  "./madatos_bancarios.js";
+import _madatos_poliza from  "./madatos_poliza.js";
 import _maestados from  "./maestados.js";
 import _mainma from  "./mainma.js";
 import _maintermediarios from  "./maintermediarios.js";
@@ -56,7 +57,6 @@ export default function initModels(sequelize) {
   const cbcierre = _cbcierre.init(sequelize, DataTypes);
   const cbcomisiones = _cbcomisiones.init(sequelize, DataTypes);
   const cbmovientos_cbcomisiones = _cbmovientos_cbcomisiones.init(sequelize, DataTypes);
-  const macedentes_maproductores = _macedentes_maproductores.init(sequelize, DataTypes);
   const cbmovimientos = _cbmovimientos.init(sequelize, DataTypes);
   const cbrecibos = _cbrecibos.init(sequelize, DataTypes);
   const insconfig = _insconfig.init(sequelize, DataTypes);
@@ -64,11 +64,13 @@ export default function initModels(sequelize) {
   const maasegurados = _maasegurados.init(sequelize, DataTypes);
   const mabancos = _mabancos.init(sequelize, DataTypes);
   const macedentes = _macedentes.init(sequelize, DataTypes);
+  const macedentes_maproductores = _macedentes_maproductores.init(sequelize, DataTypes);
   const maciudades = _maciudades.init(sequelize, DataTypes);
   const macoberturas = _macoberturas.init(sequelize, DataTypes);
   const macolores = _macolores.init(sequelize, DataTypes);
   const macontadores = _macontadores.init(sequelize, DataTypes);
   const madatos_bancarios = _madatos_bancarios.init(sequelize, DataTypes);
+  const madatos_poliza = _madatos_poliza.init(sequelize, DataTypes);
   const maestados = _maestados.init(sequelize, DataTypes);
   const mainma = _mainma.init(sequelize, DataTypes);
   const maintermediarios = _maintermediarios.init(sequelize, DataTypes);
@@ -101,20 +103,33 @@ export default function initModels(sequelize) {
 
   maprocesos.belongsTo(auoperaciones, { as: "operaciones", foreignKey: "id"});
   auoperaciones.hasOne(maprocesos, { as: "proceso", foreignKey: "id"});
+  cbcomisiones.belongsTo(cbmovimientos, { as: "movimiento", foreignKey: "cmovimiento"});
+  cbmovimientos.hasMany(cbcomisiones, { as: "comisiones", foreignKey: "cmovimiento"});
+  cbrecibos.belongsTo(cbmovimientos, { as: "movimiento", foreignKey: "cmovimiento"});
+  cbmovimientos.hasMany(cbrecibos, { as: "recibos", foreignKey: "cmovimiento"});
+  cbcomisiones.belongsTo(cbrecibos, { as: "crecibo_cbrecibo", foreignKey: "crecibo"});
+  cbcomisiones.belongsTo(cbrecibos, { as: "recibo", foreignKey: "crecibo"});
+  cbrecibos.hasMany(cbcomisiones, { as: "comisiones", foreignKey: "crecibo"});
   madatos_bancarios.belongsTo(mabancos, { as: "banco", foreignKey: "cbanco"});
   mabancos.hasMany(madatos_bancarios, { as: "datos_bancarios", foreignKey: "cbanco"});
+  madatos_poliza.belongsTo(macedentes, { as: "cedente", foreignKey: "ccedente"});
+  macedentes.hasMany(madatos_poliza, { as: "datos_polizas", foreignKey: "ccedente"});
   maproductos.belongsTo(macedentes, { as: "cedente", foreignKey: "ccedente"});
   macedentes.hasMany(maproductos, { as: "productos", foreignKey: "ccedente"});
-  popolizas.belongsTo(macedentes, { as: "cedente", foreignKey: "ccedente"});
-  macedentes.hasMany(popolizas, { as: "polizas", foreignKey: "ccedente"});
+  maproductos.belongsTo(maramos, { as: "ramo", foreignKey: "cramo"});
+  maramos.hasMany(maproductos, { as: "productos", foreignKey: "cramo"});
   mapersonas.belongsTo(maciudades, { as: "ciudad", foreignKey: "cciudad"});
   maciudades.hasMany(mapersonas, { as: "personas", foreignKey: "cciudad"});
   maproductores.belongsTo(madatos_bancarios, { as: "datos_bancarios", foreignKey: "cdatos_bancarios"});
-  madatos_bancarios.hasMany(maproductores, { as: "productores", foreignKey: "cdatos_bancarios"});
+  madatos_bancarios.hasOne(maproductores, { as: "productor", foreignKey: "cdatos_bancarios"});
+  popolizas.belongsTo(madatos_poliza, { as: "datos_poliza", foreignKey: "cdatos_poliza"});
+  madatos_poliza.hasMany(popolizas, { as: "polizas", foreignKey: "cdatos_poliza"});
   maciudades.belongsTo(maestados, { as: "estado", foreignKey: "cestado"});
   maestados.hasMany(maciudades, { as: "ciudades", foreignKey: "cestado"});
   popolizas.belongsTo(mametodologiapago, { as: "metodologia_pago", foreignKey: "cmetodologiapago"});
   mametodologiapago.hasMany(popolizas, { as: "polizas", foreignKey: "cmetodologiapago"});
+  cbcomisiones.belongsTo(mamonedas, { as: "moneda", foreignKey: "cmoneda"});
+  mamonedas.hasMany(cbcomisiones, { as: "comisiones", foreignKey: "cmoneda"});
   maproductos.belongsTo(mamonedas, { as: "moneda", foreignKey: "cmoneda"});
   mamonedas.hasMany(maproductos, { as: "productos", foreignKey: "cmoneda"});
   popolizas.belongsTo(mamonedas, { as: "moneda", foreignKey: "cmoneda"});
@@ -122,32 +137,32 @@ export default function initModels(sequelize) {
   maestados.belongsTo(mapaises, { as: "pais", foreignKey: "cpais"});
   mapaises.hasMany(maestados, { as: "estados", foreignKey: "cpais"});
   cbmovimientos.belongsTo(mapersonas, { as: "tomador", foreignKey: "ctomador"});
-  mapersonas.hasMany(cbmovimientos, { as: "movimientos_tomador", foreignKey: "ctomador"});
+  mapersonas.hasMany(cbmovimientos, { as: "tomador_movimientos", foreignKey: "ctomador"});
   macedentes.belongsTo(mapersonas, { as: "persona", foreignKey: "cpersona"});
   mapersonas.hasOne(macedentes, { as: "cedente", foreignKey: "cpersona"});
-  popolizas.belongsTo(mapersonas, { as: "asegurado", foreignKey: "casegurado"});
-  mapersonas.hasMany(popolizas, { as: "polizas_asegurado", foreignKey: "casegurado"});
-  popolizas.belongsTo(mapersonas, { as: "tomador", foreignKey: "ctomador"});
-  mapersonas.hasMany(popolizas, { as: "polizas_tomador", foreignKey: "ctomador"});
+  madatos_poliza.belongsTo(mapersonas, { as: "asegurado", foreignKey: "casegurado"});
+  mapersonas.hasMany(madatos_poliza, { as: "asegurado_datos_polizas", foreignKey: "casegurado"});
+  madatos_poliza.belongsTo(mapersonas, { as: "tomador", foreignKey: "ctomador"});
+  mapersonas.hasMany(madatos_poliza, { as: "tomador_datos_polizas", foreignKey: "ctomador"});
   seusuarios.belongsTo(mapersonas, { as: "persona", foreignKey: "cpersona"});
   mapersonas.hasOne(seusuarios, { as: "usuario", foreignKey: "cpersona"});
+  cbcomisiones.belongsTo(maproductores, { as: "productor", foreignKey: "cproductor"});
+  maproductores.hasMany(cbcomisiones, { as: "comisiones", foreignKey: "cproductor"});
   insconfig.belongsTo(maproductores, { as: "productor", foreignKey: "cproductor"});
-  maproductores.hasMany(insconfig, { as: "ins_config", foreignKey: "cproductor"});
+  maproductores.hasMany(insconfig, { as: "configs", foreignKey: "cproductor"});
+  madatos_poliza.belongsTo(maproductores, { as: "productor", foreignKey: "cproductor"});
+  maproductores.hasMany(madatos_poliza, { as: "datos_polizas", foreignKey: "cproductor"});
   maproductos.belongsTo(maproductores, { as: "productor", foreignKey: "cproductor"});
   maproductores.hasMany(maproductos, { as: "productos", foreignKey: "cproductor"});
-  popolizas.belongsTo(maproductores, { as: "productor", foreignKey: "cproductor"});
-  maproductores.hasMany(popolizas, { as: "polizas", foreignKey: "cproductor"});
-  popolizas.belongsTo(maproductores, { as: "productor_emisor", foreignKey: "cproductor_emisor"});
-  maproductores.hasMany(popolizas, { as: "popolizas_productor_emisor", foreignKey: "cproductor_emisor"});
+  popolizas.belongsTo(maproductores, { as: "productor_convenio", foreignKey: "cproductor_convenio"});
+  maproductores.hasMany(popolizas, { as: "polizas_convenio", foreignKey: "cproductor_convenio"});
   seusuarios.belongsTo(maproductores, { as: "productor", foreignKey: "cproductor"});
   maproductores.hasMany(seusuarios, { as: "usuarios", foreignKey: "cproductor"});
   popolizas.belongsTo(maproductos, { as: "producto", foreignKey: "cproducto"});
   maproductos.hasMany(popolizas, { as: "polizas", foreignKey: "cproducto"});
-  maproductos.belongsTo(maramos, { as: "ramo", foreignKey: "cramo"});
-  maramos.hasMany(maproductos, { as: "productos", foreignKey: "cramo"});
-  popolizas.belongsTo(maramos, { as: "ramo", foreignKey: "cramo"});
-  maramos.hasMany(popolizas, { as: "polizas", foreignKey: "cramo"});
-  maintermediarios.belongsTo(matipo_intermediario, { as: "tipo", foreignKey: "ctipo"});
+  madatos_poliza.belongsTo(maramos, { as: "ramo", foreignKey: "cramo"});
+  maramos.hasMany(madatos_poliza, { as: "datos_polizas", foreignKey: "cramo"});
+  maintermediarios.belongsTo(matipo_intermediario, { as: "tipo_intermediario", foreignKey: "ctipo"});
   matipo_intermediario.hasMany(maintermediarios, { as: "intermediarios", foreignKey: "ctipo"});
   maproductores.belongsTo(matipo_produc, { as: "tipo_productor", foreignKey: "ctipo_productor"});
   matipo_produc.hasMany(maproductores, { as: "productores", foreignKey: "ctipo_productor"});
@@ -169,16 +184,6 @@ export default function initModels(sequelize) {
   seusuarios.belongsToMany(sesubmenu, { through: semenuconfig, as: "submenus", foreignKey: "cusuario", otherKey: "csubmenu"});
   sesubmenu.belongsToMany(seusuarios, { through: semenuconfig, as: "usuarios", foreignKey: "csubmenu", otherKey: "cusuario"});
 
-  // serol.hasMany(serol_sesubmenu, { as: "serol_sesubmenus", foreignKey: "crol"});
-  // serol_sesubmenu.belongsTo(serol, { as: "crol_serol", foreignKey: "crol"});
-  // serol_sesubmenu.belongsTo(sesubmenu, { as: "csubmenu_sesubmenu", foreignKey: "csubmenu"});
-  // sesubmenu.hasMany(serol_sesubmenu, { as: "serol_sesubmenus", foreignKey: "csubmenu"});
-
-  // sesubmenu.hasMany(semenuconfig, { as: "semenuconfigs", foreignKey: "csubmenu"});
-  // semenuconfig.belongsTo(sesubmenu, { as: "csubmenu_sesubmenu", foreignKey: "csubmenu"});
-  // semenuconfig.belongsTo(seusuarios, { as: "cusuario_seusuario", foreignKey: "cusuario"});
-  // seusuarios.hasMany(semenuconfig, { as: "semenuconfigs", foreignKey: "cusuario"});
-
   return {
     adfdcaja,
     adpresupuesto,
@@ -186,7 +191,6 @@ export default function initModels(sequelize) {
     cbcierre,
     cbcomisiones,
     cbmovientos_cbcomisiones,
-    macedentes_maproductores,
     cbmovimientos,
     cbrecibos,
     insconfig,
@@ -194,11 +198,13 @@ export default function initModels(sequelize) {
     maasegurados,
     mabancos,
     macedentes,
+    macedentes_maproductores,
     maciudades,
     macoberturas,
     macolores,
     macontadores,
     madatos_bancarios,
+    madatos_poliza,
     maestados,
     mainma,
     maintermediarios,

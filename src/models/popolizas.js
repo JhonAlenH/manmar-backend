@@ -5,43 +5,20 @@ export default class popolizas extends Model {
   static init(sequelize, DataTypes) {
   return sequelize.define('popolizas', {
     id: {
-      type: DataTypes.DECIMAL(18,0),
+      autoIncrement: true,
+      type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    ccedente: {
+    cdatos_poliza: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'macedentes',
-        key: 'ccedente'
-      }
-    },
-    casegurado: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'mapersonas',
+        model: 'madatos_poliza',
         key: 'id'
       }
     },
-    ctomador: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'mapersonas',
-        key: 'id'
-      }
-    },
-    cproductor: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'maproductores',
-        key: 'cproductor'
-      }
-    },
-    cproductor_emisor: {
+    cproductor_convenio: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
@@ -55,14 +32,6 @@ export default class popolizas extends Model {
       references: {
         model: 'mamonedas',
         key: 'cmoneda'
-      }
-    },
-    cramo: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'maramos',
-        key: 'cramo'
       }
     },
     xpoliza: {

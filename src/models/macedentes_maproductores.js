@@ -12,11 +12,19 @@ export default class macedentes_maproductores extends Model {
     },
     ccedente: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: true,
+      references: {
+        model: 'macedentes',
+        key: 'ccedente'
+      }
     },
     cproductor: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: true,
+      references: {
+        model: 'maproductores',
+        key: 'cproductor'
+      }
     }
   }, {
     tableName: 'macedentes_maproductores',

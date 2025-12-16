@@ -26,23 +26,9 @@ const models = initModels(sequelize)
 
   const Tariffs = sequelize.define('maproductos', {});
 
-  const DetailContract = sequelize.define('poVpolizasDetalle', {
-    id: {
-      type: Sequelize.INTEGER,
-      primaryKey: true,
-      allowNull: true,
-    },
-  }, {tableName: 'poVpolizasDetalle'});
 
-  const Contracts = sequelize.define('poVpolizas', {});
-
-  const Policy = sequelize.define('poVpolizasDetalle', {
-    id: {
-      type: Sequelize.INTEGER,
-      primaryKey: true,
-      allowNull: true,
-    },
-  }, {tableName: 'poVpolizasDetalle'});
+  const Policy = models.madatos_poliza
+  const Contract = models.popolizas
 
   const Abonos = sequelize.define('cbmovimientos', {
     id: {
@@ -61,7 +47,7 @@ const models = initModels(sequelize)
   }, {tableName: 'cbVmovimientos'});
 
 
-  const Receipt = sequelize.define('cbrecibos', {});
+  const Receipt = models.cbrecibos;
 
   const Complement = sequelize.define('cbmovimientos', {});
 
@@ -153,10 +139,15 @@ const models = initModels(sequelize)
         whereClause.cramo = data.cramo;
       }
       
-      const contratos = await models.popolizas.findAll({
+      const contratos = await Policy.findAll({
         where: whereClause,
-        attributes: ['id', 'xpoliza', 'fdesde', 'fhasta'],
+        attributes: ['id', 'xpoliza'],
         include: [
+          {
+            association: 'polizas',
+            order: [['fdesde', 'desc']]
+          },
+          'polizas',
           'ramo',
           'asegurado',
           {
@@ -170,7 +161,7 @@ const models = initModels(sequelize)
       const contracts = contratos.map((item) => item.get({ plain: true }));
       return contracts;
     } catch (error) {
-      console.log(error.message)
+      console.log(error)
       return { error: error.message };
     }
   };
@@ -229,16 +220,44 @@ const models = initModels(sequelize)
 
   const detailContract = async (id) => {
     try {
-      const contract = await DetailContract.findOne({
+      const contract = await Policy.findOne({
         where: {
           id: id
         },
         attributes: [
-          'id', 'ccedente', 'xcedente', 'casegurado', 'ctomador', 'xnombre', 
-          'cramo', 'xramo', 'xpoliza', 'fdesde_pol', 'fhasta_pol', 'cproductor',
-          'cmetodologiapago', 'xmetodologiapago', 'msumaext', 'msuma', 
-          'mprimaext', 'mprima', 'xtomador', 'cmoneda', 'xmoneda'
+          'id', 'xpoliza', 'iestado', 'fcreacion',
         ],
+        include: [
+          {
+            association: 'cedente', attributes: ['ccedente'],
+            include: [{association: 'persona', attributes: ['xnombre']}],
+          },
+          {
+            association: 'polizas', attributes: ['id', 'mprimaext', 'mprima', 'fdesde', 'fhasta','iestado'],
+            include: [
+              {
+                association: 'producto', attributes: ['id', 'xproducto'],
+                include: [
+                  {association: 'ramo', attributes: ['id', 'xramo']},
+                ]
+              },
+              {association: 'recibos', attributes: ['crecibo', 'ncuota', 'iestadorec', 'fcobro', 'mprimaext', 'mprima']},
+              {association: 'metodologia_pago', attributes: ['cmetodologiapago', 'xmetodologiapago']},
+              {association: 'moneda', attributes: ['cmoneda', 'xmoneda', 'xrepresentacion']},
+            ]
+          },
+          {association: 'asegurado', attributes: ['id', 'cci_rif','xnombre', 'xapellido']},
+          {association: 'tomador', attributes: ['id', 'cci_rif','xnombre', 'xapellido']},
+          {
+            association: 'productor', attributes: ['cproductor'],
+            include: [{
+              association: 'usuario', attributes: ['cusuario'],
+              include: [
+                {association: 'persona',  attributes: ['xnombre']}
+              ]
+            }],
+          },
+        ]
       });
       return contract ? contract.get({ plain: true }) : {};;
     } catch (error) {
@@ -325,8 +344,8 @@ const searchReceipt = async (id) => {
   try {
     const recibos = await Receipt.findAll({
       where:{ id_poliza: id},
-      attributes: ['nrecibo', 'fdesde_rec', 'fhasta_rec', 'mprimaext', 'fcobro', 'id_poliza', 'mcomisionext',
-        'fcobrorec', 'iestadorec', 'crecibo', 'xruta_rec'
+      attributes: ['ncuota', 'fdesde_rec', 'fhasta_rec', 'mprimaext', 'fcobro', 'id_poliza', 'mcomisionext',
+        'fcobro', 'iestadorec', 'crecibo'
       ],
     });
     const receipt = recibos.map((item) => item.get({ plain: true }));

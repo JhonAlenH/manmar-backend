@@ -46,6 +46,10 @@ export default class mapersonas extends Model {
       type: DataTypes.CHAR(1),
       allowNull: true
     },
+    itipo_persona: {
+      type: DataTypes.CHAR(1),
+      allowNull: true
+    },
     cciudad: {
       type: DataTypes.INTEGER,
       allowNull: true,

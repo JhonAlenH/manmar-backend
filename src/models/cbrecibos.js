@@ -14,7 +14,7 @@ export default class cbrecibos extends Model {
       allowNull: true
     },
     id_poliza: {
-      type: DataTypes.DECIMAL(18,0),
+      type: DataTypes.INTEGER,
       allowNull: true,
       references: {
         model: 'popolizas',
@@ -22,10 +22,6 @@ export default class cbrecibos extends Model {
       }
     },
     ctomador: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    },
-    cramo: {
       type: DataTypes.INTEGER,
       allowNull: true
     },
@@ -76,6 +72,14 @@ export default class cbrecibos extends Model {
     mimpuestoext: {
       type: DataTypes.DECIMAL(18,2),
       allowNull: true
+    },
+    cmovimiento: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'cbmovimientos',
+        key: 'id'
+      }
     },
     fcobro: {
       type: DataTypes.DATE,

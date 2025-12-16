@@ -1,37 +1,25 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class maproductos extends Model {
+export default class madatos_poliza extends Model {
   static init(sequelize, DataTypes) {
-  return sequelize.define('maproductos', {
+  return sequelize.define('madatos_poliza', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    xproducto: {
-      type: DataTypes.STRING(100),
+    xpoliza: {
+      type: DataTypes.STRING(150),
       allowNull: true
     },
-    cmoneda: {
+    casegurado: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'mamonedas',
-        key: 'cmoneda'
-      }
-    },
-    cramo: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    },
-    cproductor: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'maproductores',
-        key: 'cproductor'
+        model: 'mapersonas',
+        key: 'id'
       }
     },
     ccedente: {
@@ -42,16 +30,36 @@ export default class maproductos extends Model {
         key: 'ccedente'
       }
     },
-    pcomision: {
-      type: DataTypes.DECIMAL(18,2),
-      allowNull: true
+    cproductor: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'maproductores',
+        key: 'cproductor'
+      }
     },
-    bactivo: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true
+    ctomador: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'mapersonas',
+        key: 'id'
+      }
+    },
+    cramo: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'maramos',
+        key: 'id'
+      }
     },
     fcreacion: {
       type: DataTypes.DATEONLY,
+      allowNull: true
+    },
+    iestado: {
+      type: DataTypes.BOOLEAN,
       allowNull: true
     },
     cusuario_creacion: {
@@ -59,12 +67,12 @@ export default class maproductos extends Model {
       allowNull: true
     }
   }, {
-    tableName: 'maproductos',
+    tableName: 'madatos_poliza',
     schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PK_maproductos",
+        name: "PK_madatos_poliza",
         unique: true,
         fields: [
           { name: "id" },

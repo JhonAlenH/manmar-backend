@@ -88,6 +88,7 @@ const getCedents = async (data) => {
     const cedents = productor.cedentes;
     return cedents;
   } catch (error) {
+    console.log(error)
     return { error: await error.parent.message };
   }
 };

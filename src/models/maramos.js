@@ -4,11 +4,15 @@ const { Model, Sequelize } = _sequelize;
 export default class maramos extends Model {
   static init(sequelize, DataTypes) {
   return sequelize.define('maramos', {
-    cramo: {
+    id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
+    },
+    cramo: {
+      type: DataTypes.INTEGER,
+      allowNull: false
     },
     xramo: {
       type: DataTypes.STRING(250),
@@ -32,10 +36,10 @@ export default class maramos extends Model {
     timestamps: false,
     indexes: [
       {
-        name: "maramos_pk",
+        name: "PK_maramos",
         unique: true,
         fields: [
-          { name: "cramo" },
+          { name: "id" },
         ]
       },
     ]
