@@ -50,6 +50,11 @@ router
 .get("/asegurados/get/:id", maestrosController.searchAsegurado)
 .post("/asegurados/edit/:id", maestrosController.updateAsegurados)
 
+.post("/clientes/search", maestrosController.searchClientes)
+.post("/clientes/create", maestrosController.createCliente)
+.get("/clientes/get/:id", maestrosController.searchCliente)
+.post("/clientes/edit/:id", maestrosController.updateCliente)
+
 .post("/agentes/search", maestrosController.searchAgentes)
 .post("/agentes/create", maestrosController.createAgentes)
 .get("/agentes/get/:id", maestrosController.searchAgente)

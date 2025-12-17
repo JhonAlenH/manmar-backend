@@ -233,7 +233,9 @@ const models = initModels(sequelize)
             include: [{association: 'persona', attributes: ['xnombre']}],
           },
           {
-            association: 'polizas', attributes: ['id', 'mprimaext', 'mprima', 'fdesde', 'fhasta','iestado'],
+            association: 'polizas', attributes: [
+              'id', 'mprimaext', 'mprima', 'msumaext', 'msuma', 'fdesde', 'fhasta','iestado',
+            ],
             include: [
               {
                 association: 'producto', attributes: ['id', 'xproducto'],
@@ -241,7 +243,9 @@ const models = initModels(sequelize)
                   {association: 'ramo', attributes: ['id', 'xramo']},
                 ]
               },
-              {association: 'recibos', attributes: ['crecibo', 'ncuota', 'iestadorec', 'fcobro', 'mprimaext', 'mprima']},
+              {association: 'recibos', attributes: [
+                'crecibo', 'ncuota', 'iestadorec', 'fcobro', 'mprimaext', 'mprima', 'pcomision', 'mcomisionext','mcomision','fdesde_rec', 'fhasta_rec', 'iestadorec'
+              ]},
               {association: 'metodologia_pago', attributes: ['cmetodologiapago', 'xmetodologiapago']},
               {association: 'moneda', attributes: ['cmoneda', 'xmoneda', 'xrepresentacion']},
             ]

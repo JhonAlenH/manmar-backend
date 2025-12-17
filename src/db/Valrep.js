@@ -1,4 +1,4 @@
-import { Sequelize, DataTypes, Op } from 'sequelize';
+import { Sequelize, DataTypes, Op, where } from 'sequelize';
 import sequelize from '../config/database.js';
 import initModels  from "../models/init-models.js";
 const models = initModels(sequelize)
@@ -7,12 +7,15 @@ const models = initModels(sequelize)
 const Trade =  models.maramos //sequelize.define('maramos', {});
 const User = models.seusuarios
 const Coin =  models.mamonedas //sequelize.define('mamonedas', {});
-const Clients = sequelize.define('maclientes', {});
+const Clients = models.mapersonas;
 const Color = models.macolores //sequelize.define('macolores', {});
 const Payment = models.mametodologiapago //sequelize.define('mametodologiapago', {}, { tableName: 'mametodologiapago' });
 const Intermediaries = models.maintermediarios //sequelize.define('mametodologiapago', {}, { tableName: 'mametodologiapago' });
 const Executive = sequelize.define('maejecutivos', {});
 const Agents = sequelize.define('maagentes', {});
+const Producers = models.maproductores //sequelize.define('maasegurados', {});
+const Products = models.maproductos //sequelize.define('maasegurados', {});
+const Cedents = models.macedentes //sequelize.define('maasegurados', {});
 const Insurance = models.mapersonas //sequelize.define('maasegurados', {});
 const Persons = models.mapersonas //sequelize.define('maasegurados', {});
 const Bank = models.mabancos //sequelize.define('mabancos', {});
@@ -72,20 +75,14 @@ const Coverage = models.macoberturas
 
 const getCedents = async (data) => {
   try {
-    const productor = await models.maproductores.findOne({
-      where: data,
-      attributes: ['cproductor'],
+    const cedentes = await Cedents.findAll({
+      attributes: ['ccedente'],
       include: [
-        {
-          association: 'cedentes',
-          include: ['persona']
-        },
-        
-      ],
-      
+        {association: 'productores', attributes: [], where: data},
+        {association: 'persona', attributes: ['xnombre', 'xapellido']}
+      ]
     })
-
-    const cedents = productor.cedentes;
+    const cedents = cedentes.map((item) => item.get({ plain: true }));
     return cedents;
   } catch (error) {
     console.log(error)
@@ -96,7 +93,7 @@ const getCedents = async (data) => {
 const getTrade = async () => {
   try {
     const trade = await Trade.findAll({
-      attributes: ['cramo', 'xramo'],
+      attributes: ['id', 'xramo'],
     });
     const trades = trade.map((item) => item.get({ plain: true }));
     return trades;
@@ -112,7 +109,7 @@ const getTrade = async () => {
 
 const getProduct = async (data) => {
   try {
-    const product = await Product.findAll({
+    const product = await Products.findAll({
       where: data,
       attributes: ['id', 'xproducto'],
     });
@@ -143,7 +140,8 @@ const getCoins = async () => {
 const getClients = async () => {
   try {
     const client = await Clients.findAll({
-      attributes: ['ccliente', 'xcliente', 'itipodoc', 'xdoc_identificacion'],
+      where: {itipo_persona: 'C'},
+      attributes: ['id', 'cci_rif', 'xnombre', 'xapellido'],
     });
     const clients = client.map((item) => item.get({ plain: true }));
     return clients;

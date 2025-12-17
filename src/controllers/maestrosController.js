@@ -739,6 +739,83 @@ const updateAsegurados = async (req, res) => {
     
   }
 }
+const searchClientes = async (req, res) => {
+  try {
+    const clientes = await Maestros.searchClientes();
+    if (clientes.error) {
+      return res.status(clientes.code).send({
+        status: false,
+        message: clientes.error
+      });
+      
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Clientes Obtenidos',
+      data: clientes
+    });
+  } catch (error){
+
+  }
+}
+
+const createCliente = async (req, res) => {
+  try {
+    const createdCliente = await Maestros.createCliente(req.body);
+    if (createdCliente.error) {
+      return res.status(createdCliente.code).send({
+        status: false,
+        message: createdCliente.error
+      });
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Cliente Creado',
+      data: createdCliente
+    });
+    
+  } catch (error) {
+    
+  }
+}
+const searchCliente = async (req, res) => {
+  try {
+    const findedClient = await Maestros.searchClienteById(req.params.id);
+    if (findedClient.error) {
+      return res.status(findedClient.code).send({
+        status: false,
+        message: findedClient.error
+      });
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Cliente Obtenido',
+      data: findedClient
+    });
+    
+  } catch (error) {
+    
+  }
+}
+const updateCliente = async (req, res) => {
+  try {
+    const updatedCliente = await Maestros.updateCliente(req.params.id, req.body);
+    if (updatedCliente.error) {
+      return res.status(updatedCliente.code).send({
+        status: false,
+        message: updatedCliente.error
+      });
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Cliente Actualizado',
+      data: updatedCliente
+    });
+    
+  } catch (error) {
+    
+  }
+}
 
 const searchAgentes = async (req, res) => {
   try {
@@ -1265,6 +1342,10 @@ export default {
   searchAsegurados,
   searchAsegurado,
   updateAsegurados,
+  searchClientes,
+  createCliente,
+  searchCliente,
+  updateCliente,
   createAgentes,
   searchAgentes,
   searchAgente,

@@ -1,7 +1,9 @@
 import sql from "mssql";
-import { Sequelize, DataTypes } from 'sequelize';
+import { Sequelize, DataTypes,  Op, where } from 'sequelize';
 import sequelize from '../config/database.js';
 import insert from "../utilities/insert.js";
+import initModels  from "../models/init-models.js";
+const models = initModels(sequelize)
 
 const sqlConfig = {
   user: process.env.USER_BD,
@@ -21,6 +23,7 @@ const MetodologiaPago = sequelize.define('mametodologiapago', {}, {tableName: 'm
 const Monedas = sequelize.define('mamonedas', {});
 const Cedentes = sequelize.define('macedentes', {});
 const Asegurados = sequelize.define('maasegurados', {});
+const Personas = models.mapersonas;
 const Agentes = sequelize.define('maVagentes', {});
 const Ejecutivos = sequelize.define('maejecutivos', {},{tableName: 'maejecutivos'});
 const Productores = sequelize.define('maproductores', {},{tableName: 'maproductores'});
@@ -475,6 +478,69 @@ const updateCedentes = async(id, data) => {
   }
 }
 
+const searchClientes = async () => {
+  try {
+    const items = await Personas.findAll({
+      where: {itipo_persona: 'C'},
+      attributes: ['id', 'cci_rif', 'xnombre', 'xapellido', 'fnacimiento'],
+    });
+    const result = items.map((item) => item.get({ plain: true }));
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
+const searchClienteById = async (id) => {
+  try {
+    const items = await Personas.findOne({
+      where: {id},
+      attributes: ['id', 'cci_rif', 'xnombre', 'xapellido', 'fnacimiento', 'xtelefono', 'xcorreo', 'isexo', 'iestado_civil','cciudad'],
+    });
+    const result = items.map((item) => item.get({ plain: true }));
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
+
+const createCliente = async(data) => {
+
+  const rData = insert.formatCreateData(data)
+
+  try {
+    let pool = await sql.connect(sqlConfig);
+    let result = await pool.request().query(`
+    INSERT INTO MAASEGURADOS (${rData.keys}) VALUES (${rData.values})`)
+    await pool.close();
+    return { 
+      result: result
+    };
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+}
+
+const updateCliente = async(id, data) => {
+
+  const rData = insert.formatEditData(data)
+
+  try {
+    let pool = await sql.connect(sqlConfig);
+    let result = await pool.request().query(`
+    UPDATE MAASEGURADOS SET ${rData} where casegurado = ${id}`)
+    await pool.close();
+    return { 
+      result: result
+    };
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+}
+
 const searchAsegurados = async () => {
   try {
     const items = await Asegurados.findAll({
@@ -536,6 +602,7 @@ const updateAsegurados = async(id, data) => {
     return { error: error.message };
   }
 }
+
 const searchAgentes = async () => {
   try {
     const items = await Agentes.findAll({
@@ -985,6 +1052,10 @@ export default {
   searchAsegurados,
   updateAsegurados,
   searchAseguradosById,
+  searchClientes,
+  createCliente,
+  updateCliente,
+  searchClienteById,
   createAgentes,
   searchAgentes,
   updateAgentes,
