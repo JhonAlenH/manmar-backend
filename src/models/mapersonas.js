@@ -1,7 +1,7 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
-
 export default class mapersonas extends Model {
+  
   static init(sequelize, DataTypes) {
   return sequelize.define('mapersonas', {
     id: {
@@ -72,8 +72,8 @@ export default class mapersonas extends Model {
     }
   }, {
     tableName: 'mapersonas',
-    schema: 'dbo',
     timestamps: false,
+    schema: 'dbo',
     indexes: [
       {
         name: "PK_mapersonas",

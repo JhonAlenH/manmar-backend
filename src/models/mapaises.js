@@ -5,6 +5,7 @@ export default class mapaises extends Model {
   static init(sequelize, DataTypes) {
   return sequelize.define('mapaises', {
     cpais: {
+      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true

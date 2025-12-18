@@ -1,5 +1,6 @@
 import Maestros from '../db/Maestros.js';
 
+// Data para maestros
 const getMaMonedas = async (req, res) => {
   try {
     const gettedMonedas = await Maestros.getMaMonedas();
@@ -10,12 +11,13 @@ const getMaMonedas = async (req, res) => {
         message: gettedMonedas.error
       });
     }
-    const formatData = gettedMonedas.result.recordset.map(item => {
+    const formatData = gettedMonedas.map(item => {
       return{
         text: item.xmoneda,
         value: `${item.cmoneda}`
       }
     })
+    formatData.unshift({text:'Seleccione una opcion...',value:''})
     res.status(201).send({
       status: true, 
       message: 'Monedas Obtenidas',
@@ -26,9 +28,62 @@ const getMaMonedas = async (req, res) => {
     
   }
 }
+const getMaRamos = async (req, res) => {
+  try {
+    const gettedRamos = await Maestros.searchRamos();
+    // console.log(gettedMonedas.result.recordset)
+    if (gettedRamos.error) {
+      return res.status(gettedRamos.code).send({
+        status: false,
+        message: gettedRamos.error
+      });
+    }
+    const formatData = gettedRamos.map(item => {
+      return{
+        text: item.xramo,
+        value: `${item.id}`
+      }
+    })
+    formatData.unshift({text:'Seleccione una opcion...',value:''})
+    res.status(201).send({
+      status: true, 
+      message: 'Ramos Obtenidas',
+      data: [...formatData]
+    });
+    
+  } catch (error) {
+    
+  }
+}
+const getMaCedentes = async (req, res) => {
+  try {
+    const gettedCedentes = await Maestros.getMaCedentes();
+    if (gettedCedentes.error) {
+      return res.status(gettedCedentes.code).send({
+        status: false,
+        message: gettedCedentes.error
+      });
+    }
+    const formatData = gettedCedentes.map(item => {
+      return{
+        text: item.xcedente,
+        value: `${item.ccedente}`
+      }
+    })
+    formatData.unshift({text:'Seleccione una opcion...',value:''})
+    res.status(201).send({
+      status: true, 
+      message: 'Cedentes Obtenidos',
+      data: [...formatData]
+    });
+    
+  } catch (error) {
+    
+  }
+}
 const getMaPaises = async (req, res) => {
   try {
-    const gettedPaises = await Maestros.getMaPaises();
+    const gettedPaises = await Maestros.searchPaises();
     // console.log(gettedPaises.result)
     if (gettedPaises.error) {
       return res.status(gettedPaises.code).send({
@@ -36,12 +91,13 @@ const getMaPaises = async (req, res) => {
         message: gettedPaises.error
       });
     }
-    const formatData = gettedPaises.result.recordset.map(item => {
+    const formatData = gettedPaises.map(item => {
       return{
         text: item.xpais.toLowerCase(),
         value: `${item.cpais}`
       }
     })
+    formatData.unshift({text:'Seleccione una opcion...',value:''})
     res.status(201).send({
       status: true, 
       message: 'Países Obtenidas',
@@ -62,7 +118,7 @@ const getMaCiudades = async (req, res) => {
         message: gettedCiudades.error
       });
     }
-    const formatData = gettedCiudades.result.recordset.map(item => {
+    const formatData = gettedCiudades.map(item => {
       return{
         text: item.xciudad,
         value: `${item.cciudad}`
@@ -79,7 +135,6 @@ const getMaCiudades = async (req, res) => {
     
   }
 }
-
 const getMaEstados = async (req, res) => {
   try {
     const gettedEstados = await Maestros.getMaEstados(req.params.pais);
@@ -90,7 +145,7 @@ const getMaEstados = async (req, res) => {
         message: gettedEstados.error
       });
     }
-    const formatData = gettedEstados.result.recordset.map(item => {
+    const formatData = gettedEstados.map(item => {
       return{
         text: item.xestado,
         value: `${item.cestado}`
@@ -133,34 +188,9 @@ const getMaMetodologiapago = async (req, res) => {
     
   }
 }
-const getMaCedentes = async (req, res) => {
-  try {
-    const gettedCedentes = await Maestros.getMaCedentes(58, 1);
-    if (gettedCedentes.error) {
-      return res.status(gettedCedentes.code).send({
-        status: false,
-        message: gettedCedentes.error
-      });
-    }
-    const formatData = gettedCedentes.result.recordset.map(item => {
-      return{
-        text: item.xcedente,
-        value: `${item.ccedente}`
-      }
-    })
-    res.status(201).send({
-      status: true, 
-      message: 'cedentes Obtenidas',
-      data: [...formatData]
-    });
-    
-  } catch (error) {
-    
-  }
-}
 const getMaBancos = async (req, res) => {
   try {
-    const gettedRepuestos = await Maestros.getMaBancos(req.body);
+    const gettedRepuestos = await Maestros.getMaBancos();
     // console.log(gettedPaises.result)
     if (gettedRepuestos.error) {
       return res.status(gettedPaises.code).send({
@@ -184,7 +214,6 @@ const getMaBancos = async (req, res) => {
     
   }
 }
-
 const getMaMarcas = async (req, res) => {
   try {
     const gettedMarcas = await Maestros.getMaMarcas();
@@ -212,7 +241,6 @@ const getMaMarcas = async (req, res) => {
     
   }
 }
-
 const getMaModelos = async (req, res) => {
   try {
     const gettedModelos = await Maestros.getMaModelos(req.params.cmarca);
@@ -240,7 +268,6 @@ const getMaModelos = async (req, res) => {
     
   }
 }
-
 const getMaVersiones = async (req, res) => {
   try {
     const gettedVersiones = await Maestros.getMaVersiones(req.params.cmarca, req.params.cmodelo);
@@ -269,6 +296,7 @@ const getMaVersiones = async (req, res) => {
   }
 }
 
+// Paises
 const searchPaises = async (req, res) => {
 //  console.log('holaaa')
   try {
@@ -289,10 +317,9 @@ const searchPaises = async (req, res) => {
 
   }
 }
-
-const createPaises = async (req, res) => {
+const createPais = async (req, res) => {
   try {
-    const createdPaises = await Maestros.createPaises(req.body);
+    const createdPaises = await Maestros.createPais(req.body);
     if (createdPaises.error) {
       return res.status(createdPaises.code).send({
         status: false,
@@ -311,7 +338,7 @@ const createPaises = async (req, res) => {
 }
 const searchPais = async (req, res) => {
   try {
-    const findedPais = await Maestros.searchPaisesById(req.params.id);
+    const findedPais = await Maestros.searchPaisById(req.params.id);
     if (findedPais.error) {
       return res.status(findedPais.code).send({
         status: false,
@@ -347,8 +374,8 @@ const updatePaises = async (req, res) => {
     
   }
 }
- 
 
+// Bancos
 const searchBancos = async (req, res) => {
   try {
     const bancos = await Maestros.searchBancos();
@@ -368,10 +395,9 @@ const searchBancos = async (req, res) => {
 
   }
 }
-
-const createBancos = async (req, res) => {
+const createBanco = async (req, res) => {
   try {
-    const createdBancos = await Maestros.createBancos(req.body);
+    const createdBancos = await Maestros.createBanco(req.body);
     if (createdBancos.error) {
       return res.status(createdBancos.code).send({
         status: false,
@@ -390,7 +416,7 @@ const createBancos = async (req, res) => {
 }
 const searchBanco = async (req, res) => {
   try {
-    const findedBancos = await Maestros.searchBancosById(req.params.id);
+    const findedBancos = await Maestros.searchBancoById(req.params.id);
     if (findedBancos.error) {
       return res.status(findedBancos.code).send({
         status: false,
@@ -407,9 +433,9 @@ const searchBanco = async (req, res) => {
     
   }
 }
-const updateBancos = async (req, res) => {
+const updateBanco = async (req, res) => {
   try {
-    const updatedBancos = await Maestros.updateBancos(req.params.id, req.body);
+    const updatedBancos = await Maestros.updateBanco(req.params.id, req.body);
     if (updatedBancos.error) {
       return res.status(updatedBancos.code).send({
         status: false,
@@ -427,7 +453,7 @@ const updateBancos = async (req, res) => {
   }
 }
 
-
+// Metodologias de Pago
 const searchMetodologiapagos = async (req, res) => {
   try {
     const metodologiapago = await Maestros.searchMetodologiapago();
@@ -447,7 +473,6 @@ const searchMetodologiapagos = async (req, res) => {
 
   }
 }
-
 const createMetodologiapago = async (req, res) => {
   try {
     const createdMetodologiapago = await Maestros.createMetodologiapago(req.body);
@@ -506,6 +531,7 @@ const updateMetodologiapago = async (req, res) => {
   }
 }
 
+// Monedas
 const searchMonedas = async (req, res) => {
   try {
     const monedas = await Maestros.searchMonedas();
@@ -525,10 +551,9 @@ const searchMonedas = async (req, res) => {
 
   }
 }
-
-const createMonedas = async (req, res) => {
+const createMoneda = async (req, res) => {
   try {
-    const createdMonedas = await Maestros.createMonedas(req.body);
+    const createdMonedas = await Maestros.createMoneda(req.body);
     if (createdMonedas.error) {
       return res.status(createdMonedas.code).send({
         status: false,
@@ -564,9 +589,9 @@ const searchMoneda = async (req, res) => {
     
   }
 }
-const updateMonedas = async (req, res) => {
+const updateMoneda = async (req, res) => {
   try {
-    const updatedMonedas = await Maestros.updateMonedas(req.params.id, req.body);
+    const updatedMonedas = await Maestros.updateMoneda(req.params.id, req.body);
     if (updatedMonedas.error) {
       return res.status(updatedMonedas.code).send({
         status: false,
@@ -584,6 +609,7 @@ const updateMonedas = async (req, res) => {
   }
 }
 
+// Cedentes
 const searchCedentes = async (req, res) => {
   try {
     const cedentes = await Maestros.searchCedentes();
@@ -603,7 +629,6 @@ const searchCedentes = async (req, res) => {
 
   }
 }
-
 const createCedentes = async (req, res) => {
   try {
     const createdCedentes = await Maestros.createCedentes(req.body);
@@ -662,83 +687,7 @@ const updateCedentes = async (req, res) => {
   }
 }
 
-const searchAsegurados = async (req, res) => {
-  try {
-    const asegurados = await Maestros.searchAsegurados();
-    if (asegurados.error) {
-      return res.status(asegurados.code).send({
-        status: false,
-        message: asegurados.error
-      });
-      
-    }
-    res.status(201).send({
-      status: true, 
-      message: 'Asegurados Obtenidos',
-      data: asegurados
-    });
-  } catch (error){
-
-  }
-}
-
-const createAsegurados = async (req, res) => {
-  try {
-    const createdAsegurados = await Maestros.createAsegurados(req.body);
-    if (createdAsegurados.error) {
-      return res.status(createdAsegurados.code).send({
-        status: false,
-        message: createdAsegurados.error
-      });
-    }
-    res.status(201).send({
-      status: true, 
-      message: 'Asegurado Creado',
-      data: createdAsegurados
-    });
-    
-  } catch (error) {
-    
-  }
-}
-const searchAsegurado = async (req, res) => {
-  try {
-    const findedAsegurados = await Maestros.searchAseguradosById(req.params.id);
-    if (findedAsegurados.error) {
-      return res.status(findedAsegurados.code).send({
-        status: false,
-        message: findedAsegurados.error
-      });
-    }
-    res.status(201).send({
-      status: true, 
-      message: 'Asegurado Obtenido',
-      data: findedAsegurados
-    });
-    
-  } catch (error) {
-    
-  }
-}
-const updateAsegurados = async (req, res) => {
-  try {
-    const updatedAsegurados = await Maestros.updateAsegurados(req.params.id, req.body);
-    if (updatedAsegurados.error) {
-      return res.status(updatedAsegurados.code).send({
-        status: false,
-        message: updatedAsegurados.error
-      });
-    }
-    res.status(201).send({
-      status: true, 
-      message: 'Asegurado Actualizado',
-      data: updatedAsegurados
-    });
-    
-  } catch (error) {
-    
-  }
-}
+// Clientes
 const searchClientes = async (req, res) => {
   try {
     const clientes = await Maestros.searchClientes();
@@ -758,7 +707,6 @@ const searchClientes = async (req, res) => {
 
   }
 }
-
 const createCliente = async (req, res) => {
   try {
     const createdCliente = await Maestros.createCliente(req.body);
@@ -817,188 +765,7 @@ const updateCliente = async (req, res) => {
   }
 }
 
-const searchAgentes = async (req, res) => {
-  try {
-    const agentes = await Maestros.searchAgentes();
-    if (agentes.error) {
-      return res.status(agentes.code).send({
-        status: false,
-        message: agentes.error
-      });
-      
-    }
-    res.status(201).send({
-      status: true, 
-      message: 'Agentes Obtenidos',
-      data: agentes
-    });
-  } catch (error){
-
-  }
-}
-const createAgentes = async (req, res) => {
-  try {
-    const createdAgentes = await Maestros.createAgentes(req.body);
-    if (createdAgentes.error) {
-      return res.status(createdAgentes.code).send({
-        status: false,
-        message: createdAgentes.error
-      });
-    }
-    res.status(201).send({
-      status: true, 
-      message: 'Agente Creado',
-      data: createdAgentes
-    });
-    
-  } catch (error) {
-    
-  }
-}
-const searchAgente = async (req, res) => {
-  console.log('buscar')
-  try {
-    const findedAgentes = await Maestros.searchAgentesById(req.params.id);
-    if (findedAgentes.error) {
-      return res.status(findedAgentes.code).send({
-        status: false,
-        message: findedAgentes.error
-      });
-    }
-    res.status(201).send({
-      status: true, 
-      message: 'Agente Obtenido',
-      data: findedAgentes
-    });
-    
-  } catch (error) {
-    
-  }
-}
-const updateAgentes = async (req, res) => {
-  console.log('modificar')
-  try {
-    const updatedAgentes = await Maestros.updateAgentes(req.params.id, req.body);
-    if (updatedAgentes.error) {
-      return res.status(updatedAgentes.code).send({
-        status: false,
-        message: updatedAgentes.error
-      });
-    }
-    res.status(201).send({
-      status: true, 
-      message: 'Agente Actualizado',
-      data: updatedAgentes
-    });
-    
-  } catch (error) {
-    
-  }
-}
-
-
-const searchEjecutivos = async (req, res) => {
-  try {
-    const ejecutivos = await Maestros.searchEjecutivos();
-    if (ejecutivos.error) {
-      return res.status(ejecutivos.code).send({
-        status: false,
-        message: ejecutivos.error
-      });
-      
-    }
-    res.status(201).send({
-      status: true, 
-      message: 'Ejecutivos Obtenidos',
-      data: ejecutivos
-    });
-  } catch (error){
-
-  }
-}
-const searchEjecutivosMaestros = async (req, res) => {
-  try {
-    const ejecutivos = await Maestros.searchEjecutivos();
-    if (ejecutivos.error) {
-      return res.status(ejecutivos.code).send({
-        status: false,
-        message: ejecutivos.error
-      });
-      
-    }
-    const formData = ejecutivos.map(item => {
-      return {
-        text: item.xejecutivo,
-        value: item.cejecutivo
-      }
-    })
-    res.status(201).send({
-      status: true, 
-      message: 'Ejecutivos Obtenidos',
-      data: formData
-    });
-  } catch (error){
-
-  }
-}
-const createEjecutivos = async (req, res) => {
-  try {
-    const createdEjecutivos = await Maestros.createEjecutivos(req.body);
-    if (createdEjecutivos.error) {
-      return res.status(createdEjecutivos.code).send({
-        status: false,
-        message: createdEjecutivos.error
-      });
-    }
-    res.status(201).send({
-      status: true, 
-      message: 'Ejecutivo Creado',
-      data: createdEjecutivos
-    });
-    
-  } catch (error) {
-    
-  }
-}
-const searchEjecutivo = async (req, res) => {
-
-  try {
-    const findedEjecutivos = await Maestros.searchEjecutivosById(req.params.id);
-    if (findedEjecutivos.error) {
-      return res.status(findedEjecutivos.code).send({
-        status: false,
-        message: findedEjecutivos.error
-      });
-    }
-    res.status(201).send({
-      status: true, 
-      message: 'Ejecutivo Obtenido',
-      data: findedEjecutivos
-    });
-    
-  } catch (error) {
-    
-  }
-}
-const updateEjecutivos = async (req, res) => {
-  try {
-    const updatedEjecutivos = await Maestros.updateEjecutivos(req.params.id, req.body);
-    if (updatedEjecutivos.error) {
-      return res.status(updatedEjecutivos.code).send({
-        status: false,
-        message: updatedEjecutivos.error
-      });
-    }
-    res.status(201).send({
-      status: true, 
-      message: 'Ejecutivo Actualizado',
-      data: updatedEjecutivos
-    });
-    
-  } catch (error) {
-    
-  }
-}
+// Productores
 const searchProductores = async (req, res) => {
   try {
     const productores = await Maestros.searchProductores();
@@ -1076,83 +843,8 @@ const updateProductores = async (req, res) => {
     
   }
 }
-const searchTomadores = async (req, res) => {
-  try {
-    const tomadores = await Maestros.searchTomadores();
-    if (tomadores.error) {
-      return res.status(tomadores.code).send({
-        status: false,
-        message: tomadores.error
-      });
-      
-    }
-    res.status(201).send({
-      status: true, 
-      message: 'Tomadores Obtenidos',
-      data: tomadores
-    });
-  } catch (error){
 
-  }
-}
-const createTomadores = async (req, res) => {
-  try {
-    const createdTomadores = await Maestros.createTomadores(req.body);
-    if (createdTomadores.error) {
-      return res.status(createdTomadores.code).send({
-        status: false,
-        message: createdTomadores.error
-      });
-    }
-    res.status(201).send({
-      status: true, 
-      message: 'Tomador Creado',
-      data: createdTomadores
-    });
-    
-  } catch (error) {
-    
-  }
-}
-const searchTomador = async (req, res) => {
-
-  try {
-    const findedTomadores = await Maestros.searchTomadoresById(req.params.id);
-    if (findedTomadores.error) {
-      return res.status(findedTomadores.code).send({
-        status: false,
-        message: findedTomadores.error
-      });
-    }
-    res.status(201).send({
-      status: true, 
-      message: 'Tomador Obtenido',
-      data: findedTomadores
-    });
-    
-  } catch (error) {
-    
-  }
-}
-const updateTomadores = async (req, res) => {
-  try {
-    const updatedTomadores = await Maestros.updateTomadores(req.params.id, req.body);
-    if (updatedTomadores.error) {
-      return res.status(updatedTomadores.code).send({
-        status: false,
-        message: updatedTomadores.error
-      });
-    }
-    res.status(201).send({
-      status: true, 
-      message: 'Tomador Actualizado',
-      data: updatedTomadores
-    });
-    
-  } catch (error) {
-    
-  }
-}
+// Ramos
 const searchRamos = async (req, res) => {
   try {
     const ramos = await Maestros.searchRamos();
@@ -1172,19 +864,19 @@ const searchRamos = async (req, res) => {
 
   }
 }
-const createRamos = async (req, res) => {
+const createRamo = async (req, res) => {
   try {
-    const createdRamos = await Maestros.createRamos(req.body);
-    if (createdRamos.error) {
-      return res.status(createdRamos.code).send({
+    const createdRamo = await Maestros.createRamo(req.body);
+    if (createdRamo.error) {
+      return res.status(createdRamo.code).send({
         status: false,
-        message: createdRamos.error
+        message: createdRamo.error
       });
     }
     res.status(201).send({
       status: true, 
       message: 'Ramo Creado',
-      data: createdRamos
+      data: createdRamo
     });
     
   } catch (error) {
@@ -1194,7 +886,7 @@ const createRamos = async (req, res) => {
 const searchRamo = async (req, res) => {
 console.log('buscar Ramo')
   try {
-    const findedRamos = await Maestros.searchRamosById(req.params.id);
+    const findedRamos = await Maestros.searchRamoById(req.params.id);
     if (findedRamos.error) {
       return res.status(findedRamos.code).send({
         status: false,
@@ -1211,9 +903,9 @@ console.log('buscar Ramo')
     
   }
 }
-const updateRamos = async (req, res) => {
+const updateRamo = async (req, res) => {
   try {
-    const updatedRamos = await Maestros.updateRamos(req.params.id, req.body);
+    const updatedRamos = await Maestros.updateRamo(req.params.id, req.body);
     if (updatedRamos.error) {
       return res.status(updatedRamos.code).send({
         status: false,
@@ -1230,6 +922,86 @@ const updateRamos = async (req, res) => {
     
   }
 }
+
+// Productos
+const searchProductos = async (req, res) => {
+  try {
+    const productos = await Maestros.searchProductos();
+    if (productos.error) {
+      return res.status(productos.code).send({
+        status: false,
+        message: productos.error
+      });
+      
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Productos Obtenidos',
+      data: productos
+    });
+  } catch (error){
+
+  }
+}
+const createProducto = async (req, res) => {
+  try {
+    const createdProducto = await Maestros.createProducto(req.body);
+    if (createdProducto.error) {
+      return res.status(createdProducto.code).send({
+        status: false,
+        message: createdProducto.error
+      });
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Producto Creado',
+      data: createdProducto
+    });
+    
+  } catch (error) {
+    
+  }
+}
+const searchProducto = async (req, res) => {
+  try {
+    const findedProducto = await Maestros.searchProductoById(req.params.id);
+    if (findedProducto.error) {
+      return res.status(findedProducto.code).send({
+        status: false,
+        message: findedProducto.error
+      });
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Producto Obtenido',
+      data: findedProducto
+    });
+    
+  } catch (error) {
+    
+  }
+}
+const updateProducto = async (req, res) => {
+  try {
+    const updatedProducto = await Maestros.updateProducto(req.params.id, req.body);
+    if (updatedProducto.error) {
+      return res.status(updatedProducto.code).send({
+        status: false,
+        message: updatedProducto.error
+      });
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Producto Actualizado',
+      data: updatedProducto
+    });
+    
+  } catch (error) {
+    
+  }
+}
+
+// Vehiculos
 const searchVehiculos = async (req, res) => {
   try {
     const vehiculos = await Maestros.searchVehiculos();
@@ -1307,68 +1079,18 @@ const updateVehiculos = async (req, res) => {
     
   }
 }
+
+
 export default {
-  getMaMonedas,
-  getMaPaises,
-  getMaCiudades,
-  getMaEstados, 
-  getMaCedentes,
-  getMaBancos,
-  getMaMarcas, 
-  getMaModelos, 
-  getMaVersiones, 
-  getMaMetodologiapago, 
-  searchPais,
-  updatePaises,
-  createPaises,
-  searchPaises,
-  updateBancos,
-  searchBanco,
-  createBancos,
-  searchBancos,
-  updateMetodologiapago,
-  searchMetodologiapago,
-  createMetodologiapago,
-  searchMetodologiapagos,
-  createMonedas,
-  searchMonedas,
-  searchMoneda,
-  updateMonedas,
-  createCedentes,
-  searchCedentes,
-  searchCedente,
-  updateCedentes,
-  createAsegurados,
-  searchAsegurados,
-  searchAsegurado,
-  updateAsegurados,
-  searchClientes,
-  createCliente,
-  searchCliente,
-  updateCliente,
-  createAgentes,
-  searchAgentes,
-  searchAgente,
-  updateAgentes,
-  createEjecutivos,
-  searchEjecutivos,
-  searchEjecutivosMaestros,
-  searchEjecutivo,
-  updateEjecutivos,
-  createProductores,
-  searchProductores,
-  searchProductor,
-  updateProductores,
-  createTomadores,
-  searchTomadores,
-  searchTomador,
-  updateTomadores,
-  createRamos,
-  searchRamos,
-  searchRamo,
-  updateRamos,
-  createVehiculo,
-  searchVehiculos,
-  searchVehiculo,
-  updateVehiculos
+  getMaMonedas,getMaRamos,getMaCedentes,getMaPaises,getMaCiudades,getMaEstados,getMaBancos,getMaMarcas,getMaModelos,getMaVersiones,getMaMetodologiapago, 
+  searchPaises,searchPais,createPais,updatePaises,
+  searchBancos,searchBanco,createBanco,updateBanco,
+  searchMetodologiapagos,searchMetodologiapago,createMetodologiapago,updateMetodologiapago,
+  searchMonedas,searchMoneda,createMoneda,updateMoneda,
+  searchCedentes,searchCedente,createCedentes,updateCedentes,
+  searchClientes,searchCliente,createCliente,updateCliente,
+  searchProductores,searchProductor,createProductores,updateProductores,
+  searchRamos,searchRamo,createRamo,updateRamo,
+  searchProductos,searchProducto,createProducto,updateProducto,
+  searchVehiculos,searchVehiculo,createVehiculo,updateVehiculos
 }

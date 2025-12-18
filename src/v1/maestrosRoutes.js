@@ -6,12 +6,12 @@ const router = express.Router();
 
 router
 .post("/bancos/search", maestrosController.searchBancos)
-.post("/bancos/create", maestrosController.createBancos)
+.post("/bancos/create", maestrosController.createBanco)
 .get("/bancos/get/:id", maestrosController.searchBanco)
-.post("/bancos/edit/:id", maestrosController.updateBancos)
+.post("/bancos/edit/:id", maestrosController.updateBanco)
 
 .post("/paises/search", maestrosController.searchPaises)
-.post("/paises/create", maestrosController.createPaises)
+.post("/paises/create", maestrosController.createPais)
 .get("/paises/get/:id", maestrosController.searchPais)
 .post("/paises/edit/:id", maestrosController.updatePaises)
 
@@ -21,17 +21,18 @@ router
 .post("/metodologiapago/edit/:id", maestrosController.updateMetodologiapago)
 
 .post("/monedas/search", maestrosController.searchMonedas)
-.post("/monedas/create", maestrosController.createMonedas)
+.post("/monedas/create", maestrosController.createMoneda)
 .get("/monedas/get/:id", maestrosController.searchMoneda)
-.post("/monedas/edit/:id", maestrosController.updateMonedas)
+.post("/monedas/edit/:id", maestrosController.updateMoneda)
 
 // Rutas para obtener los maestros en formulario de item
-.post("/paises", maestrosController.getMaPaises)
-.post("/bancos", maestrosController.getMaBancos)
+.get("/bancos", maestrosController.getMaBancos)
 .get("/metodologiapago", maestrosController.getMaMetodologiapago)
-.post("/monedas", maestrosController.getMaMonedas)
-.get("/ejecutivos/searchMaestros", maestrosController.searchEjecutivosMaestros)
+.get("/monedas", maestrosController.getMaMonedas)
+.get("/ramos", maestrosController.getMaRamos)
+.get("/cedentes", maestrosController.getMaCedentes)
 
+.get("/paises", maestrosController.getMaPaises)
 .get("/ciudades/:estado", maestrosController.getMaCiudades)
 .get("/estados/:pais", maestrosController.getMaEstados)
 
@@ -45,41 +46,25 @@ router
 .get("/cedentes/get/:id", maestrosController.searchCedente)
 .post("/cedentes/edit/:id", maestrosController.updateCedentes)
 
-.post("/asegurados/search", maestrosController.searchAsegurados)
-.post("/asegurados/create", maestrosController.createAsegurados)
-.get("/asegurados/get/:id", maestrosController.searchAsegurado)
-.post("/asegurados/edit/:id", maestrosController.updateAsegurados)
-
 .post("/clientes/search", maestrosController.searchClientes)
 .post("/clientes/create", maestrosController.createCliente)
 .get("/clientes/get/:id", maestrosController.searchCliente)
 .post("/clientes/edit/:id", maestrosController.updateCliente)
-
-.post("/agentes/search", maestrosController.searchAgentes)
-.post("/agentes/create", maestrosController.createAgentes)
-.get("/agentes/get/:id", maestrosController.searchAgente)
-.post("/agentes/edit/:id", maestrosController.updateAgentes)
-
-.post("/ejecutivos/search", maestrosController.searchEjecutivos)
-.post("/ejecutivos/create", maestrosController.createEjecutivos)
-.get("/ejecutivos/get/:id", maestrosController.searchEjecutivo)
-.post("/ejecutivos/edit/:id", maestrosController.updateEjecutivos)
-
 
 .post("/productores/search", maestrosController.searchProductores)
 .post("/productores/create", maestrosController.createProductores)
 .get("/productores/get/:id", maestrosController.searchProductor)
 .post("/productores/edit/:id", maestrosController.updateProductores)
 
-.post("/tomadores/search", maestrosController.searchTomadores)
-.post("/tomadores/create", maestrosController.createTomadores)
-.get("/tomadores/get/:id", maestrosController.searchTomador)
-.post("/tomadores/edit/:id", maestrosController.updateTomadores)
-
 .post("/ramos/search", maestrosController.searchRamos)
-.post("/ramos/create", maestrosController.createRamos)
+.post("/ramos/create", maestrosController.createRamo)
 .get("/ramos/get/:id", maestrosController.searchRamo)
-.post("/ramos/edit/:id", maestrosController.updateRamos)
+.post("/ramos/edit/:id", maestrosController.updateRamo)
+
+.post("/productos/search", maestrosController.searchProductos)
+.post("/productos/create", maestrosController.createProducto)
+.get("/productos/get/:id", maestrosController.searchProducto)
+.post("/productos/edit/:id", maestrosController.updateProducto)
 
 //Rutas de Vehiculos (Luego Cambio marcas por vehiculos)
 .post("/vehiculos/search", maestrosController.searchVehiculos)

@@ -1,4 +1,4 @@
-import _sequelize from "sequelize";
+import _sequelize, { Sequelize } from "sequelize";
 const DataTypes = _sequelize.DataTypes;
 import _adfdcaja from  "./adfdcaja.js";
 import _adpresupuesto from  "./adpresupuesto.js";
@@ -51,6 +51,13 @@ import _tmrecibos from  "./tmrecibos.js";
 import _tmsuscripcion_polizas from  "./tmsuscripcion_polizas.js";
 
 export default function initModels(sequelize) {
+
+  Sequelize.DATE.prototype._stringify = function _stringify(date, options) {
+  date = this._applyTimezone(date, options);
+  // Return date in YYYY-MM-DD HH:mm:ss.SSS format, without the timezone offset
+  return date.format('YYYY-MM-DD HH:mm:ss.SSS');
+};
+  
   const adfdcaja = _adfdcaja.init(sequelize, DataTypes);
   const adpresupuesto = _adpresupuesto.init(sequelize, DataTypes);
   const auoperaciones = _auoperaciones.init(sequelize, DataTypes);
@@ -112,6 +119,10 @@ export default function initModels(sequelize) {
   cbrecibos.hasMany(cbcomisiones, { as: "comisiones", foreignKey: "crecibo"});
   madatos_bancarios.belongsTo(mabancos, { as: "banco", foreignKey: "cbanco"});
   mabancos.hasMany(madatos_bancarios, { as: "datos_bancarios", foreignKey: "cbanco"});
+  mabancos.belongsTo(mamonedas, { as: "moneda", foreignKey: "cmoneda"});
+  mamonedas.hasMany(mabancos, { as: "bancos", foreignKey: "cmoneda"});
+  mabancos.belongsTo(mapaises, { as: "pais", foreignKey: "cpais"});
+  mapaises.hasOne(mabancos, { as: "bancos", foreignKey: "cpais"});
   madatos_poliza.belongsTo(macedentes, { as: "cedente", foreignKey: "ccedente"});
   macedentes.hasMany(madatos_poliza, { as: "datos_polizas", foreignKey: "ccedente"});
   maproductos.belongsTo(macedentes, { as: "cedente", foreignKey: "ccedente"});

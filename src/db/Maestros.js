@@ -3,6 +3,8 @@ import { Sequelize, DataTypes,  Op, where } from 'sequelize';
 import sequelize from '../config/database.js';
 import insert from "../utilities/insert.js";
 import initModels  from "../models/init-models.js";
+import moment from "moment/moment.js";
+// import moment from "moment";
 const models = initModels(sequelize)
 
 const sqlConfig = {
@@ -17,42 +19,46 @@ const sqlConfig = {
   }
 }
 
-const Paises = sequelize.define('mapaises', {});
-const Bancos = sequelize.define('mabancos', {});
-const MetodologiaPago = sequelize.define('mametodologiapago', {}, {tableName: 'mametodologiapago'});
-const Monedas = sequelize.define('mamonedas', {});
-const Cedentes = sequelize.define('macedentes', {});
-const Asegurados = sequelize.define('maasegurados', {});
+const Paises = models.mapaises;
+const Bancos = models.mabancos;
+const MetodologiaPago = models.mametodologiapago;
+const Monedas = models.mamonedas;
+const Cedentes = models.macedentes;
 const Personas = models.mapersonas;
-const Agentes = sequelize.define('maVagentes', {});
-const Ejecutivos = sequelize.define('maejecutivos', {},{tableName: 'maejecutivos'});
-const Productores = sequelize.define('maproductores', {},{tableName: 'maproductores'});
-const Tomadores = sequelize.define('matomadores', {});
-const Ramos = sequelize.define('maramos', {});
-const Vehiculos = sequelize.define('mainma', {},{tableName: 'mainma'});
+const Productores = models.maproductores;
+const Productos = models.maproductos;
+const Ramos = models.maramos;
+const Ciudades = models.maciudades;
+const Estados = models.maestados;
+const Vehiculos = models.mainma;
+const Usuarios = models.seusuarios;
 
 const getMaMonedas = async() => {
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query('SELECT cmoneda, xmoneda, xabreviatura from MAMONEDAS')
-    await pool.close();
-    return { 
-      result: result
-    };
+    const items = await Monedas.findAll({
+      attributes: ['cmoneda', 'xmoneda', 'xabreviatura'],
+    });
+    const result = items.map((item) => item.get({ plain: true }));
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 }
-
-const getMaPaises = async() => {
+const getMaCedentes = async() => {
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query('SELECT cpais, xpais from MAPAISES')
-    await pool.close();
-    return { 
-      result: result
-    };
+    const items = await Cedentes.findAll({
+      attributes: ['ccedente'],
+      include: [
+        {association: 'persona', attributes: ['xnombre']}
+      ]
+    });
+    const result = items.map((item) => {
+      const get = item.get({ plain: true })
+      get.xcedente = get.persona?.xnombre; 
+      return get
+    });
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
@@ -60,13 +66,12 @@ const getMaPaises = async() => {
 }
 const getMaCiudades = async(estado) => {
   try {
-    let pool = await sql.connect(sqlConfig);
-    // console.log(pais)
-    let result = await pool.request().query(`SELECT cciudad, xciudad from MACIUDADES where cestado = ${estado}`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const items = await Ciudades.findAll({
+      where: {cestado:  estado},
+      attributes: ['cciudad', 'xciudad'],
+    });
+    const result = items.map((item) => item.get({ plain: true }));
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
@@ -74,39 +79,38 @@ const getMaCiudades = async(estado) => {
 }
 const getMaEstados = async(pais) => {
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`SELECT cestado, xestado from MAESTADOS where cpais = ${pais}`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const items = await Estados.findAll({
+      where: {cpais:  pais},
+      attributes: ['cestado', 'xestado'],
+    });
+    const result = items.map((item) => item.get({ plain: true }));
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 }
-const getMaBancos = async(getMaBancos) => {
+const getMaBancos = async() => {
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`SELECT cbanco, xbanco from MABANCO where cbanco = ${getMaBancos.cbanco}`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const items = await Bancos.findAll({
+      attributes: ['cbanco', 'xbanco'],
+    });
+    const result = items.map((item) => item.get({ plain: true }));
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 }
-
 const getMaMarcas = async() => {
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`select cmarca, xmarca from mainma group by cmarca, xmarca order by xmarca`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const items = await Vehiculos.findAll({
+      attributes: ['cmarca', 'xmarca'],
+      group: ['cmarca', 'xmarca'],
+      order: [['xmarca', 'DESC']]
+    });
+    const result = items.map((item) => item.get({ plain: true }));
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
@@ -114,12 +118,14 @@ const getMaMarcas = async() => {
 }
 const getMaModelos = async(cmarca) => {
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`select cmodelo, xmodelo from mainma where cmarca = '${cmarca}' group by cmodelo, xmodelo order by xmodelo`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const items = await Vehiculos.findAll({
+      where: {cmarca},
+      attributes: ['cmodelo', 'xmodelo'],
+      group: ['cmodelo', 'xmodelo'],
+      order: [['xmodelo', 'DESC']]
+    });
+    const result = items.map((item) => item.get({ plain: true }));
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
@@ -127,44 +133,31 @@ const getMaModelos = async(cmarca) => {
 }
 const getMaVersiones = async(cmarca,cmodelo) => {
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`select cversion, xversion from mainma where cmarca = '${cmarca}' and cmodelo = '${cmodelo}' group by cversion, xversion order by xversion`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const items = await Vehiculos.findAll({
+      where: {cmarca,cmodelo},
+      attributes: ['cversion', 'xversion'],
+      group: ['cversion', 'xversion'],
+      order: [['xversion', 'DESC']]
+    });
+    const result = items.map((item) => item.get({ plain: true }));
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 }
-const getMaCedentes = async(id) => {
-    try {
-      let pool = await sql.connect(sqlConfig);
-      let result = await pool.request().query(`SELECT ccedente, xrif, xcedente, cestado, cciudad, xdireccion, xtelefono1, xtelefono2, xcorreo, xportal, xusuario, xlogin from MACEDENTES where ccedente = ${id.toString()}`)
-      await pool.close();
-      return { 
-        result: result
-      };
-    } catch (error) {
-      console.log(error.message)
-      return { error: error.message };
-    }
+const getMaMetodologiapago = async() => {
+  try {
+    const items = await Bancos.findAll({
+      attributes: ['cmetodologiapago', 'xmetodologiapago', 'cpais'],
+    });
+    const result = items.map((item) => item.get({ plain: true }));
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
   }
-
-  const getMaMetodologiapago = async(id) => {
-    try {
-      let pool = await sql.connect(sqlConfig);
-      let result = await pool.request().query(`SELECT cmetodologiapago,xmetodologiapago,cpais from MAMETODOLOGIAPAGO where cmetodologiapago = ${id.toString()}`)
-      await pool.close();
-      return { 
-        result: result
-      };
-    } catch (error) {
-      console.log(error.message)
-      return { error: error.message };
-    }
-  }
+}
 
 const searchPaises = async () => {
   try {
@@ -178,48 +171,34 @@ const searchPaises = async () => {
     return { error: error.message };
   }
 };
-const searchPaisesById = async (id) => {
+const searchPaisById = async (id) => {
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`SELECT cpais, xpais from MAPAISES WHERE cpais = ${parseInt(id)}`)
-    await pool.close();
-    return { 
-      result: result.recordset[0]
-    };
+    const result = await Paises.findOne({
+      where:{cpais: id},
+      attributes: ['cpais', 'xpais'],
+    });
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 };
-const createPaises = async(data) => {
-
-  const rData = insert.formatCreateData(data)
-
+const createPais = async(body) => {
+  const data = setAuItems(body)
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    INSERT INTO MAPAISES (${rData.keys}) VALUES (${rData.values})`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const pais = Paises.create(data)
+    return { result: pais };
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 }
 const updatePaises = async(id, data) => {
-
-  const rData = insert.formatEditData(data)
-
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    UPDATE MAPAISES SET ${rData} where cpais = ${id}`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const result = await Paises.update(data, {
+      where: {cpais: id}
+    });
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
@@ -229,61 +208,52 @@ const updatePaises = async(id, data) => {
 const searchBancos = async () => {
   try {
     const items = await Bancos.findAll({
-      attributes: ['cbanco', 'xbanco','itipo', 'cpais'],
+      attributes: ['cbanco', 'xbanco', 'cod_bancario'],
+      include:[
+        {association: 'moneda', attributes: ['xmoneda']},
+        {association: 'pais', attributes: ['xpais']}
+      ]
     });
-    console.log(items)
-    const result = items.map((item) => item.get({ plain: true }));
-    console.log(result)
+    const result = items.map((item) => {
+      const get = item.get({ plain: true })
+      get.xmoneda = get.moneda.xmoneda; get.xpais = get.pais.xpais; 
+      return get
+    });
     return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 };
-const searchBancosById = async (id) => {
+const searchBancoById = async (id) => {
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`SELECT cbanco, xbanco, itipo, cpais from MABANCOS WHERE cbanco = ${parseInt(id)}`)
-    await pool.close();
-    return { 
-      result: result.recordset[0]
-    };
+    const result = await Bancos.findOne({
+      where:{cbanco: id},
+      attributes: ['cbanco', 'xbanco', 'cod_bancario', 'cpais', 'cmoneda'],
+    });
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 };
+const createBanco = async(body) => {
 
-
-const createBancos = async(data) => {
-
-  const rData = insert.formatCreateData(data)
-
+  const data = setAuItems(body)
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    INSERT INTO MABANCOS (${rData.keys}) VALUES (${rData.values})`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const banco = Bancos.create(data)
+    return { result: banco };
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 }
-
-const updateBancos = async(id, data) => {
-
-  const rData = insert.formatEditData(data)
-
+const updateBanco = async(id, data) => {
   try {
-    let pool = await sql.connect(sqlConfig);
- 
-    await pool.close();
-    return { 
-      result: result
-    };
+    const result = await Bancos.update(data, {
+      where: {cbanco: id}
+    });
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
@@ -315,8 +285,6 @@ const searchMetodologiapagoById = async (id) => {
     return { error: error.message };
   }
 };
-
-
 const createMetodologiapago = async(data) => {
 
   const rData = insert.formatCreateData(data)
@@ -334,7 +302,6 @@ const createMetodologiapago = async(data) => {
     return { error: error.message };
   }
 }
-
 const updateMetodologiapago = async(id, data) => {
 
   const rData = insert.formatEditData(data)
@@ -365,7 +332,6 @@ const searchMonedas = async () => {
     return { error: error.message };
   }
 };
-
 const searchMonedasById = async (id) => {
   try {
     let pool = await sql.connect(sqlConfig);
@@ -379,37 +345,23 @@ const searchMonedasById = async (id) => {
     return { error: error.message };
   }
 };
+const createMoneda = async(body) => {
 
-const createMonedas = async(data) => {
-
-  const rData = insert.formatCreateData(data)
-
+  const data = setAuItems(body)
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    INSERT INTO MAMONEDAS (${rData.keys}) VALUES (${rData.values})`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const moneda = Monedas.create(data)
+    return { result: moneda };
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 }
-
-const updateMonedas = async(id, data) => {
-
-  const rData = insert.formatEditData(data)
-
+const updateMoneda = async(id, data) => {
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    UPDATE MAMONEDAS SET ${rData} where cmoneda = ${id}`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const result = await Monedas.update(data, {
+      where: {cmoneda: id}
+    });
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
@@ -441,7 +393,6 @@ const searchCedentesById = async (id) => {
     return { error: error.message };
   }
 };
-
 const createCedentes = async(data) => {
 
   const rData = insert.formatCreateData(data)
@@ -459,7 +410,6 @@ const createCedentes = async(data) => {
     return { error: error.message };
   }
 }
-
 const updateCedentes = async(id, data) => {
 
   const rData = insert.formatEditData(data)
@@ -493,36 +443,46 @@ const searchClientes = async () => {
 };
 const searchClienteById = async (id) => {
   try {
-    const items = await Personas.findOne({
+    let result = await Personas.findOne({
       where: {id},
-      attributes: ['id', 'cci_rif', 'xnombre', 'xapellido', 'fnacimiento', 'xtelefono', 'xcorreo', 'isexo', 'iestado_civil','cciudad'],
+      attributes: ['id', 'cci_rif', 'xnombre', 'xapellido', 'fnacimiento', 'xtelefono', 'xdireccion', 'xcorreo', 'isexo', 'iestado_civil','cciudad'],
+      include: [
+        {association: 'ciudad', attributes: [], include: [
+          {association: 'estado', attributes: ['cestado'], include: [
+            {association: 'pais', attributes: ['cpais']}
+          ]}
+        ]}
+      ]
     });
-    const result = items.map((item) => item.get({ plain: true }));
+
+    result.dataValues.itipodoc = result.cci_rif.split('-')[0]; result.dataValues.cci_rif = result.cci_rif.split('-')[1];
+    result.dataValues.cestado = result.estado?.cestado; result.dataValues.cpais = result.estado?.pais?.cpais;
+
     return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 };
+const createCliente = async(body) => {
+  
+  const data = setAuItems(body)
+  data.cci_rif = `${data.itipodoc}-${data.cci_rif}`
+  data.itipo_persona = 'C'
 
-const createCliente = async(data) => {
-
-  const rData = insert.formatCreateData(data)
+  delete data.itipodoc
+  delete data.cestado
+  delete data.cpais
+  // const rData = insert.formatCreateData(data)
 
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    INSERT INTO MAASEGURADOS (${rData.keys}) VALUES (${rData.values})`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const client = Personas.create(data)
+    return { result: client };
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 }
-
 const updateCliente = async(id, data) => {
 
   const rData = insert.formatEditData(data)
@@ -541,191 +501,6 @@ const updateCliente = async(id, data) => {
   }
 }
 
-const searchAsegurados = async () => {
-  try {
-    const items = await Asegurados.findAll({
-      attributes: ['casegurado', 'xcedula', 'xnombre', 'xapellido', 'fnacimiento', 'iestado_civil', 'isexo', 'xtelefono1', 'xtelefono2', 'xdireccion', 'xcorreo'],
-    });
-    const result = items.map((item) => item.get({ plain: true }));
-    return result;
-  } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
-  }
-};
-const searchAseguradosById = async (id) => {
-  try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`SELECT casegurado, xcedula, xnombre, xapellido, fnacimiento, iestado_civil, isexo, xtelefono1, xtelefono2, xdireccion, xcorreo from MAASEGURADOS WHERE casegurado = ${parseInt(id)}`)
-    await pool.close();
-    return { 
-      result: result.recordset[0]
-    };
-  } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
-  }
-};
-
-const createAsegurados = async(data) => {
-
-  const rData = insert.formatCreateData(data)
-
-  try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    INSERT INTO MAASEGURADOS (${rData.keys}) VALUES (${rData.values})`)
-    await pool.close();
-    return { 
-      result: result
-    };
-  } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
-  }
-}
-
-const updateAsegurados = async(id, data) => {
-
-  const rData = insert.formatEditData(data)
-
-  try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    UPDATE MAASEGURADOS SET ${rData} where casegurado = ${id}`)
-    await pool.close();
-    return { 
-      result: result
-    };
-  } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
-  }
-}
-
-const searchAgentes = async () => {
-  try {
-    const items = await Agentes.findAll({
-      attributes: ['cagente', 'xejecutivo','xagente','xrif'],
-    });
-    const result = items.map((item) => item.get({ plain: true }));
-    console.log(result)
-    return result;
-  } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
-  }
-};
-const searchAgentesById = async (id) => {
-  try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`SELECT cagente, cejecutivo, xagente, xrif, xdireccion, xtelefono, xcorreo, xcta_nacional, xcta_extranjero,pcomision from MAAGENTES WHERE cagente = ${parseInt(id)}`)
-    await pool.close();
-    return { 
-      result: result.recordset[0]
-    };
-  } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
-  }
-};
-
-const createAgentes = async(data) => {
-
-  const rData = insert.formatCreateData(data)
-
-  try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    INSERT INTO MAAGENTES (${rData.keys}) VALUES (${rData.values})`)
-    await pool.close();
-    return { 
-      result: result
-    };
-  } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
-  }
-}
-
-const updateAgentes = async(id, data) => {
-console.log('Actalizacionnnn')
-  const rData = insert.formatEditData(data)
-
-  try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    UPDATE MAAGENTES SET ${rData} where cagente = ${id}`)
-    await pool.close();
-    return { 
-      result: result
-    };
-  } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
-  }
-}
-
-const searchEjecutivos = async () => {
-  try {
-    const items = await Ejecutivos.findAll({
-      attributes: ['cejecutivo', 'xejecutivo', 'xrif', 'xdireccion', 'xtelefono1','xtelefono2', 'xcorreo', 'xcta_nacional', 'xcta_extranjero', 'pcomision'],
-    });
-    const result = items.map((item) => item.get({ plain: true }));
-    return result;
-  } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
-  }
-};
-const searchEjecutivosById = async (id) => {
-  try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`SELECT cejecutivo, xejecutivo, xrif, xdireccion, xtelefono1,xtelefono2, xcorreo, xcta_nacional, xcta_extranjero, pcomision from MAEJECUTIVOS WHERE cejecutivo = ${parseInt(id)}`)
-    await pool.close();
-    return { 
-      result: result.recordset[0]
-    };
-  } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
-  }
-};
-
-const createEjecutivos = async(data) => {
-
-  const rData = insert.formatCreateData(data)
-
-  try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    INSERT INTO MAEJECUTIVOS (${rData.keys}) VALUES (${rData.values})`)
-    await pool.close();
-    return { 
-      result: result
-    };
-  } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
-  }
-}
-const updateEjecutivos = async(id, data) => {
-  console.log('Modificar')
-  const rData = insert.formatEditData(data)
-
-  try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    UPDATE MAEJECUTIVOS SET ${rData} where cejecutivo = ${id}`)
-    await pool.close();
-    return { 
-      result: result
-    };
-  } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
-  }
-}
 const searchProductores = async () => {
   try {
     const items = await Productores.findAll({
@@ -751,7 +526,6 @@ const searchProductoresById = async (id) => {
     return { error: error.message };
   }
 };
-
 const createProductores = async(data) => {
 
   const rData = insert.formatCreateData(data)
@@ -785,70 +559,11 @@ const updateProductores = async(id, data) => {
     return { error: error.message };
   }
 }
-const searchTomadores = async () => {
-  try {
-    const items = await Tomadores.findAll({
-      attributes: ['ctomador','xtomador','xcedula','xtelefono','xdireccion','xcorreo']
-    });
-    const result = items.map((item) => item.get({ plain: true }));
-    return result;
-  } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
-  }
-};
-const searchTomadoresById = async (id) => {
-  try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`SELECT ctomador,xtomador,xcedula,xtelefono,xdireccion,xcorreo from MATOMADORES WHERE ctomador = ${parseInt(id)}`)
-    await pool.close();
-    return { 
-      result: result.recordset[0]
-    };
-  } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
-  }
-};
 
-const createTomadores = async(data) => {
-
-  const rData = insert.formatCreateData(data)
-
-  try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    INSERT INTO MATOMADORES (${rData.keys}) VALUES (${rData.values})`)
-    await pool.close();
-    return { 
-      result: result
-    };
-  } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
-  }
-}
-const updateTomadores = async(id, data) => {
-  console.log("Actualiza T")
-  const rData = insert.formatEditData(data)
-
-  try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    UPDATE MATOMADORES SET ${rData} where ctomador = ${id}`)
-    await pool.close();
-    return { 
-      result: result
-    };
-  } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
-  }
-}
 const searchRamos = async () => {
   try {
     const items = await Ramos.findAll({
-      attributes: ['cramo','xramo']
+      attributes: ['id','xramo']
     });
     const result = items.map((item) => item.get({ plain: true }));
     return result;
@@ -857,53 +572,102 @@ const searchRamos = async () => {
     return { error: error.message };
   }
 };
-const searchRamosById = async (id) => {
+const searchRamoById = async (id) => {
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`SELECT cramo,xramo from MARAMOS WHERE cramo = ${parseInt(id)}`)
-    await pool.close();
-    return { 
-      result: result.recordset[0]
-    };
+    const result = await Ramos.findOne({
+      where:{id},
+      attributes: ['xramo'],
+    });
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 };
-
-const createRamos = async(data) => {
-
-  const rData = insert.formatCreateData(data)
-
+const createRamo = async(body) => {
+  const data = setAuItems(body)
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    INSERT INTO MARAMOS (${rData.keys}) VALUES (${rData.values})`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const ramo = Ramos.create(data)
+    return { result: ramo };
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 }
-const updateRamos = async(id, data) => {
-  const rData = insert.formatEditData(data)
-
+const updateRamo = async(id, data) => {
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    UPDATE MARAMOS SET ${rData} where cramo = ${id}`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const result = await Ramos.update(data, {
+      where: {id}
+    });
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 }
+
+const searchProductos = async () => {
+  try {
+    const items = await Productos.findAll({
+      attributes: ['id','xproducto'],
+      include:[
+        {association: 'cedente', attributes: ['ccedente'], include:[
+          {association: 'persona', attributes: ['xnombre']}
+        ]},
+        {association: 'ramo', attributes: ['xramo']}
+      ]
+    });
+    const result = items.map((item) => {
+      const get = item.get({ plain: true })
+      get.xramo = get.ramo?.xramo; get.xcedente = get.cedente?.persona?.xnombre; 
+      return get
+    });
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
+const searchProductoById = async (id) => {
+  try {
+    const result = await Productos.findOne({
+      where:{id},
+      attributes: ['id','xproducto','cmoneda','cramo','ccedente','pcomision'],
+    });
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
+const createProducto = async(body) => {
+  const data = setAuItems(body)
+  const usuario = await Usuarios.findOne({
+    where: {cusuario: data.cusuario_creacion},
+    attributes: ['cproductor']
+  })
+  data.cproductor = usuario.cproductor
+
+  try {
+    const producto = Productos.create(data)
+    return { result: producto };
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+}
+const updateProducto = async(id, data) => {
+  try {
+    const result = await Productos.update(data, {
+      where: {id}
+    });
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+}
+
 const searchVehiculos = async () => {
   try {
     const items = await Vehiculos.findAll({
@@ -929,7 +693,6 @@ const searchVehiculoById = async (id) => {
     return { error: error.message };
   }
 };
-
 const createVehiculo = async(data) => {
 
   const dataArray = Object.entries(data)
@@ -997,6 +760,8 @@ const updateVehiculos = async(id, data) => {
     return { error: error.message };
   }
 }
+
+// Utils
 const checkItem = async(otherValue, otherKey, key, table) => {
   try {
     let pool = await sql.connect(sqlConfig);
@@ -1014,70 +779,25 @@ const checkItem = async(otherValue, otherKey, key, table) => {
     return { error: error.message };
   }
 }
+const setAuItems = (data) => {
+  const newData = {...data}
+
+  newData.bactivo = 1;
+  newData.fcreacion = new Date();
+
+  return newData
+}
 
 export default {
-  getMaMonedas,
-  getMaPaises,
-  getMaEstados,
-  getMaBancos,
-  getMaCedentes,
-  getMaCiudades,
-  getMaMarcas,
-  getMaModelos,
-  getMaVersiones,
-  getMaCedentes,
-  getMaMetodologiapago,
-  createPaises,
-  updatePaises,
-  searchPaisesById,
-  searchPaises,
-  getMaBancos,
-  updateBancos,
-  createBancos,
-  searchBancosById,
-  searchBancos,
-  updateMetodologiapago,
-  createMetodologiapago,
-  searchMetodologiapagoById,
-  searchMetodologiapago,
-  createMonedas,
-  searchMonedas,
-  updateMonedas,
-  searchMonedasById,
-  createCedentes,
-  searchCedentes,
-  updateCedentes,
-  searchCedentesById,
-  createAsegurados,
-  searchAsegurados,
-  updateAsegurados,
-  searchAseguradosById,
-  searchClientes,
-  createCliente,
-  updateCliente,
-  searchClienteById,
-  createAgentes,
-  searchAgentes,
-  updateAgentes,
-  searchAgentesById,
-  searchEjecutivos,
-  createEjecutivos,
-  updateEjecutivos,
-  searchEjecutivosById,
-  searchProductores,
-  createProductores,
-  updateProductores,
-  searchProductoresById,
-  searchTomadores,
-  createTomadores,
-  updateTomadores,
-  searchTomadoresById,
-  searchRamos,
-  createRamos,
-  updateRamos,
-  searchRamosById,
-  searchVehiculos,
-  createVehiculo,
-  updateVehiculos,
-  searchVehiculoById
+  getMaMonedas,getMaCedentes,getMaEstados,getMaBancos,getMaCiudades,getMaMarcas,getMaModelos,getMaVersiones,getMaMetodologiapago,getMaBancos,
+  searchPaises,searchPaisById,createPais,updatePaises,
+  searchBancos,searchBancoById,createBanco,updateBanco,
+  searchMetodologiapago,searchMetodologiapagoById,createMetodologiapago,updateMetodologiapago,
+  searchMonedas,searchMonedasById,createMoneda,updateMoneda,
+  searchCedentes,searchCedentesById,createCedentes,updateCedentes,
+  searchClientes,searchClienteById,createCliente,updateCliente,
+  searchProductores,searchProductoresById,createProductores,updateProductores,
+  searchRamos,searchRamoById,createRamo,updateRamo,
+  searchProductos,searchProductoById,createProducto,updateProducto,
+  searchVehiculos,searchVehiculoById,createVehiculo,updateVehiculos
 }
