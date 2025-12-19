@@ -85,7 +85,6 @@ const getCedents = async (data) => {
     const cedents = cedentes.map((item) => item.get({ plain: true }));
     return cedents;
   } catch (error) {
-    console.log(error)
     return { error: await error.parent.message };
   }
 };
@@ -192,21 +191,17 @@ const getModel = async (data) => {
 };
 
 const getVersion = async (data) => {
-  console.log(data)
   try {
     const versions = await Version.findAll({
       where: data,
-      attributes: ['xversion', 'npasajero', 'xclasificacion', 'id', 'xclase_rcv', 'msum', 'ctarifa_exceso', 'xuso', 'npesovacio', 'ncapcarga'],
+      attributes: ['xversion', 'cversion'],
     });
     const version = versions.map((item) => item.get({ plain: true }));
     return version;
   } catch (error) {
-    let errors = []
-    for (const errorA of await error.parent.errors) {
-      errors.push(errorA)
-    }
-    return { error: errors.join(`
-    `) };
+    // let errors = []
+
+    return { error: error}
   }
 };
 
@@ -273,7 +268,6 @@ const getTakers = async () => {
 };
 
 const getTakersId = async (data) => {
-  console.log(data)
   try {
     const result = await Takers.findOne({
       where: {xcedula: data},
@@ -459,9 +453,7 @@ const getBankProductor = async (data) => {
     });
     return banco;
   } catch (error) {
-    console.log(error)
-    console.log('await', error.message)
-    
+
     return { error: error};
   }
 };

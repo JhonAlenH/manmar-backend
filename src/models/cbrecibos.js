@@ -5,7 +5,8 @@ export default class cbrecibos extends Model {
   static init(sequelize, DataTypes) {
   return sequelize.define('cbrecibos', {
     crecibo: {
-      type: DataTypes.DECIMAL(18,0),
+      autoIncrement: true,
+      type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },

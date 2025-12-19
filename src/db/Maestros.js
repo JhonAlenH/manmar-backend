@@ -1,10 +1,8 @@
 import sql from "mssql";
+import insert from "../utilities/insert.js";
 import { Sequelize, DataTypes,  Op, where } from 'sequelize';
 import sequelize from '../config/database.js';
-import insert from "../utilities/insert.js";
 import initModels  from "../models/init-models.js";
-import moment from "moment/moment.js";
-// import moment from "moment";
 const models = initModels(sequelize)
 
 const sqlConfig = {

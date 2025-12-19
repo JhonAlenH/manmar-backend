@@ -18,11 +18,7 @@ const getReceipt = async (req, res) => {
                 message: receipt.error
             });
     }
-    const formattedList = receipt.recordset.map((item) => ({
-        fdesde_rec: item.fdesde_rec,
-        fhasta_rec: item.fhasta_rec,
-        mprima: item.mprima
-    }));
+    const formattedList = receipt.recordset
     return res
         .status(200)
         .send({

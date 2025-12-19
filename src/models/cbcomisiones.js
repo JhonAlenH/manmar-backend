@@ -11,7 +11,7 @@ export default class cbcomisiones extends Model {
       primaryKey: true
     },
     crecibo: {
-      type: DataTypes.DECIMAL(18,0),
+      type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: 'cbrecibos',

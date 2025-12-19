@@ -16,19 +16,12 @@ const models = initModels(sequelize)
       }
   }
 
-  const Producers = sequelize.define('maproductores', {
-      cproductor: {
-          type: Sequelize.INTEGER,
-          primaryKey: true,
-          allowNull: true,
-      },
-  });
+  const Producers = models.maproductores
 
-  const Tariffs = sequelize.define('maproductos', {});
+  const Tariffs = models.maproductos;
 
 
-  const Policy = models.madatos_poliza
-  const Contract = models.popolizas
+  
 
   const Abonos = sequelize.define('cbmovimientos', {
     id: {
@@ -47,42 +40,36 @@ const models = initModels(sequelize)
   }, {tableName: 'cbVmovimientos'});
 
 
-  const Receipt = models.cbrecibos;
+  const Recibos = models.cbrecibos;
+  const Comisiones = models.cbcomisiones;
+  const Complement = models.cbmovimientos;
+  const Documentos = models.podocumentos;
+  const Tarifas = models.popolizas;
+  const Polizas = models.madatos_poliza;
+  const Policy = models.madatos_poliza
+  const Contracts = models.popolizas
 
-  const Complement = sequelize.define('cbmovimientos', {});
-
-  const Document = sequelize.define('podocumentos', {});
-
-  const Tarifas = sequelize.define('popolizas', {
-    id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        allowNull: true,
-    },
-  });
-
-  const getReceipt = async (getReceipt) => {
-    console.log(getReceipt)
-      const strPrecio = getReceipt.mprima || '0,00'; // El string que contiene el precio
-      const precioNumerico = parseFloat(strPrecio.replace(',', '.')); // Convertir a número con decimales
-      try{
-
-          let pool = await sql.connect(sqlConfig);
-          let result = await pool.request()
-          .input('fdesde_pol', sql.DateTime, getReceipt.fdesde)
-          .input('fhasta_pol', sql.DateTime, getReceipt.fhasta)
-          .input('mprima', sql.Numeric(18, 2), precioNumerico)
-          .input('cmetodologiapago', sql.Int, getReceipt.cmetodologiapago)
-          .execute('tmBRecibos');
-          const receipt= await pool.request()
-          .query('select * from tmrecibos');
-          await pool.close();
-          return receipt
-                
-      }catch(err){
-        console.log(err.message)
-          return { error: err.message };
-          }
+  const getReceipt = async (data) => {
+    console.log(data)
+    const strPrecio = data.mprima || '0,00'; // El string que contiene el precio
+    const precioNumerico = parseFloat(strPrecio.replace(',', '.')); // Convertir a número con decimales
+    try {
+      let pool = await sql.connect(sqlConfig);
+      let result = await pool.request()
+      .input('fdesde_pol', sql.DateTime, data.fdesde)
+      .input('fhasta_pol', sql.DateTime, data.fhasta)
+      .input('mprima', sql.Numeric(18, 2), precioNumerico)
+      .input('pcomision', sql.Numeric(18, 2), data.pcomision)
+      .input('cmetodologiapago', sql.Int, data.cmetodologiapago)
+      .execute('tmBRecibos');
+      const receipt= await pool.request()
+      .query('select * from tmrecibos');
+      await pool.close();
+      return receipt       
+    } catch(err){
+      console.log(err.message)
+      return { error: err.message };
+    }
   }
 
   const getReceiptUpdate = async (getReceiptUpdate) => {
@@ -167,54 +154,38 @@ const models = initModels(sequelize)
   };
 
   const createContract = async (data) => {
-    let pool;
     try {
-      pool = await sql.connect(sqlConfig);
-      const keys = Object.keys(data).filter(key => key != 'documentos');
+      const documentos = data.documentos || [];
+      console.log(data)
+      const policy = await Polizas.create(data)
+      console.log('datos poliza cre')
 
-      const values = keys.map(key => data[key] === '' ? null : data[key]);
-
-      const request = pool.request();
-  
-      const placeholders = keys.map((_, i) => `@param${i + 1}`).join(',');
-      const query = `INSERT INTO tmsuscripcion_polizas (${keys.join(',')}) VALUES (${placeholders})`;
-  
-      keys.forEach((key, index) => {
-        request.input(`param${index + 1}`, values[index]);
-      });
-  
-      const create = await request.query(query);
-
-      if (create.rowsAffected[0] > 0 && data.documentos.length > 0) {
-        const selectPoliza = await request.query`SELECT id FROM popolizas ORDER BY id DESC`
-        const selectedPoliza = selectPoliza.recordset[0]
-        console.log(selectedPoliza.id);
-        await pool.close();
-        let query2 = `INSERT INTO podocumentos (id_poliza, xtitulo, xruta, bactivo, xarchivo) VALUES`
-        let u = 1
-        for (const document of data.documentos) {
-          query2 += `(${selectedPoliza.id}, '${document.xtitulo}', '${document.xruta}', 1, '${document.xnombrenota}')`
-          if(u < data.documentos.length) {
-            query2 += `, `
+      for (const poliza of data.polizas) {
+        const contract = await Contracts.create({...poliza, cdatos_poliza: policy.id})
+        console.log('poliza cre')
+        for (const recibo of poliza.recibos) {
+          const receipt = await Recibos.create({...recibo, id_poliza: contract.id})
+          console.log('recibo cre')
+          for (const comision of recibo.comisiones) {
+            const comitt = await Comisiones.create({...comision, crecibo: receipt.crecibo})
+            console.log('comision cre')
           }
-          u++
         }
-        console.log(query2);
-        pool = await sql.connect(sqlConfig);
-        const request2 = pool.request();
-        let request21 = await request2.query(query2)
-        console.log(request21);
-        await pool.close();
+      }
+      if (policy && data.documentos.length > 0) {
+        for (const document of documentos) {
+          Documentos.create({
+            ...document,
+            itipo: 'P',
+            ccodigo: policy.polizas[0].id,
+          })
+        }
       }
   
-      return create;
+      return policy;
     } catch (error) {
       console.error(error.message);
       return { error: error.message };
-    } finally {
-      if (pool) {
-        await pool.close();
-      }
     }
   };
 
@@ -271,9 +242,10 @@ const models = initModels(sequelize)
 
   const documentsContract = async (id) => {
     try {
-      const documentos = await Document.findAll({
+      const documentos = await Documentos.findAll({
         where: {
-          id_poliza: id
+          itipo: 'P',
+          ccodigo: id
         },
         attributes: [
           'xtitulo', 'xruta', 'xarchivo'
@@ -346,7 +318,7 @@ const searchPolicy = async (xpoliza, ccedente) => {
 
 const searchReceipt = async (id) => {
   try {
-    const recibos = await Receipt.findAll({
+    const recibos = await Recibos.findAll({
       where:{ id_poliza: id},
       attributes: ['ncuota', 'fdesde_rec', 'fhasta_rec', 'mprimaext', 'fcobro', 'id_poliza', 'mcomisionext',
         'fcobro', 'iestadorec', 'crecibo'
@@ -566,7 +538,6 @@ const createComplement = async (data) => {
   }
 };
 
-
 const createAbono = async (createAbono) => {
   let pool = await sql.connect(sqlConfig);
   try {
@@ -723,9 +694,6 @@ const paymentProductor = async (data) => {
   }
 };
 
-
-
-
 const paymentEjecutivo = async (data) => {
   let pool;
   try {
@@ -873,105 +841,6 @@ const buscarTarifasDist = async (id) => {
     return { error: error.message };
   }
 };
-
-// async function checkExpiringContracts() {
-//   let pool;
-//   try {
-//       pool = await sql.connect(sqlConfig);
-
-//       const currentMonth = new Date().getMonth() + 1;
-//       const currentYear = new Date().getFullYear();
-
-//       const query = `
-//           SELECT * FROM poVpolizasDetalle 
-//           WHERE MONTH(fhasta_pol) = @currentMonth
-//           AND YEAR(fhasta_pol) = @currentYear
-//       `;
-
-//       const result = await pool.request()
-//           .input('currentMonth', sql.Int, currentMonth)
-//           .input('currentYear', sql.Int, currentYear)
-//           .query(query);
-
-//       const contracts = result.recordset;
-
-//       if (contracts.length > 0) {
-//           let emailHtml = `
-//               <h2>Contratos que vencen en ${currentMonth}/${currentYear}:</h2>
-//               <table border="1" cellpadding="5" cellspacing="0">
-//                   <thead>
-//                       <tr>
-//                           <th>ID</th>
-//                           <th>Póliza</th>
-//                           <th>Fecha de Vencimiento</th>
-//                           <th>Asegurado</th>
-//                           <th>Tomador</th>
-//                       </tr>
-//                   </thead>
-//                   <tbody>
-//           `;
-//           contracts.forEach(contract => {
-//             const formattedDate = new Date(contract.fhasta_pol).toLocaleDateString('es-ES');
-//               emailHtml += `
-//                   <tr>
-//                       <td>${contract.id}</td>
-//                       <td>${contract.xpoliza}</td>
-//                       <td>${formattedDate}</td>
-//                       <td>${contract.xnombre}</td>
-//                       <td>${contract.xtomador}</td>
-//                   </tr>
-//               `;
-//           });
-//           emailHtml += `
-//                   </tbody>
-//               </table>
-//           `;
-//           await sendEmail(`Contratos Vencen en ${currentMonth}/${currentYear}`, emailHtml);
-//       } else {
-//           console.log('No hay contratos que venzan este mes.');
-//       }
-
-//   } catch (error) {
-//       console.error('Error ejecutando la consulta:', error.message);
-//   } finally {
-//       if (pool) {
-//           await pool.close();
-//       }
-//   }
-// }
-
-// // Configuración de nodemailer
-// const transporter = nodemailer.createTransport({
-//   service: 'gmail', // o cualquier otro servicio de correo (e.g., 'yahoo', 'outlook')
-//   auth: {
-//         user: 'alenjhon9@gmail.com',
-//         pass: 'nnvwygxnvdpjegbj'
-//   }
-// });
-
-// // Función para enviar correos
-// async function sendEmail(subject, html) {
-//   const mailOptions = {
-//       from: 'Manmar Corretaje de Seguros',
-//       to: 'alenjhon9@gmail.com', // Cambia esto por la dirección de destino
-//       subject: subject,
-//       html: html
-//   };
-
-//   try {
-//       await transporter.sendMail(mailOptions);
-//       console.log('Correo enviado correctamente');
-//   } catch (error) {
-//       console.error('Error al enviar el correo:', error.message);
-//   }
-// }
-
-
-// // Programar el demonio para que se ejecute cada 2 minutos
-// cron.schedule('*/1 * * * *', () => {
-//   console.log('Ejecutando el demonio para verificar contratos que vencen...');
-//   checkExpiringContracts();
-// });
 
 export default {
     getReceipt,

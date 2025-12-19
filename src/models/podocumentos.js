@@ -10,7 +10,11 @@ export default class podocumentos extends Model {
       allowNull: false,
       primaryKey: true
     },
-    id_poliza: {
+    itipo: {
+      type: DataTypes.STRING(20),
+      allowNull: true
+    },
+    ccodigo: {
       type: DataTypes.INTEGER,
       allowNull: true
     },
