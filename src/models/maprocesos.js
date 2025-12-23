@@ -4,14 +4,14 @@ const { Model, Sequelize } = _sequelize;
 export default class maprocesos extends Model {
   static init(sequelize, DataTypes) {
   return sequelize.define('maprocesos', {
-    id: {
+    cproceso: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
       references: {
         model: 'auoperaciones',
-        key: 'id'
+        key: 'coperacion'
       }
     },
     xproceso: {
@@ -39,7 +39,7 @@ export default class maprocesos extends Model {
         name: "PK_maprocesos",
         unique: true,
         fields: [
-          { name: "id" },
+          { name: "cproceso" },
         ]
       },
     ]

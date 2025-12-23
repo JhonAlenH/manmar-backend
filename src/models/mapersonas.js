@@ -1,10 +1,10 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
+
 export default class mapersonas extends Model {
-  
   static init(sequelize, DataTypes) {
   return sequelize.define('mapersonas', {
-    id: {
+    cpersona: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -72,14 +72,14 @@ export default class mapersonas extends Model {
     }
   }, {
     tableName: 'mapersonas',
-    timestamps: false,
     schema: 'dbo',
+    timestamps: false,
     indexes: [
       {
         name: "PK_mapersonas",
         unique: true,
         fields: [
-          { name: "id" },
+          { name: "cpersona" },
         ]
       },
     ]

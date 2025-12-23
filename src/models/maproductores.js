@@ -14,7 +14,7 @@ export default class maproductores extends Model {
       allowNull: true,
       references: {
         model: 'matipo_produc',
-        key: 'id'
+        key: 'ctipo_produc'
       }
     },
     cusuario: {
@@ -34,7 +34,7 @@ export default class maproductores extends Model {
       allowNull: true,
       references: {
         model: 'madatos_bancarios',
-        key: 'id'
+        key: 'cdatos_bancarios'
       }
     },
     fcreacion: {

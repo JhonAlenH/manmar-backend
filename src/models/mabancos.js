@@ -20,11 +20,19 @@ export default class mabancos extends Model {
     },
     cmoneda: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: true,
+      references: {
+        model: 'mamonedas',
+        key: 'cmoneda'
+      }
     },
     cpais: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: true,
+      references: {
+        model: 'mapaises',
+        key: 'cpais'
+      }
     },
     bactivo: {
       type: DataTypes.BOOLEAN,

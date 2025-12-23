@@ -4,7 +4,7 @@ const { Model, Sequelize } = _sequelize;
 export default class cbmovimientos extends Model {
   static init(sequelize, DataTypes) {
   return sequelize.define('cbmovimientos', {
-    id: {
+    cmovimiento: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -15,7 +15,7 @@ export default class cbmovimientos extends Model {
       allowNull: true,
       references: {
         model: 'mapersonas',
-        key: 'id'
+        key: 'cpersona'
       }
     },
     itipomov: {
@@ -76,7 +76,7 @@ export default class cbmovimientos extends Model {
         name: "PK_cbmovimientos",
         unique: true,
         fields: [
-          { name: "id" },
+          { name: "cmovimiento" },
         ]
       },
     ]

@@ -4,7 +4,7 @@ const { Model, Sequelize } = _sequelize;
 export default class matipo_produc extends Model {
   static init(sequelize, DataTypes) {
   return sequelize.define('matipo_produc', {
-    id: {
+    ctipo_produc: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -31,7 +31,7 @@ export default class matipo_produc extends Model {
         name: "PK_matipo_produc",
         unique: true,
         fields: [
-          { name: "id" },
+          { name: "ctipo_produc" },
         ]
       },
     ]

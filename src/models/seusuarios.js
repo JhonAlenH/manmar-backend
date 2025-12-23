@@ -15,7 +15,7 @@ export default class seusuarios extends Model {
       allowNull: true,
       references: {
         model: 'mapersonas',
-        key: 'id'
+        key: 'cpersona'
       }
     },
     xusuario: {

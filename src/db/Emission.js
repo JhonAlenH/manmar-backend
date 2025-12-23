@@ -44,10 +44,10 @@ const models = initModels(sequelize)
   const Comisiones = models.cbcomisiones;
   const Complement = models.cbmovimientos;
   const Documentos = models.podocumentos;
-  const Tarifas = models.popolizas;
-  const Polizas = models.madatos_poliza;
-  const Policy = models.madatos_poliza
-  const Contracts = models.popolizas
+  const Products = models.maproductos;
+  const Polizas = models.popolizas;
+  const Policy = models.popolizas
+  const Contracts = models.povigencias
 
   const getReceipt = async (data) => {
     console.log(data)
@@ -106,8 +106,8 @@ const models = initModels(sequelize)
 
   const getTariffs = async (data) => {
     try {
-      const tariffs = await Tariffs.findOne({
-        where:data,
+      const tariffs = await Products.findOne({
+        where:{cproducto: data.id},
         attributes: ['pcomision'],
       });
       return tariffs ? tariffs.get({ plain: true }) : {};;
@@ -128,13 +128,12 @@ const models = initModels(sequelize)
       
       const contratos = await Policy.findAll({
         where: whereClause,
-        attributes: ['id', 'xpoliza'],
+        attributes: ['cpoliza', 'xpoliza'],
         include: [
           {
-            association: 'polizas',
+            association: 'vigencias',
             order: [['fdesde', 'desc']]
           },
-          'polizas',
           'ramo',
           'asegurado',
           {
@@ -160,11 +159,11 @@ const models = initModels(sequelize)
       const policy = await Polizas.create(data)
       console.log('datos poliza cre')
 
-      for (const poliza of data.polizas) {
-        const contract = await Contracts.create({...poliza, cdatos_poliza: policy.id})
+      for (const vigencia of data.vigencias) {
+        const contract = await Contracts.create({...vigencia, cpoliza: policy.cpoliza})
         console.log('poliza cre')
-        for (const recibo of poliza.recibos) {
-          const receipt = await Recibos.create({...recibo, id_poliza: contract.id})
+        for (const recibo of vigencia.recibos) {
+          const receipt = await Recibos.create({...recibo, cvigencia: contract.cvigencia})
           console.log('recibo cre')
           for (const comision of recibo.comisiones) {
             const comitt = await Comisiones.create({...comision, crecibo: receipt.crecibo})
@@ -177,7 +176,7 @@ const models = initModels(sequelize)
           Documentos.create({
             ...document,
             itipo: 'P',
-            ccodigo: policy.polizas[0].id,
+            ccodigo: policy.polizas[0].cvigencia,
           })
         }
       }
@@ -193,10 +192,10 @@ const models = initModels(sequelize)
     try {
       const contract = await Policy.findOne({
         where: {
-          id: id
+          cpoliza: id
         },
         attributes: [
-          'id', 'xpoliza', 'iestado', 'fcreacion',
+          'cpoliza', 'xpoliza', 'iestado', 'fcreacion',
         ],
         include: [
           {
@@ -204,14 +203,14 @@ const models = initModels(sequelize)
             include: [{association: 'persona', attributes: ['xnombre']}],
           },
           {
-            association: 'polizas', attributes: [
-              'id', 'mprimaext', 'mprima', 'msumaext', 'msuma', 'fdesde', 'fhasta','iestado',
-            ],
+            association: 'vigencias', attributes: [
+              'cvigencia', 'mprimaext', 'mprima', 'msumaext', 'msuma', 'fdesde', 'fhasta','iestado',
+            ], order: [['fdesde', 'DESC']],
             include: [
               {
-                association: 'producto', attributes: ['id', 'xproducto'],
+                association: 'producto', attributes: ['cproducto', 'xproducto', 'pcomision'],
                 include: [
-                  {association: 'ramo', attributes: ['id', 'xramo']},
+                  {association: 'ramo', attributes: ['cramo', 'xramo']},
                 ]
               },
               {association: 'recibos', attributes: [
@@ -221,8 +220,8 @@ const models = initModels(sequelize)
               {association: 'moneda', attributes: ['cmoneda', 'xmoneda', 'xrepresentacion']},
             ]
           },
-          {association: 'asegurado', attributes: ['id', 'cci_rif','xnombre', 'xapellido']},
-          {association: 'tomador', attributes: ['id', 'cci_rif','xnombre', 'xapellido']},
+          {association: 'asegurado', attributes: ['cpersona', 'cci_rif','xnombre', 'xapellido']},
+          {association: 'tomador', attributes: ['cpersona', 'cci_rif','xnombre', 'xapellido']},
           {
             association: 'productor', attributes: ['cproductor'],
             include: [{
@@ -267,7 +266,7 @@ const models = initModels(sequelize)
         // Construir la cláusula SET
         const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
 
-        const query = `UPDATE popolizas SET ${setClause} WHERE id = @id`;
+        const query = `UPDATE povigencias SET ${setClause} WHERE cvigencia = @id`;
 
         const updateRequest = pool.request();
 
@@ -280,7 +279,7 @@ const models = initModels(sequelize)
         const update = await updateRequest.query(query);
 
         // Actualizar solo ccedente en cbrecibos
-        const updateCbrecibosQuery = `UPDATE cbrecibos SET ccedente = @ccedente WHERE id_poliza = @id`;
+        const updateCbrecibosQuery = `UPDATE cbrecibos SET ccedente = @ccedente WHERE cvigencia = @id`;
 
         const updateRequestCbrecibos = pool.request();
         updateRequestCbrecibos.input('ccedente', data.ccedente);
@@ -319,8 +318,8 @@ const searchPolicy = async (xpoliza, ccedente) => {
 const searchReceipt = async (id) => {
   try {
     const recibos = await Recibos.findAll({
-      where:{ id_poliza: id},
-      attributes: ['ncuota', 'fdesde_rec', 'fhasta_rec', 'mprimaext', 'fcobro', 'id_poliza', 'mcomisionext',
+      where:{ cvigencia: id},
+      attributes: ['ncuota', 'fdesde_rec', 'fhasta_rec', 'mprimaext', 'fcobro', 'cvigencia', 'mcomisionext',
         'fcobro', 'iestadorec', 'crecibo'
       ],
     });
@@ -335,11 +334,11 @@ const searchComplement = async (data) => {
   try {
     const complementos = await Complement.findAll({
       where:{ 
-        id_poliza: data.id_poliza,
+        cvigencia: data.cvigencia,
         crecibo: data.crecibo,
         itipomov: 'C'
       },
-      attributes: ['fmovimiento', 'mpagado', 'crecibo', 'id_poliza', 'xruta_tipomov'],
+      attributes: ['fmovimiento', 'mpagado', 'crecibo', 'cvigencia', 'xruta_tipomov'],
     });
     const complement = complementos.map((item) => item.get({ plain: true }));
     return complement
@@ -355,19 +354,19 @@ const updateReceipt = async (data) => {
       if (Array.isArray(data.recibos) && data.recibos.length > 0) {
         await Promise.all(data.recibos.map(async (recibos) => {
           const keys = Object.keys(recibos).filter(key => 
-            key !== 'id_poliza' &&
+            key !== 'cvigencia' &&
             key !== 'nrecibo'
           );
           const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
       
-          const queryUpdate = `UPDATE cbrecibos SET ${setClause} WHERE id_poliza = @id_poliza AND nrecibo = @nrecibo`;
+          const queryUpdate = `UPDATE cbrecibos SET ${setClause} WHERE cvigencia = @cvigencia AND nrecibo = @nrecibo`;
       
           const updateRequest = pool.request();
           keys.forEach((key, index) => {
               const value = recibos[key] === '' ? null : recibos[key];
               updateRequest.input(`param${index + 1}`, value);
           });
-          updateRequest.input('id_poliza', recibos.id_poliza);
+          updateRequest.input('cvigencia', recibos.cvigencia);
           updateRequest.input('nrecibo', recibos.nrecibo);
       
           await updateRequest.query(queryUpdate);

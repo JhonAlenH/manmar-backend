@@ -75,16 +75,18 @@ const Coverage = models.macoberturas
 
 const getCedents = async (data) => {
   try {
+    console.log(data)
     const cedentes = await Cedents.findAll({
       attributes: ['ccedente'],
       include: [
-        {association: 'productores', attributes: [], where: data},
+        // {association: 'productores', attributes: [], where: data},
         {association: 'persona', attributes: ['xnombre', 'xapellido']}
       ]
     })
     const cedents = cedentes.map((item) => item.get({ plain: true }));
     return cedents;
   } catch (error) {
+    console.log(error)
     return { error: await error.parent.message };
   }
 };
@@ -92,7 +94,7 @@ const getCedents = async (data) => {
 const getTrade = async () => {
   try {
     const trade = await Trade.findAll({
-      attributes: ['id', 'xramo'],
+      attributes: ['cramo', 'xramo'],
     });
     const trades = trade.map((item) => item.get({ plain: true }));
     return trades;
@@ -110,7 +112,7 @@ const getProduct = async (data) => {
   try {
     const product = await Products.findAll({
       where: data,
-      attributes: ['id', 'xproducto'],
+      attributes: ['cproducto', 'xproducto'],
     });
     const products = product.map((item) => item.get({ plain: true }));
     return products;
@@ -140,7 +142,7 @@ const getClients = async () => {
   try {
     const client = await Clients.findAll({
       where: {itipo_persona: 'C'},
-      attributes: ['id', 'cci_rif', 'xnombre', 'xapellido'],
+      attributes: ['cpersona', 'cci_rif', 'xnombre', 'xapellido'],
     });
     const clients = client.map((item) => item.get({ plain: true }));
     return clients;
@@ -242,7 +244,7 @@ const getMethodOfPayment = async () => {
 const getTakers = async () => {
   try {
     const tomador = await Persons.findAll({
-      attributes: ['id', 'xnombre', 'xapellido', 'cci_rif'],
+      attributes: ['cpersona', 'xnombre', 'xapellido', 'cci_rif'],
       include: [{
         association: 'usuario',
       }],
@@ -371,7 +373,7 @@ const getAgents = async (cejecutivo) => {
 const getInsurance = async () => {
   try {
     const asegurados = await Persons.findAll({
-      attributes: ['id', 'xnombre', 'xapellido', 'cci_rif'],
+      attributes: ['cpersona', 'xnombre', 'xapellido', 'cci_rif'],
       include: [{
         association: 'usuario',
       }],

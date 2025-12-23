@@ -1,7 +1,9 @@
 import sql from "mssql";
+import Emission from "./Emission.js";
 import { Sequelize, Op } from 'sequelize';
 import sequelize from '../config/database.js';
-import Emission from "./Emission.js";
+import initModels  from "../models/init-models.js";
+const models = initModels(sequelize)
 
 const sqlConfig = {
   user: process.env.USER_BD,
@@ -15,21 +17,9 @@ const sqlConfig = {
   }
 }
 
-const Renovations = sequelize.define('poVpolizas', {
-    id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        allowNull: true,
-    },
-});
+const Renovations = models.povigencias;
 
-const Distribution = sequelize.define('poVdistribuciones', {
-  id_poliza: {
-      type: Sequelize.INTEGER,
-      primaryKey: true,
-      allowNull: true,
-  },
-});
+const Distribution = models.maproductos;
 
 const searchRenovations = async (data) => {
   try {
@@ -61,11 +51,24 @@ const searchRenovations = async (data) => {
       };
     }
 
+    console.log(conditions)
+
     const renovaciones = await Renovations.findAll({
       where: conditions,
       attributes: [
-        'id', 'ccedente', 'xcedente', 'cramo', 'xramo', 'casegurado', 'xasegurado', 'fdesde', 'fhasta', 'xpoliza'
+        'cvigencia', 'fdesde', 'fhasta',
       ],
+      include: [
+        {association: 'producto', attributes: ['cproducto'], include: [
+          {association: 'cedente', attributes: ['ccedente'], include: [
+            {association: 'persona', attributes: ['xnombre']},
+          ]},
+          {association: 'ramo', attributes: ['cramo','xramo']},
+        ]},
+        {association: 'poliza', attributes: ['cpoliza', 'xpoliza'], include: [
+          {association: 'asegurado', attributes: ['cpersona','xnombre', 'xapellido']},
+        ]},
+      ]
     });
 
     const renovations = renovaciones.map((item) => {
@@ -106,13 +109,13 @@ const getReceipt = async (getReceipt) => {
 
     // Convertir a número
     const mprimaNumeric = parseFloat(mprimaNumericString);
-    console.log(getReceipt)
     try {
       let pool = await sql.connect(sqlConfig);
       let result = await pool.request()
         .input('fdesde_pol', sql.DateTime, getReceipt.fdesde)
         .input('fhasta_pol', sql.DateTime, getReceipt.fhasta)
         .input('mprima', sql.Numeric(18, 2), getReceipt.mprima) // Ahora pasa el valor numérico correcto
+        .input('pcomision', sql.Numeric(18, 2), getReceipt.pcomision) // Ahora pasa el valor numérico correcto
         .input('cmetodologiapago', sql.Int, getReceipt.cmetodologiapago)
         .execute('tmBRecibos');
 
@@ -154,7 +157,7 @@ const createRenovation = async (data,id) => {
     const poliza = await Emission.createContract(data);
     if(poliza.rowsAffected[0] > 0){
       let pool = await sql.connect(sqlConfig);
-      let result = await pool.request().query(`UPDATE popolizas SET iestado_poliza = 'R' WHERE id = ${id}`);
+      let result = await pool.request().query(`UPDATE povigencias SET iestado_poliza = 'R' WHERE cvigencia = ${id}`);
     }
     return true;
   } catch (error) {
@@ -162,27 +165,11 @@ const createRenovation = async (data,id) => {
     return { error: error.message };
   }
 };
-const getDistribution = async (id_poliza) => {
+const getDistribution = async (cproducto) => {
   try {
     const distribution = await Distribution.findOne({
-      where: {id_poliza},
-      attributes: ['id_poliza', 
-                   'cproductor', 
-                   'xproductor',
-                   'pcomision_p',
-                   'mcomision_p',
-                   'mcomision_pext',
-                   'cejecutivo',
-                   'xejecutivo',
-                   'pcomision_e',
-                   'mcomision_e',
-                   'mcomision_eext',
-                   'cagente',
-                   'xagente',
-                   'pcomision_a',
-                   'mcomision_a',
-                   'mcomision_aext',
-                   ],
+      where: {cproducto: cproducto},
+      attributes: ['cproduct', 'pcomision'],
     });
     return distribution ? distribution.get({ plain: true }) : {};;
   } catch (error) {

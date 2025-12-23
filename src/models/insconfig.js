@@ -4,7 +4,7 @@ const { Model, Sequelize } = _sequelize;
 export default class insconfig extends Model {
   static init(sequelize, DataTypes) {
   return sequelize.define('insconfig', {
-    id: {
+    cconfig: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -63,7 +63,7 @@ export default class insconfig extends Model {
         name: "PK_insconfig",
         unique: true,
         fields: [
-          { name: "id" },
+          { name: "cconfig" },
         ]
       },
     ]

@@ -14,12 +14,12 @@ export default class cbrecibos extends Model {
       type: DataTypes.INTEGER,
       allowNull: true
     },
-    id_poliza: {
+    cvigencia: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'popolizas',
-        key: 'id'
+        model: 'povigencias',
+        key: 'cvigencia'
       }
     },
     ctomador: {
@@ -32,6 +32,10 @@ export default class cbrecibos extends Model {
     },
     fhasta_rec: {
       type: DataTypes.DATEONLY,
+      allowNull: true
+    },
+    ptasamon_cobro: {
+      type: DataTypes.DECIMAL(18,2),
       allowNull: true
     },
     ptasamon: {
@@ -79,11 +83,11 @@ export default class cbrecibos extends Model {
       allowNull: true,
       references: {
         model: 'cbmovimientos',
-        key: 'id'
+        key: 'cmovimiento'
       }
     },
     fcobro: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: true
     },
     fcierre: {

@@ -430,7 +430,7 @@ const searchClientes = async () => {
   try {
     const items = await Personas.findAll({
       where: {itipo_persona: 'C'},
-      attributes: ['id', 'cci_rif', 'xnombre', 'xapellido', 'fnacimiento'],
+      attributes: ['cpersona', 'cci_rif', 'xnombre', 'xapellido', 'fnacimiento'],
     });
     const result = items.map((item) => item.get({ plain: true }));
     return result;
@@ -442,8 +442,8 @@ const searchClientes = async () => {
 const searchClienteById = async (id) => {
   try {
     let result = await Personas.findOne({
-      where: {id},
-      attributes: ['id', 'cci_rif', 'xnombre', 'xapellido', 'fnacimiento', 'xtelefono', 'xdireccion', 'xcorreo', 'isexo', 'iestado_civil','cciudad'],
+      where: {cpersona: id},
+      attributes: ['cpersona', 'cci_rif', 'xnombre', 'xapellido', 'fnacimiento', 'xtelefono', 'xdireccion', 'xcorreo', 'isexo', 'iestado_civil','cciudad'],
       include: [
         {association: 'ciudad', attributes: [], include: [
           {association: 'estado', attributes: ['cestado'], include: [
@@ -483,16 +483,11 @@ const createCliente = async(body) => {
 }
 const updateCliente = async(id, data) => {
 
-  const rData = insert.formatEditData(data)
-
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    UPDATE MAASEGURADOS SET ${rData} where casegurado = ${id}`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const result = await Personas.update(data, {
+      where: {cpersona: id}
+    });
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
@@ -545,13 +540,10 @@ const updateProductores = async(id, data) => {
   const rData = insert.formatEditData(data)
 
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    UPDATE MAPRODUCTORES SET ${rData} where cproductor = ${id}`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const result = await Productores.update(data, {
+      where: {cproductor:id}
+    });
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
@@ -561,7 +553,7 @@ const updateProductores = async(id, data) => {
 const searchRamos = async () => {
   try {
     const items = await Ramos.findAll({
-      attributes: ['id','xramo']
+      attributes: ['cramo','xramo']
     });
     const result = items.map((item) => item.get({ plain: true }));
     return result;
@@ -574,7 +566,7 @@ const searchRamoById = async (id) => {
   try {
     const result = await Ramos.findOne({
       where:{id},
-      attributes: ['xramo'],
+      attributes: ['cramo'],
     });
     return result;
   } catch (error) {
@@ -607,7 +599,7 @@ const updateRamo = async(id, data) => {
 const searchProductos = async () => {
   try {
     const items = await Productos.findAll({
-      attributes: ['id','xproducto'],
+      attributes: ['cproducto','xproducto'],
       include:[
         {association: 'cedente', attributes: ['ccedente'], include:[
           {association: 'persona', attributes: ['xnombre']}
@@ -630,7 +622,7 @@ const searchProductoById = async (id) => {
   try {
     const result = await Productos.findOne({
       where:{id},
-      attributes: ['id','xproducto','cmoneda','cramo','ccedente','pcomision'],
+      attributes: ['cproducto','xproducto','cmoneda','cramo','ccedente','pcomision'],
     });
     return result;
   } catch (error) {

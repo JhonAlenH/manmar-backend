@@ -4,7 +4,7 @@ const { Model, Sequelize } = _sequelize;
 export default class podocumentos extends Model {
   static init(sequelize, DataTypes) {
   return sequelize.define('podocumentos', {
-    id: {
+    cdocumento: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -43,7 +43,7 @@ export default class podocumentos extends Model {
         name: "PK_podocumentos_1",
         unique: true,
         fields: [
-          { name: "id" },
+          { name: "cdocumento" },
         ]
       },
     ]

@@ -4,7 +4,7 @@ const { Model, Sequelize } = _sequelize;
 export default class madatos_bancarios extends Model {
   static init(sequelize, DataTypes) {
   return sequelize.define('madatos_bancarios', {
-    id: {
+    cdatos_bancarios: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -43,7 +43,7 @@ export default class madatos_bancarios extends Model {
         name: "PK_madatos_bancarios",
         unique: true,
         fields: [
-          { name: "id" },
+          { name: "cdatos_bancarios" },
         ]
       },
     ]

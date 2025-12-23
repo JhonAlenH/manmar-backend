@@ -22,6 +22,10 @@ export default class tmrecibos extends Model {
       type: DataTypes.DECIMAL(18,2),
       allowNull: true
     },
+    mcomision: {
+      type: DataTypes.DECIMAL(18,2),
+      allowNull: true
+    },
     cmetodologiapago: {
       type: DataTypes.INTEGER,
       allowNull: true

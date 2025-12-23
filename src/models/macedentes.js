@@ -19,7 +19,7 @@ export default class macedentes extends Model {
       allowNull: false,
       references: {
         model: 'mapersonas',
-        key: 'id'
+        key: 'cpersona'
       }
     },
     crepresentante: {

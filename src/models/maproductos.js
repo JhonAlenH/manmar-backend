@@ -4,7 +4,7 @@ const { Model, Sequelize } = _sequelize;
 export default class maproductos extends Model {
   static init(sequelize, DataTypes) {
   return sequelize.define('maproductos', {
-    id: {
+    cproducto: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -24,7 +24,11 @@ export default class maproductos extends Model {
     },
     cramo: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: true,
+      references: {
+        model: 'maramos',
+        key: 'cramo'
+      }
     },
     cproductor: {
       type: DataTypes.INTEGER,
@@ -67,7 +71,7 @@ export default class maproductos extends Model {
         name: "PK_maproductos",
         unique: true,
         fields: [
-          { name: "id" },
+          { name: "cproducto" },
         ]
       },
     ]

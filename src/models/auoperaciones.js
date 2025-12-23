@@ -4,7 +4,7 @@ const { Model, Sequelize } = _sequelize;
 export default class auoperaciones extends Model {
   static init(sequelize, DataTypes) {
   return sequelize.define('auoperaciones', {
-    id: {
+    coperacion: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -47,7 +47,7 @@ export default class auoperaciones extends Model {
         name: "PK_auoperaciones",
         unique: true,
         fields: [
-          { name: "id" },
+          { name: "coperacion" },
         ]
       },
     ]

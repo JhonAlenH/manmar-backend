@@ -4,21 +4,33 @@ const { Model, Sequelize } = _sequelize;
 export default class popolizas extends Model {
   static init(sequelize, DataTypes) {
   return sequelize.define('popolizas', {
-    id: {
+    cpoliza: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    cdatos_poliza: {
+    xpoliza: {
+      type: DataTypes.STRING(150),
+      allowNull: true
+    },
+    casegurado: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'madatos_poliza',
-        key: 'id'
+        model: 'mapersonas',
+        key: 'cpersona'
       }
     },
-    cproductor_convenio: {
+    ccedente: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'macedentes',
+        key: 'ccedente'
+      }
+    },
+    cproductor: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
@@ -26,81 +38,44 @@ export default class popolizas extends Model {
         key: 'cproductor'
       }
     },
-    cmoneda: {
+    ctomador: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'mamonedas',
-        key: 'cmoneda'
+        model: 'mapersonas',
+        key: 'cpersona'
       }
     },
-    xpoliza: {
-      type: DataTypes.STRING(30),
-      allowNull: true
-    },
-    cproducto: {
+    cramo: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'maproductos',
-        key: 'id'
+        model: 'maramos',
+        key: 'cramo'
       }
     },
-    fdesde: {
+    fcreacion: {
       type: DataTypes.DATEONLY,
       allowNull: true
-    },
-    fhasta: {
-      type: DataTypes.DATEONLY,
-      allowNull: true
-    },
-    femision: {
-      type: DataTypes.DATE,
-      allowNull: true
-    },
-    cmetodologiapago: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'mametodologiapago',
-        key: 'cmetodologiapago'
-      }
     },
     iestado: {
-      type: DataTypes.CHAR(1),
+      type: DataTypes.BOOLEAN,
       allowNull: true
     },
-    msuma: {
-      type: DataTypes.DECIMAL(17,2),
-      allowNull: true
-    },
-    msumaext: {
-      type: DataTypes.DECIMAL(17,2),
-      allowNull: true
-    },
-    mprima: {
-      type: DataTypes.DECIMAL(17,2),
-      allowNull: true
-    },
-    mprimaext: {
-      type: DataTypes.DECIMAL(17,2),
-      allowNull: true
-    },
-    cusuario: {
+    cusuario_creacion: {
       type: DataTypes.INTEGER,
       allowNull: true
     }
   }, {
     tableName: 'popolizas',
     schema: 'dbo',
-    hasTrigger: true,
     timestamps: false,
     indexes: [
       {
-        name: "popolizas_pk",
+        name: "PK_madatos_poliza",
         unique: true,
         fields: [
-          { name: "id" },
+          { name: "cpoliza" },
         ]
       },
     ]
