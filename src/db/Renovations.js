@@ -18,6 +18,8 @@ const sqlConfig = {
 }
 
 const Renovations = models.povigencias;
+const Recibos = models.cbrecibos;
+const Comisiones = models.cbcomisiones;
 
 const Distribution = models.maproductos;
 
@@ -154,10 +156,18 @@ const getReceipt = async (getReceipt) => {
 
 const createRenovation = async (data,id) => {
   try {
-    const poliza = await Emission.createContract(data);
-    if(poliza.rowsAffected[0] > 0){
-      let pool = await sql.connect(sqlConfig);
-      let result = await pool.request().query(`UPDATE povigencias SET iestado_poliza = 'R' WHERE cvigencia = ${id}`);
+    const updateVigencia = await Renovations.update(
+      { iestado: 'R' },
+      { where: { cpoliza: id } }
+    );
+    const renovacion = await Renovations.create(data)
+    for (const recibo of data.recibos) {
+      const receipt = await Recibos.create({...recibo, cvigencia: renovacion.cvigencia})
+      console.log('recibo cre')
+      for (const comision of recibo.comisiones) {
+        const comitt = await Comisiones.create({...comision, crecibo: receipt.crecibo})
+        console.log('comision cre')
+      }
     }
     return true;
   } catch (error) {
