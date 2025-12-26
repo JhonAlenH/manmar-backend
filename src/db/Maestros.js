@@ -673,11 +673,11 @@ const searchVehiculos = async () => {
 const searchVehiculoById = async (id) => {
   try {
     let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`SELECT ccodigo,cmarca,xmarca,cmodelo, xmodelo,cversion,xversion,xtrans, xmotor,qano from MAINMA WHERE ccodigo = ${parseInt(id)}`)
-    await pool.close();
-    return { 
-      result: result.recordset[0]
-    };
+    const item = await Vehiculos.findOne({
+      where:{ccodigo: id},
+      attributes: ['ccodigo','cmarca','xmarca','cmodelo', 'xmodelo','cversion','xversion','xtrans', 'xmotor','qano']
+    });
+    return item
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
