@@ -672,7 +672,6 @@ const searchVehiculos = async () => {
 };
 const searchVehiculoById = async (id) => {
   try {
-    let pool = await sql.connect(sqlConfig);
     const item = await Vehiculos.findOne({
       where:{ccodigo: id},
       attributes: ['ccodigo','cmarca','xmarca','cmodelo', 'xmodelo','cversion','xversion','xtrans', 'xmotor','qano']

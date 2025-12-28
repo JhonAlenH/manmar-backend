@@ -128,7 +128,7 @@ const models = initModels(sequelize)
       
       const contratos = await Policy.findAll({
         where: whereClause,
-        attributes: ['cpoliza', 'xpoliza'],
+        attributes: ['cpoliza', 'xpoliza', 'iestado'],
         include: [
           {
             association: 'vigencias',
@@ -162,6 +162,15 @@ const models = initModels(sequelize)
       for (const vigencia of data.vigencias) {
         const contract = await Contracts.create({...vigencia, cpoliza: policy.cpoliza})
         console.log('poliza cre')
+        if (policy && data.documentos.length > 0) {
+          for (const document of documentos) {
+            Documentos.create({
+              ...document,
+              itipo: 'P',
+              ccodigo: contract.cvigencia,
+            })
+          }
+        }
         for (const recibo of vigencia.recibos) {
           const receipt = await Recibos.create({...recibo, cvigencia: contract.cvigencia})
           console.log('recibo cre')
@@ -169,15 +178,6 @@ const models = initModels(sequelize)
             const comitt = await Comisiones.create({...comision, crecibo: receipt.crecibo})
             console.log('comision cre')
           }
-        }
-      }
-      if (policy && data.documentos.length > 0) {
-        for (const document of documentos) {
-          Documentos.create({
-            ...document,
-            itipo: 'P',
-            ccodigo: policy.polizas[0].cvigencia,
-          })
         }
       }
   
@@ -205,7 +205,7 @@ const models = initModels(sequelize)
           {
             association: 'vigencias', attributes: [
               'cvigencia', 'mprimaext', 'mprima', 'msumaext', 'msuma', 'fdesde', 'fhasta','iestado',
-            ], order: [['fdesde', 'DESC']],
+            ], order: [['fdesde', 'ASC']],
             include: [
               {
                 association: 'producto', attributes: ['cproducto', 'xproducto', 'pcomision'],
