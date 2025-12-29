@@ -130,7 +130,7 @@ const models = initModels(sequelize)
       
       const contratos = await Policy.findAll({
         where: whereClause,
-        attributes: ['cpoliza', 'xpoliza', 'iestado'],
+        attributes: ['cpoliza', 'xpoliza', 'iestado', 'fcreacion'],
         include: [
           {
             association: 'vigencias',
