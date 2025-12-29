@@ -1,7 +1,8 @@
 import sql from "mssql";
-import { Sequelize, Op } from 'sequelize';
+import { Sequelize, Op, where } from 'sequelize';
 import sequelize from '../config/database.js';
 import initModels  from "../models/init-models.js";
+import e from "express";
 const models = initModels(sequelize)
 
   const sqlConfig = {
@@ -41,6 +42,7 @@ const models = initModels(sequelize)
 
 
   const Recibos = models.cbrecibos;
+  const Movimientos = models.cbmovimientos;
   const Comisiones = models.cbcomisiones;
   const Complement = models.cbmovimientos;
   const Documentos = models.podocumentos;
@@ -167,6 +169,7 @@ const models = initModels(sequelize)
             Documentos.create({
               ...document,
               itipo: 'P',
+              bactivo: 1,
               ccodigo: contract.cvigencia,
             })
           }
@@ -214,7 +217,7 @@ const models = initModels(sequelize)
                 ]
               },
               {association: 'recibos', attributes: [
-                'crecibo', 'ncuota', 'iestadorec', 'fcobro', 'mprimaext', 'mprima', 'pcomision', 'mcomisionext','mcomision','fdesde_rec', 'fhasta_rec', 'iestadorec'
+                'crecibo', 'ncuota', 'iestadorec', 'fcobro', 'mprimaext', 'mprima', 'pcomision', 'mcomisionext','mcomision','fdesde_rec', 'fhasta_rec', 'iestadorec', 'cmovimiento'
               ]},
               {association: 'metodologia_pago', attributes: ['cmetodologiapago', 'xmetodologiapago']},
               {association: 'moneda', attributes: ['cmoneda', 'xmoneda', 'xrepresentacion']},
@@ -233,25 +236,52 @@ const models = initModels(sequelize)
           },
         ]
       });
-      return contract ? contract.get({ plain: true }) : {};;
+      return contract ? contract : {};;
     } catch (error) {
       return { error: error.message };
     }
   };
 
-  const documentsContract = async (id) => {
+  const documentsContract = async (data) => {
     try {
-      const documentos = await Documentos.findAll({
+      const documentosTotal = [];
+      for (const vigencia of data) {
+        const documentos = await Documentos.findAll({
+          where: {
+            itipo: 'P',
+            bactivo: 1,
+            ccodigo: vigencia.cvigencia
+          },
+          attributes: [
+            'xtitulo', 'xruta', 'xarchivo'
+          ],
+        });
+        const documents = documentos.map((item) => item.get({ plain: true }));
+        documentosTotal.push(...documents);
+      }
+      return documentosTotal;
+    } catch (error) {
+      return { error: error.message };
+    }
+  };
+
+  const getReceiptDocument = async (data) => {
+    try {
+      if (data.cmovimiento) {
+      const documento = await Documentos.findOne({
         where: {
-          itipo: 'P',
-          ccodigo: id
+          itipo: 'M',
+          bactivo: 1,
+          ccodigo: data.cmovimiento
         },
         attributes: [
-          'xtitulo', 'xruta', 'xarchivo'
+          'cdocumento','xtitulo', 'xruta', 'xarchivo'
         ],
       });
-      const documents = documentos.map((item) => item.get({ plain: true }));
-      return documents
+      return documento;
+      } else {
+        return null
+      }
     } catch (error) {
       return { error: error.message };
     }
@@ -408,37 +438,47 @@ const searchDueReceipt = async () => {
 };
 
 const updateReceiptPremium = async (data) => {
-  let pool;
   try {
-      pool = await sql.connect(sqlConfig);
-      const keys = Object.keys(data).filter(key => 
-        key !== 'id_poliza' &&
-        key !== 'nrecibo');
+    const dataMovimiento = {
+      itipomov: 'C',
+      fmovimiento: data.fcobro,
+      mmonto: data.mmonto,
+      mmontoext: data.mmontoext,
+      ptasamon: data.ptasamon,
+      cmoneda: data.cmoneda,
+      cbanco: data.cbanco,
+      xreferencia: data.xreferencia,
+      xruta_p: data.xruta_p,
+      fcreacion: new Date(),
+      iestado: 'C',
+      cusuario_creacion: data.cusuario,
+    }
+    const movimiento = await Movimientos.create(dataMovimiento)
+    console.log(movimiento)
 
-      // Construir la cláusula SET
-      const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
+    const dataRecibo = {
+      ptasamon_cobro: data.ptasamon,
+      cmovimiento: movimiento.cmovimiento,
+      fcobro: data.fcobro,
+      iestadorec: 'C',
+    }
+    const recibo = await Recibos.update(dataRecibo, {
+      where: {crecibo: data.crecibo}
+    })
 
-      const query = `UPDATE cbrecibos SET ${setClause} WHERE id_poliza = @id_poliza and nrecibo = @nrecibo`;
+    const dataDocumento = {
+      itipo: data.itipo,
+      xtitulo: data.xtitulo,
+      xruta: data.xruta,
+      bactivo: 1,
+      ccodigo: movimiento.cmovimiento,
+    }
+    const documento = await Documentos.create(dataDocumento)
 
-      const updateRequest = pool.request();
-
-      // Asignar los valores correspondientes desde data
-      keys.forEach((key, index) => {
-          updateRequest.input(`param${index + 1}`, data[key]);
-      });
-      updateRequest.input('id_poliza', data.id_poliza);
-      updateRequest.input('nrecibo', data.nrecibo);
-
-      const update = await updateRequest.query(query);
-
-      return update;
+    return recibo;
   } catch (error) {
       console.error(error.message);
       return { error: error.message };
-  } finally {
-      if (pool) {
-          await pool.close();
-      }
   }
 };
 
@@ -842,28 +882,29 @@ const buscarTarifasDist = async (id) => {
 };
 
 export default {
-    getReceipt,
-    getReceiptUpdate,
-    getProducers,
-    getTariffs,
-    searchContract,
-    createContract,
-    detailContract,
-    documentsContract,
-    updateContract,
-    searchPolicy,
-    searchReceipt,
-    searchComplement,
-    updateReceipt,
-    searchDueReceipt,
-    updateReceiptPremium,
-    searchFertilizers,
-    feeCharged,
-    createComplement,
-    createAbono,
-    searchDistribution,
-    paymentProductor,
-    paymentEjecutivo,
-    paymentAgente,
-    buscarTarifasDist
+  getReceipt,
+  getReceiptUpdate,
+  getProducers,
+  getTariffs,
+  searchContract,
+  createContract,
+  detailContract,
+  documentsContract,
+  updateContract,
+  searchPolicy,
+  searchReceipt,
+  searchComplement,
+  updateReceipt,
+  searchDueReceipt,
+  updateReceiptPremium,
+  searchFertilizers,
+  feeCharged,
+  createComplement,
+  createAbono,
+  searchDistribution,
+  paymentProductor,
+  paymentEjecutivo,
+  paymentAgente,
+  buscarTarifasDist,
+  getReceiptDocument
 }

@@ -1,4 +1,5 @@
 import emissionService from '../service/emissionService.js';
+import Emission from '../db/Emission.js';
 
 const getReceipt = async (req, res) => {
     const receipt = await emissionService.getReceipt(req.body);
@@ -188,29 +189,32 @@ const detailContract = async (req, res) => {
                 message: contratos.error
             });
     }
-    const documentos = await emissionService.documentsContract(req.params.id);
 
+    const documentos = await emissionService.documentsContract(contratos.vigencias);
     if (documentos.permissionError) {
         return res
-            .status(403)
-            .send({
-                status: false,
-                message: documentos.permissionError
-            });
+        .status(403)
+        .send({
+            status: false,
+            message: documentos.permissionError
+        });
     }
 
-    const documentList = documentos.map(item => ({
-        xnombrenota: item.xarchivo,
-        xruta: item.xruta,
-        xtitulo: item.xtitulo,
-    }))
-
+    for (const vigencia of contratos.vigencias) {
+        for (const recibo of vigencia.recibos) {
+            if(recibo.iestadorec == 'C') {
+                const docRecibo = await Emission.getReceiptDocument(recibo);
+                recibo.dataValues.documento = docRecibo;
+            }
+        }
+    }
+    
     return res
         .status(200)
         .send({
             status: true,
             data: contratos,
-            documents: documentList
+            documents: documentos
         });
 }
 

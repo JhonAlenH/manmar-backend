@@ -420,7 +420,7 @@ const getCoverage = async (cramo) => {
 const getBank = async () => {
   try {
     const bancos = await Bank.findAll({
-      attributes: ['cbanco', 'xbanco'],
+      attributes: ['cbanco', 'xbanco', 'cmoneda'],
     });
     const bank = bancos.map((item) => item.get({ plain: true }));
     return bank;

@@ -224,7 +224,7 @@ const getMaMarcas = async (req, res) => {
         message: gettedMarcas.error
       });
     }
-    const formatData = gettedMarcas.result.recordset.map(item => {
+    const formatData = gettedMarcas.map(item => {
       return{
         text: item.xmarca,
         value: `${item.cmarca}`
@@ -251,7 +251,7 @@ const getMaModelos = async (req, res) => {
         message: gettedModelos.error
       });
     }
-    const formatData = gettedModelos.result.recordset.map(item => {
+    const formatData = gettedModelos.map(item => {
       return{
         text: item.xmodelo,
         value: `${item.cmodelo}`
@@ -278,7 +278,7 @@ const getMaVersiones = async (req, res) => {
         message: gettedVersiones.error
       });
     }
-    const formatData = gettedVersiones.result.recordset.map(item => {
+    const formatData = gettedVersiones.map(item => {
       return{
         text: item.xversion,
         value: `${item.cversion}`

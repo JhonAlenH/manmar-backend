@@ -70,8 +70,8 @@ const detailContract = async (id) => {
     return contract;
 }
 
-const documentsContract = async (id) => {
-    const document = await Emission.documentsContract(id);
+const documentsContract = async (data) => {
+    const document = await Emission.documentsContract(data);
     if (document.error) {
         return {
             error: document.error
