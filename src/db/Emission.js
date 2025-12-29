@@ -134,7 +134,8 @@ const models = initModels(sequelize)
         include: [
           {
             association: 'vigencias',
-            order: [['fdesde', 'DESC']]
+            separate: true,
+            order: [['fhasta', 'ASC']]
           },
           'ramo',
           'asegurado',
@@ -208,7 +209,9 @@ const models = initModels(sequelize)
           {
             association: 'vigencias', attributes: [
               'cvigencia', 'mprimaext', 'mprima', 'msumaext', 'msuma', 'fdesde', 'fhasta','iestado',
-            ], order: [['fdesde', 'ASC']],
+            ], 
+            separate: true,
+            order: [['fhasta', 'DESC']],
             include: [
               {
                 association: 'producto', attributes: ['cproducto', 'xproducto', 'pcomision'],
