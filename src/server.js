@@ -6,6 +6,12 @@ import fs from 'fs';
 import bodyParser from 'body-parser';
 import multer from 'multer';
 
+import sequelize from './config/database.js';
+import initModels  from "./models/init-models.js";
+const models = initModels(sequelize)
+
+const Documentos = models.podocumentos;
+
 import v1AuthRouter from './v1/authRoutes.js';
 import v1ValrepRouter from './v1/valrepRoutes.js';
 import v1EmissionRouter from './v1/emissionRoutes.js';
@@ -99,6 +105,22 @@ app.post('/api/upload/documents', document_upload.array('file', 5), (req, res) =
 //   const uploadedFiles = files.map(file => ({ filename: file.filename }));
 
   res.json({ data: { status: true, uploadedFile: files, url: absolutePath } });
+});
+
+app.post('/api/create/document', async (req, res) => {
+  const data = req.body;
+  console.log(data)
+  const document = await Documentos.create(data)
+  return res.status(200).send({status: true, data: document});
+});
+
+app.post('/api/delete/document/:id', async (req, res) => {
+  const document = await Documentos.update(
+    { bestado: 0 },
+    {where: { cdocumento : req.params.id } }
+  )
+  
+  return res.status(200).send({status: true, data: document});
 });
 
 app.post('/api/upload/document/emission', document_upload.array('file', 5), (req, res) => {

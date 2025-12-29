@@ -190,20 +190,30 @@ const detailContract = async (req, res) => {
             });
     }
 
-    const documentos = await emissionService.documentsContract(contratos.vigencias);
-    if (documentos.permissionError) {
-        return res
-        .status(403)
-        .send({
-            status: false,
-            message: documentos.permissionError
-        });
-    }
-
     for (const vigencia of contratos.vigencias) {
+
+        const documentos = await emissionService.documentsContract(vigencia);
+        if (documentos.permissionError) {
+            return res
+            .status(403)
+            .send({
+                status: false,
+                message: documentos.permissionError
+            });
+        }
+        vigencia.dataValues.documentos = documentos;
+
         for (const recibo of vigencia.recibos) {
             if(recibo.iestadorec == 'C') {
                 const docRecibo = await Emission.getReceiptDocument(recibo);
+                if (docRecibo?.permissionError) {
+                    return res
+                    .status(403)
+                    .send({
+                        status: false,
+                        message: docRecibo.permissionError
+                    });
+                }
                 recibo.dataValues.documento = docRecibo;
             }
         }
@@ -214,7 +224,6 @@ const detailContract = async (req, res) => {
         .send({
             status: true,
             data: contratos,
-            documents: documentos
         });
 }
 

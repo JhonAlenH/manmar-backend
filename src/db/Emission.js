@@ -244,22 +244,18 @@ const models = initModels(sequelize)
 
   const documentsContract = async (data) => {
     try {
-      const documentosTotal = [];
-      for (const vigencia of data) {
-        const documentos = await Documentos.findAll({
-          where: {
-            itipo: 'P',
-            bactivo: 1,
-            ccodigo: vigencia.cvigencia
-          },
-          attributes: [
-            'xtitulo', 'xruta', 'xarchivo'
-          ],
-        });
-        const documents = documentos.map((item) => item.get({ plain: true }));
-        documentosTotal.push(...documents);
-      }
-      return documentosTotal;
+      const documentos = await Documentos.findAll({
+        where: {
+          itipo: 'P',
+          bactivo: 1,
+          ccodigo: data.cvigencia
+        },
+        attributes: [
+          'cdocumento', 'xtitulo', 'xruta', 'xarchivo'
+        ],
+      });
+      const documents = documentos.map((item) => item.get({ plain: true }));
+      return documents;
     } catch (error) {
       return { error: error.message };
     }
