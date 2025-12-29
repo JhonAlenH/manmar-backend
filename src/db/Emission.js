@@ -134,7 +134,7 @@ const models = initModels(sequelize)
         include: [
           {
             association: 'vigencias',
-            order: [['fdesde', 'desc']]
+            order: [['fdesde', 'asc']]
           },
           'ramo',
           'asegurado',
