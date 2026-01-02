@@ -1,8 +1,8 @@
 import Reports from '../db/Reports.js';
 
-const generateReport = async (req, res) => {
+const emissionsReport = async (req, res) => {
   try {
-    const report = await Reports.generateReport(req.body);
+    const report = await Reports.emissionsReport(req.body);
     if (report.error) {
       return res.status(report.code).send({
         status: false,
@@ -13,7 +13,8 @@ const generateReport = async (req, res) => {
     res.status(201).send({
       status: true, 
       message: 'Reporte Generado',
-      data: report
+      data: report.data,
+      label: report.label
     });
   } catch (error){
 
@@ -21,5 +22,5 @@ const generateReport = async (req, res) => {
 }
 
 export default {
-  generateReport,
+  emissionsReport,
 }

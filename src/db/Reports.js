@@ -16,29 +16,37 @@ const sqlConfig = {
   }
 }
 
-const generateReport = async (data) => {
+const emissionsReport = async (data) => {
   try {
     let pool = await sql.connect(sqlConfig);
     let queryWhere = ''
-    const entries = Object.entries(data)
+    let date = new Date()
+    let label = `Reporte_emisiones(generado_${date.toLocaleDateString('en-GB')})`
     if(data != {}) {
-      queryWhere += 'WHERE'
+      const entries = Object.entries(data)
+      console.log(entries)
+      queryWhere += ' WHERE '
+      label += '-var_('
       let x = 0
       for (const item of entries) {
+
         if(x != 0){
-          queryWhere += ' AND '  
+          queryWhere += ' AND '
+          label += '-'
         }
-        if(item[0] = 'fdesde'){
-          queryWhere += ` b.${item[0]} = '${item[1]}'`
+        if(item[0] == 'fdesde'){
+          queryWhere += `b.${item[0]} ${item[1]}`
         }
-        if(item[0] = 'ccedente'){
-          queryWhere += ` a.${item[0]} = '${item[1]}'`
+        if(item[0] == 'ccedente'){
+          queryWhere += `a.${item[0]} = '${item[1]}'`
         }
-        if(item[0] = 'cramo'){
-          queryWhere += ` a.${item[0]} = '${item[1]}'`
+        if(item[0] == 'cramo'){
+          queryWhere += `a.${item[0]} = '${item[1]}'`
         }
+        label += `${item[0]}.${item[1]}`
         x++
       }
+      label += ')'
       
     }
     console.log(queryWhere)
@@ -58,10 +66,9 @@ const generateReport = async (data) => {
       inner join mapersonas d on a.casegurado = d.cpersona
       inner join mapersonas e on a.ctomador = e.cpersona
     `
-    let result = await pool.request().query(queryInitial)
-    console.log(result)
+    let result = await pool.request().query(queryInitial + queryWhere)
     await pool.close();
-    return result
+    return {data:result.recordset, label}
   } catch (error) {
     console.log(error)
     return { error: await error.parent.message };
@@ -69,5 +76,5 @@ const generateReport = async (data) => {
 };
 
 export default {
-  generateReport
+  emissionsReport
 }

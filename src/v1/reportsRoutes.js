@@ -6,6 +6,6 @@ const router = express.Router();
 
 router
 
-    .post("/emissions/get", reportsController.generateReport)
+    .post("/emissions/get", reportsController.emissionsReport)
 
 export default router;
