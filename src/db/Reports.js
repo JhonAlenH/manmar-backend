@@ -24,7 +24,6 @@ const emissionsReport = async (data) => {
     let label = `Reporte_emisiones(generado_${date.toLocaleDateString('en-GB')})`
     if(data != {}) {
       const entries = Object.entries(data)
-      console.log(entries)
       queryWhere += ' WHERE '
       label += '-var_('
       let x = 0
@@ -49,7 +48,6 @@ const emissionsReport = async (data) => {
       label += ')'
       
     }
-    console.log(queryWhere)
     let queryInitial = `
       SELECT 
       a.xpoliza, a.cpoliza,
