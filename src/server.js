@@ -18,6 +18,7 @@ import v1EmissionRouter from './v1/emissionRoutes.js';
 import v1EstadosRouter from './v1/estadosRoutes.js';
 import v1MaestrosRouter from './v1/maestrosRoutes.js';
 import v1RenovationsRouter from './v1/renovationsRoutes.js';
+import v1ReportsRouter from './v1/reportsRoutes.js';
 
 const { diskStorage } = multer;
 
@@ -48,6 +49,7 @@ app.use("/api/v1/emission", v1EmissionRouter);
 app.use("/api/v1/estado", v1EstadosRouter);
 app.use("/api/v1/maestros", v1MaestrosRouter);
 app.use("/api/v1/renovations", v1RenovationsRouter);
+app.use("/api/v1/reports", v1ReportsRouter);
 
 const PORT = process.env.PORT || 3000; 
 

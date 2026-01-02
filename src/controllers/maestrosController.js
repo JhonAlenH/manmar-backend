@@ -41,7 +41,7 @@ const getMaRamos = async (req, res) => {
     const formatData = gettedRamos.map(item => {
       return{
         text: item.xramo,
-        value: `${item.id}`
+        value: `${item.cramo}`
       }
     })
     formatData.unshift({text:'Seleccione una opcion...',value:''})
