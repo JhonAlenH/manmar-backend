@@ -369,9 +369,20 @@ const updateMoneda = async(id, data) => {
 const searchCedentes = async () => {
   try {
     const items = await Cedentes.findAll({
-      attributes: ['ccedente', 'xrif', 'xcedente', 'cestado', 'cciudad', 'xdireccion', 'xtelefono1', 'xtelefono2', 'xcorreo', 'xportal', 'xusuario', 'xlogin'],
-    });''
-    const result = items.map((item) => item.get({ plain: true }));
+      attributes: ['ccedente'],
+      include: [
+        {association: 'persona', attributes: ['xnombre', 'cci_rif', 'xtelefono', 'xcorreo']}
+      ]
+    });
+    const result = items.map((item) => {
+      const get = item.get({ plain: true })
+      get.xcedente = get.persona?.xnombre; 
+      get.cci_rif = get.persona?.cci_rif;
+      get.xtelefono = get.persona?.xtelefono;
+      get.xcorreo = get.persona?.xcorreo;
+
+      return get
+    });
     return result;
   } catch (error) {
     console.log(error.messagec)
@@ -380,29 +391,68 @@ const searchCedentes = async () => {
 };
 const searchCedentesById = async (id) => {
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`SELECT ccedente, xrif, xcedente, cestado, cciudad, xdireccion, xtelefono1, xtelefono2, xcorreo, xportal, xusuario, xlogin from MACEDENTES WHERE ccedente = ${parseInt(id)}`)
-    await pool.close();
-    return { 
-      result: result.recordset[0]
-    };
+    const result = await Cedentes.findOne({
+      where:{ccedente: id},
+      attributes: ['ccedente', 'csuper'],
+      include: [
+        {association: 'persona', attributes: ['xnombre', 'cci_rif', 'xtelefono', 'xcorreo', 'xdireccion'],
+          include:[
+            {association: 'ciudad', attributes: ['cciudad'], include: [
+              {association: 'estado', attributes: ['cestado'], include: [
+                {association: 'pais', attributes: ['cpais']}
+              ]}
+            ]}
+          ]
+        }
+      ]
+    });
+
+    result.dataValues.itipodoc = result.persona?.cci_rif.split('-')[0];
+    result.dataValues.cci_rif = result.persona?.cci_rif.split('-')[1];
+    result.dataValues.xcedente = result.persona?.xnombre;
+    result.dataValues.xcorreo = result.persona?.xcorreo;
+    result.dataValues.xdireccion = result.persona?.xdireccion;
+    result.dataValues.cciudad = result.persona?.ciudad?.cciudad;
+    result.dataValues.cestado = result.persona?.ciudad?.estado?.cestado;
+    result.dataValues.cpais = result.persona?.ciudad?.estado?.pais?.cpais;
+
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 };
-const createCedentes = async(data) => {
+const createCedentes = async(body) => {
 
-  const rData = insert.formatCreateData(data)
+  const data = setAuItems(body)
+
+  const persona = {
+    cci_rif: `${data.itipodoc}-${data.cci_rif}`,
+    xnombre: data.xcedente,
+    xcorreo: data.xcorreo,
+    xtelefono: data.xtelefono,
+    xdireccion: data.xdireccion,
+    cciudad: data.cciudad,
+    itipo_persona: 'E',
+  }
+
+  delete data.itipodoc
+  delete data.cci_rif
+  delete data.xcedente
+  delete data.xcorreo
+  delete data.xtelefono
+  delete data.xdireccion
+  delete data.cestado
+  delete data.cpais
+  delete data.cciudad
+  // const rData = insert.formatCreateData(data)
+
 
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    INSERT INTO MACEDENTES (${rData.keys}) VALUES (${rData.values})`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const personaC = Personas.create(persona)
+    data.cpersona = personaC.cpersona
+    const cedente = Cedentes.create(data)
+    return { result: cedente };
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
@@ -410,15 +460,31 @@ const createCedentes = async(data) => {
 }
 const updateCedentes = async(id, data) => {
 
-  const rData = insert.formatEditData(data)
+  const persona = {
+    cci_rif: `${data.itipodoc}-${data.cci_rif}`,
+    xnombre: data.xcedente,
+    xcorreo: data.xcorreo,
+    xtelefono: data.xtelefono,
+    xdireccion: data.xdireccion,
+    cciudad: data.cciudad,
+    itipo_persona: 'E',
+  }
+
+  delete data.itipodoc
+  delete data.cci_rif
+  delete data.xcedente
+  delete data.xcorreo
+  delete data.xtelefono
+  delete data.xdireccion
+  delete data.cestado
+  delete data.cpais
+  delete data.cciudad
 
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    UPDATE MACEDENTES SET ${rData} where ccedente = ${id}`)
-    await pool.close();
+    const cedente = Cedentes.update({where: {ccedente: id}, data})
+   const personaC = Personas.update({where: {cpersona: cedente.cpersona},persona})
     return { 
-      result: result
+      result: cedente
     };
   } catch (error) {
     console.log(error.message)
@@ -454,7 +520,7 @@ const searchClienteById = async (id) => {
     });
 
     result.dataValues.itipodoc = result.cci_rif.split('-')[0]; result.dataValues.cci_rif = result.cci_rif.split('-')[1];
-    result.dataValues.cestado = result.estado?.cestado; result.dataValues.cpais = result.estado?.pais?.cpais;
+    result.dataValues.cestado = result.ciudad?.estado?.cestado; result.dataValues.cpais = result.ciudad?.estado?.pais?.cpais;
 
     return result;
   } catch (error) {
