@@ -15,6 +15,11 @@ router
 .get("/paises/get/:id", maestrosController.searchPais)
 .post("/paises/edit/:id", maestrosController.updatePaises)
 
+.post("/estados/search", maestrosController.searchEstados)
+.post("/estados/create", maestrosController.createEstado)
+.get("/estados/get/:id", maestrosController.searchEstado)
+.post("/estados/edit/:id", maestrosController.updateEstado)
+
 .post("/metodologiapago/search", maestrosController.searchMetodologiapagos)
 .post("/metodologiapago/create", maestrosController.createMetodologiapago)
 .get("/metodologiapago/get/:id", maestrosController.searchMetodologiapago)

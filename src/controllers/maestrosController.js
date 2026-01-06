@@ -375,6 +375,85 @@ const updatePaises = async (req, res) => {
   }
 }
 
+// Estados
+const searchEstados = async (req, res) => {
+//  console.log('holaaa')
+  try {
+    const estados = await Maestros.searchEstados();
+    if (estados.error) {
+      return res.status(estados.code).send({
+        status: false,
+        message: estados.error
+      });
+      
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Estados Obtenidos',
+      data: estados
+    });
+  } catch (error){
+
+  }
+}
+const createEstado = async (req, res) => {
+  try {
+    const createdEstado = await Maestros.createEstado(req.body);
+    if (createdEstado.error) {
+      return res.status(createdEstado.code).send({
+        status: false,
+        message: createdEstado.error
+      });
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Estado Creado',
+      data: createdEstado
+    });
+    
+  } catch (error) {
+    
+  }
+}
+const searchEstado = async (req, res) => {
+  try {
+    const findedEstado = await Maestros.searchEstadoById(req.params.id);
+    if (findedEstado.error) {
+      return res.status(findedEstado.code).send({
+        status: false,
+        message: findedEstado.error
+      });
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Estado Obtenido',
+      data: findedEstado
+    });
+    
+  } catch (error) {
+    
+  }
+}
+const updateEstado = async (req, res) => {
+  try {
+    const updatedEstado = await Maestros.updateEstado(req.params.id, req.body);
+    if (updatedEstado.error) {
+      return res.status(updatedEstado.code).send({
+        status: false,
+        message: updatedEstado.error
+      });
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Estado Actualizado',
+      data: updatedEstado
+    });
+    
+  } catch (error) {
+    
+  }
+}
+
 // Bancos
 const searchBancos = async (req, res) => {
   try {
@@ -1084,6 +1163,7 @@ const updateVehiculos = async (req, res) => {
 export default {
   getMaMonedas,getMaRamos,getMaCedentes,getMaPaises,getMaCiudades,getMaEstados,getMaBancos,getMaMarcas,getMaModelos,getMaVersiones,getMaMetodologiapago, 
   searchPaises,searchPais,createPais,updatePaises,
+  searchEstados,searchEstado,createEstado,updateEstado,
   searchBancos,searchBanco,createBanco,updateBanco,
   searchMetodologiapagos,searchMetodologiapago,createMetodologiapago,updateMetodologiapago,
   searchMonedas,searchMoneda,createMoneda,updateMoneda,

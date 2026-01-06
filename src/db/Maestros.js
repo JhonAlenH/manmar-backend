@@ -203,6 +203,61 @@ const updatePaises = async(id, data) => {
   }
 }
 
+const searchEstados = async () => {
+  try {
+    const items = await Estados.findAll({
+      attributes: ['cestado', 'xestado', 'cpais'],
+      include: [
+        {association: 'pais', attributes: ['xpais']}
+      ]
+    });
+    const result = items.map((item) => {
+      const get = item.get({ plain: true })
+      get.xpais = get.pais.xpais; 
+      return get
+    });
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
+const searchEstadoById = async (id) => {
+  try {
+    const result = await Estados.findOne({
+      where:{cestado: id},
+      attributes: ['cpais', 'cestado','xestado'],
+    });
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
+const createEstado = async(body) => {
+  console.log(body)
+  const data = setAuItems(body)
+  try {
+    const estado = Estados.create(data)
+    return { result: estado };
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+}
+const updateEstado = async(id, data) => {
+  try {
+    console.log(data)
+    const result = await Estados.update(data, {
+      where: {cestado: id}
+    });
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+}
+
 const searchBancos = async () => {
   try {
     const items = await Bancos.findAll({
@@ -509,18 +564,20 @@ const searchClienteById = async (id) => {
   try {
     let result = await Personas.findOne({
       where: {cpersona: id},
-      attributes: ['cpersona', 'cci_rif', 'xnombre', 'xapellido', 'fnacimiento', 'xtelefono', 'xdireccion', 'xcorreo', 'isexo', 'iestado_civil','cciudad'],
+      attributes: ['cpersona', 'cci_rif', 'xnombre', 'xapellido', 'fnacimiento', 'xtelefono', 'xdireccion', 'xcorreo', 'isexo', 'iestado_civil', 'cciudad'],
       include: [
-        {association: 'ciudad', attributes: [], include: [
+        {association: 'ciudad', attributes: ['cciudad'], include: [
           {association: 'estado', attributes: ['cestado'], include: [
             {association: 'pais', attributes: ['cpais']}
           ]}
         ]}
       ]
     });
-
-    result.dataValues.itipodoc = result.cci_rif.split('-')[0]; result.dataValues.cci_rif = result.cci_rif.split('-')[1];
-    result.dataValues.cestado = result.ciudad?.estado?.cestado; result.dataValues.cpais = result.ciudad?.estado?.pais?.cpais;
+    
+    result.dataValues.itipodoc = result.cci_rif.split('-')[0];
+    result.dataValues.cci_rif = result.cci_rif.split('-')[1];
+    result.dataValues.cestado = result.ciudad?.estado?.cestado;
+    result.dataValues.cpais = result.ciudad?.estado?.pais?.cpais;
 
     return result;
   } catch (error) {
@@ -749,14 +806,53 @@ const searchVehiculoById = async (id) => {
   }
 };
 const createVehiculo = async(data) => {
-
   const dataArray = Object.entries(data)
   for (const item of dataArray) {
     const key = item[0]
     const valueNoTrimmed = item[1]
-    const value = valueNoTrimmed.split('[]')[0]
-
-    if(value === ''){
+    const value = valueNoTrimmed.toString().split('[]')[0]
+    if(value.toString() == '' ){
+      if(key === 'cmarca') {
+        const check = await checkItem(data['xmarca'].split('[]')[0], 'xmarca', key, 'MAINMA')
+        if(check.error){
+          return { error: error.message };
+        } else {
+          data[key] = check.value +'[]'+ valueNoTrimmed.split('[]')[1]
+        }
+      }
+      if(key === 'cmodelo') {
+        const check = await checkItem(data['xmodelo'].split('[]')[0], 'xmodelo', key, 'MAINMA')
+        if(check.error){
+          return { error: error.message };
+        } else {
+          data[key] = check.value +'[]'+ valueNoTrimmed.split('[]')[1]
+        }
+      }
+      if(key === 'cversion') {
+        const check = await checkItem(data['xversion'].split('[]')[0], 'xversion', key, 'MAINMA')
+        if(check.error){
+          return { error: error.message };
+        } else {
+          data[key] = check.value +'[]'+ valueNoTrimmed.split('[]')[1]
+        }
+      }
+    }
+  }
+  try {
+    const result = await Vehiculos.create(data);
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+}
+const updateVehiculos = async(id, data) => {
+  const dataArray = Object.entries(data)
+  for (const item of dataArray) {
+    const key = item[0]
+    const valueNoTrimmed = item[1]
+    const value = valueNoTrimmed.toString().split('[]')[0]
+    if(value.toString() == '' ){
       if(key === 'cmarca') {
         const check = await checkItem(data['xmarca'].split('[]')[0], 'xmarca', key, 'MAINMA')
         if(check.error){
@@ -783,33 +879,13 @@ const createVehiculo = async(data) => {
       }
       // data[key] = check.value
     }
-
   }
-
-  const rData = insert.formatCreateData(data)
+  // const rData = insert.formatEditData(data)
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`INSERT INTO MAINMA (${rData.keys}) VALUES (${rData.values})`)
-    
-    await pool.close();
-    return { 
-      result: result
-    };
-  } catch (error) {
-    console.log(error.message)
-    return { error: error.message };
-  }
-}
-const updateVehiculos = async(id, data) => {
-  const rData = insert.formatEditData(data)
-  try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    UPDATE MAINMA SET ${rData} where ccodigo = ${id}`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const result = await Vehiculos.update(data, {
+      where: {ccodigo: id}
+    });
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
@@ -846,6 +922,7 @@ const setAuItems = (data) => {
 export default {
   getMaMonedas,getMaCedentes,getMaEstados,getMaBancos,getMaCiudades,getMaMarcas,getMaModelos,getMaVersiones,getMaMetodologiapago,getMaBancos,
   searchPaises,searchPaisById,createPais,updatePaises,
+  searchEstados,searchEstadoById,createEstado,updateEstado,
   searchBancos,searchBancoById,createBanco,updateBanco,
   searchMetodologiapago,searchMetodologiapagoById,createMetodologiapago,updateMetodologiapago,
   searchMonedas,searchMonedasById,createMoneda,updateMoneda,
