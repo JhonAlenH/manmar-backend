@@ -190,23 +190,51 @@ const getMaMetodologiapago = async (req, res) => {
 }
 const getMaBancos = async (req, res) => {
   try {
-    const gettedRepuestos = await Maestros.getMaBancos();
+    const gettedBancos = await Maestros.getMaBancos(req.params.cmoneda);
     // console.log(gettedPaises.result)
-    if (gettedRepuestos.error) {
-      return res.status(gettedPaises.code).send({
+    if (gettedBancos.error) {
+      return res.status(gettedBancos.code).send({
         status: false,
-        message: gettedPaises.error
+        message: gettedBancos.error
       });
     }
-    const formatData = gettedRepuestos.result.recordset.map(item => {
+    const formatData = gettedBancos.map(item => {
       return{
-        text: item.xrepuesto,
-        value: `${item.crepuesto}`
+        text: item.xbanco,
+        value: `${item.cbanco}`
       }
     })
+    formatData.unshift({text:'Seleccione una opcion...',value:''})
     res.status(201).send({
       status: true, 
-      message: 'Repuestos Obtenidas',
+      message: 'Bancos Obtenidos',
+      data: [...formatData]
+    });
+    
+  } catch (error) {
+    
+  }
+}
+const getMaTipoProducto = async (req, res) => {
+  try {
+    const gettedTipos = await Maestros.getMaTipoProducto();
+    // console.log(gettedPaises.result)
+    if (gettedTipos.error) {
+      return res.status(gettedTipos.code).send({
+        status: false,
+        message: gettedTipos.error
+      });
+    }
+    const formatData = gettedTipos.map(item => {
+      return{
+        text: item.xtipo,
+        value: `${item.ctipo_produc}`
+      }
+    })
+    formatData.unshift({text:'Seleccione una opcion...',value:''})
+    res.status(201).send({
+      status: true, 
+      message: 'Bancos Obtenidos',
       data: [...formatData]
     });
     
@@ -447,6 +475,85 @@ const updateEstado = async (req, res) => {
       status: true, 
       message: 'Estado Actualizado',
       data: updatedEstado
+    });
+    
+  } catch (error) {
+    
+  }
+}
+
+// Ciudades
+const searchCiudades = async (req, res) => {
+//  console.log('holaaa')
+  try {
+    const ciudades = await Maestros.searchCiudades();
+    if (ciudades.error) {
+      return res.status(ciudades.code).send({
+        status: false,
+        message: ciudades.error
+      });
+      
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Ciudades Obtenidas',
+      data: ciudades
+    });
+  } catch (error){
+
+  }
+}
+const createCiudad = async (req, res) => {
+  try {
+    const createdCiudad = await Maestros.createCiudad(req.body);
+    if (createdCiudad.error) {
+      return res.status(createdCiudad.code).send({
+        status: false,
+        message: createdCiudad.error
+      });
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Ciudada Creada',
+      data: createdCiudad
+    });
+    
+  } catch (error) {
+    
+  }
+}
+const searchCiudad = async (req, res) => {
+  try {
+    const findedCiudad = await Maestros.searchCiudadById(req.params.id);
+    if (findedCiudad.error) {
+      return res.status(findedCiudad.code).send({
+        status: false,
+        message: findedCiudad.error
+      });
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Ciudad Obtenida',
+      data: findedCiudad
+    });
+    
+  } catch (error) {
+    
+  }
+}
+const updateCiudad = async (req, res) => {
+  try {
+    const updatedCiudad = await Maestros.updateCiudad(req.params.id, req.body);
+    if (updatedCiudad.error) {
+      return res.status(updatedCiudad.code).send({
+        status: false,
+        message: updatedCiudad.error
+      });
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Ciudad Actualizada',
+      data: updatedCiudad
     });
     
   } catch (error) {
@@ -864,9 +971,9 @@ const searchProductores = async (req, res) => {
 
   }
 }
-const createProductores = async (req, res) => {
+const createProductor = async (req, res) => {
   try {
-    const createdProductores = await Maestros.createProductores(req.body);
+    const createdProductores = await Maestros.createProductor(req.body);
     if (createdProductores.error) {
       return res.status(createdProductores.code).send({
         status: false,
@@ -1161,15 +1268,16 @@ const updateVehiculos = async (req, res) => {
 
 
 export default {
-  getMaMonedas,getMaRamos,getMaCedentes,getMaPaises,getMaCiudades,getMaEstados,getMaBancos,getMaMarcas,getMaModelos,getMaVersiones,getMaMetodologiapago, 
+  getMaMonedas,getMaRamos,getMaCedentes,getMaPaises,getMaCiudades,getMaEstados,getMaBancos,getMaTipoProducto,getMaMarcas,getMaModelos,getMaVersiones,getMaMetodologiapago, 
   searchPaises,searchPais,createPais,updatePaises,
   searchEstados,searchEstado,createEstado,updateEstado,
+  searchCiudades,searchCiudad,createCiudad,updateCiudad,
   searchBancos,searchBanco,createBanco,updateBanco,
   searchMetodologiapagos,searchMetodologiapago,createMetodologiapago,updateMetodologiapago,
   searchMonedas,searchMoneda,createMoneda,updateMoneda,
   searchCedentes,searchCedente,createCedentes,updateCedentes,
   searchClientes,searchCliente,createCliente,updateCliente,
-  searchProductores,searchProductor,createProductores,updateProductores,
+  searchProductores,searchProductor,createProductor,updateProductores,
   searchRamos,searchRamo,createRamo,updateRamo,
   searchProductos,searchProducto,createProducto,updateProducto,
   searchVehiculos,searchVehiculo,createVehiculo,updateVehiculos

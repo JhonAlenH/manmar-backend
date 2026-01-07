@@ -19,6 +19,8 @@ const sqlConfig = {
 
 const Paises = models.mapaises;
 const Bancos = models.mabancos;
+const TipoProductor = models.matipo_produc;
+const DatosBancarios = models.madatos_bancarios;
 const MetodologiaPago = models.mametodologiapago;
 const Monedas = models.mamonedas;
 const Cedentes = models.macedentes;
@@ -88,10 +90,23 @@ const getMaEstados = async(pais) => {
     return { error: error.message };
   }
 }
-const getMaBancos = async() => {
+const getMaBancos = async(cmoneda) => {
   try {
     const items = await Bancos.findAll({
+      where:{cmoneda},
       attributes: ['cbanco', 'xbanco'],
+    });
+    const result = items.map((item) => item.get({ plain: true }));
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+}
+const getMaTipoProducto = async() => {
+  try {
+    const items = await TipoProductor.findAll({
+      attributes: ['ctipo_produc', 'xtipo'],
     });
     const result = items.map((item) => item.get({ plain: true }));
     return result;
@@ -105,7 +120,7 @@ const getMaMarcas = async() => {
     const items = await Vehiculos.findAll({
       attributes: ['cmarca', 'xmarca'],
       group: ['cmarca', 'xmarca'],
-      order: [['xmarca', 'DESC']]
+      order: [['xmarca', 'ASC']]
     });
     const result = items.map((item) => item.get({ plain: true }));
     return result;
@@ -120,7 +135,7 @@ const getMaModelos = async(cmarca) => {
       where: {cmarca},
       attributes: ['cmodelo', 'xmodelo'],
       group: ['cmodelo', 'xmodelo'],
-      order: [['xmodelo', 'DESC']]
+      order: [['xmodelo', 'ASC']]
     });
     const result = items.map((item) => item.get({ plain: true }));
     return result;
@@ -135,7 +150,7 @@ const getMaVersiones = async(cmarca,cmodelo) => {
       where: {cmarca,cmodelo},
       attributes: ['cversion', 'xversion'],
       group: ['cversion', 'xversion'],
-      order: [['xversion', 'DESC']]
+      order: [['xversion', 'ASC']]
     });
     const result = items.map((item) => item.get({ plain: true }));
     return result;
@@ -250,6 +265,75 @@ const updateEstado = async(id, data) => {
     console.log(data)
     const result = await Estados.update(data, {
       where: {cestado: id}
+    });
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+}
+
+const searchCiudades = async () => {
+  try {
+    const items = await Ciudades.findAll({
+      attributes: ['cciudad', 'xciudad', 'cestado'],
+      include: [
+        {association: 'estado', attributes: ['xestado'], include:[
+          {association: 'pais', attributes: ['xpais']}
+        ]}
+      ]
+    });
+    const result = items.map((item) => {
+      const get = item.get({ plain: true })
+      get.xestado = get.estado?.xestado; 
+      get.xpais = get.estado?.pais?.xpais; 
+      return get
+    });
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
+const searchCiudadById = async (id) => {
+  try {
+    const result = await Ciudades.findOne({
+      where:{cciudad: id},
+      attributes: ['cciudad','xciudad'],
+      include: [
+        {association: 'estado', attributes: ['cestado'], include:[
+          {association: 'pais', attributes: ['cpais']}
+        ]}
+      ]
+    });
+
+    result.dataValues.cestado = result.estado?.cestado;
+    result.dataValues.cpais = result.estado?.pais?.cpais;
+
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
+const createCiudad = async(body) => {
+  console.log(body)
+  const data = setAuItems(body)
+  delete data.cpais
+  try {
+    const estado = Ciudades.create(data)
+    return { result: estado };
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+}
+const updateCiudad = async(id, data) => {
+  try {
+    console.log(data)
+    delete data.cpais
+    const result = await Ciudades.update(data, {
+      where: {cciudad: id}
     });
     return result;
   } catch (error) {
@@ -387,19 +471,17 @@ const searchMonedas = async () => {
 };
 const searchMonedasById = async (id) => {
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`SELECT cmoneda, xmoneda, xabreviatura from MAMONEDAS WHERE cmoneda = ${parseInt(id)}`)
-    await pool.close();
-    return { 
-      result: result.recordset[0]
-    };
+    const result = await Monedas.findOne({
+      where:{cmoneda: id},
+      attributes: ['cmoneda', 'xmoneda', 'xabreviatura', 'xrepresentacion'],
+    });
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 };
 const createMoneda = async(body) => {
-
   const data = setAuItems(body)
   try {
     const moneda = Monedas.create(data)
@@ -502,7 +584,6 @@ const createCedentes = async(body) => {
   delete data.cciudad
   // const rData = insert.formatCreateData(data)
 
-
   try {
     const personaC = Personas.create(persona)
     data.cpersona = personaC.cpersona
@@ -536,8 +617,13 @@ const updateCedentes = async(id, data) => {
   delete data.cciudad
 
   try {
-    const cedente = Cedentes.update({where: {ccedente: id}, data})
-   const personaC = Personas.update({where: {cpersona: cedente.cpersona},persona})
+    const cedenteUp = await Cedentes.update(data, {where: {ccedente: id}})
+    const cedente =  await Cedentes.findOne({
+      where: {ccedente: id},
+      attributes: ['ccedente', 'cpersona'],
+    })
+    console.log(cedente)
+   const personaC = await Personas.update(persona, {where: {cpersona: cedente.cpersona}})
     return { 
       result: cedente
     };
@@ -620,9 +706,22 @@ const updateCliente = async(id, data) => {
 const searchProductores = async () => {
   try {
     const items = await Productores.findAll({
-      attributes: ['cproductor','xproductor','xrif','csuper','cpais','cestado','cciudad','xdireccion','xtelefono','xcorreo','pcomision','xcta_nacional','xcta_extranjero']
+      attributes: ['cproductor', 'cusuario', 'ctipo_productor'],
+      include:[
+        {association: 'tipo_productor', attributes: ['xtipo']},
+        {association: 'usuario', attributes: ['cpersona'], include:[
+          {association: 'persona', attributes: ['xnombre', 'cci_rif']}
+        ]}
+      ]
     });
-    const result = items.map((item) => item.get({ plain: true }));
+    const result = items.map((item) => {
+      const get = item.get({ plain: true })
+      get.xtipo = get.tipo_productor?.xtipo;
+      get.xproductor = get.usuario?.persona?.xnombre;
+      get.cci_rif = get.usuario?.persona?.cci_rif;
+
+      return get
+    });
     return result;
   } catch (error) {
     console.log(error.message)
@@ -631,29 +730,96 @@ const searchProductores = async () => {
 };
 const searchProductoresById = async (id) => {
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`SELECT cproductor,xproductor,xrif,csuper,cpais,cestado,cciudad,xdireccion,xtelefono,xcorreo,pcomision,xcta_nacional,xcta_extranjero from MAPRODUCTORES WHERE cproductor = ${parseInt(id)}`)
-    await pool.close();
-    return { 
-      result: result.recordset[0]
-    };
+    const result = await Productores.findOne({
+      where:{cproductor: id},
+      attributes: ['cproductor', 'csuper', 'ctipo_productor'],
+      include: [
+        {association: 'datos_bancarios', attributes: ['cbanco','xtelefono','cci_rif','xcuenta','itipo_cuenta'], include: [
+          {association: 'banco', attributes: ['cbanco', 'cmoneda']}
+        ]},
+        {association: 'usuario', attributes: ['cpersona', 'xusuario', 'xcontrasena', 'xobservacion'], include:[
+          {association: 'persona', attributes: ['xnombre', 'cci_rif', 'xtelefono', 'xcorreo', 'xdireccion'],
+            include:[
+              {association: 'ciudad', attributes: ['cciudad'], include: [
+                {association: 'estado', attributes: ['cestado'], include: [
+                  {association: 'pais', attributes: ['cpais']}
+                ]}
+              ]}
+            ]
+          }
+        ]}
+      ]
+    });
+
+    result.dataValues.xproductor = result.usuario?.persona?.xnombre;
+    result.dataValues.xtelefono = result.usuario?.persona?.xtelefono;
+    result.dataValues.xcorreo = result.usuario?.persona?.xcorreo;
+    result.dataValues.xdireccion = result.usuario?.persona?.xdireccion;
+    result.dataValues.itipodoc = result.usuario?.persona?.cci_rif.split('-')[0];
+    result.dataValues.cci_rif = result.usuario?.persona?.cci_rif.split('-')[1];
+
+    result.dataValues.cciudad = result.usuario?.persona?.ciudad?.cciudad;
+    result.dataValues.cestado = result.usuario?.persona?.ciudad?.estado?.cestado;
+    result.dataValues.cpais = result.usuario?.persona?.ciudad?.estado?.pais?.cpais;
+    
+    result.dataValues.cmoneda = result.datos_bancarios?.banco?.cmoneda;
+    result.dataValues.cbanco = result.datos_bancarios?.cbanco;
+    result.dataValues.xtelefono_banco = result.datos_bancarios?.xtelefono;
+    result.dataValues.cci_rif_banco = result.datos_bancarios?.cci_rif;
+    result.dataValues.xcuenta = result.datos_bancarios?.xcuenta;
+    result.dataValues.itipo_cuenta = result.datos_bancarios?.itipo_cuenta;
+    
+    result.dataValues.xusuario = result.usuario?.xusuario;
+    result.dataValues.xcontrasena = result.usuario?.xcontrasena;
+    result.dataValues.xobservacion = result.usuario?.xobservacion;
+
+    return result
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 };
-const createProductores = async(data) => {
+const createProductor = async(body) => {
 
-  const rData = insert.formatCreateData(data)
+  const data = setAuItems(body)
+
+  const persona = {
+    cci_rif: `${data.itipodoc}-${data.cci_rif}`,
+    xnombre: data.xcedente,
+    xcorreo: data.xcorreo,
+    xtelefono: data.xtelefono,
+    xdireccion: data.xdireccion,
+    cciudad: data.cciudad,
+    itipo_persona: 'S',
+  }
+
+  const datos_bancarios = {
+    cbanco: data.cbanco,
+    xtelefono: data.xtelefono_banco,
+    cci_rif: data.cci_rif_banco,
+    xcuenta: data.xcuenta,
+    itipo_cuenta: data.itipo_cuenta,
+  }
+
+  const usuario = {
+    cbanco: data.cbanco,
+    xtelefono: data.xtelefono_banco,
+    cci_rif: data.cci_rif_banco,
+    xcuenta: data.xcuenta,
+    itipo_cuenta: data.itipo_cuenta,
+  }
 
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    INSERT INTO MAPRODUCTORES (${rData.keys}) VALUES (${rData.values})`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const personaC = await Personas.create(persona)
+    const usuarioC = await Usuarios.create(usuario)
+    const datos_bancariosC = await DatosBancarios.create(datos_bancarios)
+
+    const productor = await Productores.create({
+      csuper: data.csuper,
+      ctipo_productor: data.ctipo_productor,
+      cusuario: data.cusua
+    })
+    return {result: productor} 
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
@@ -920,15 +1086,16 @@ const setAuItems = (data) => {
 }
 
 export default {
-  getMaMonedas,getMaCedentes,getMaEstados,getMaBancos,getMaCiudades,getMaMarcas,getMaModelos,getMaVersiones,getMaMetodologiapago,getMaBancos,
+  getMaMonedas,getMaCedentes,getMaEstados,getMaBancos,getMaCiudades,getMaMarcas,getMaTipoProducto,getMaModelos,getMaVersiones,getMaMetodologiapago,getMaBancos,
   searchPaises,searchPaisById,createPais,updatePaises,
   searchEstados,searchEstadoById,createEstado,updateEstado,
+  searchCiudades,searchCiudadById,createCiudad,updateCiudad,
   searchBancos,searchBancoById,createBanco,updateBanco,
   searchMetodologiapago,searchMetodologiapagoById,createMetodologiapago,updateMetodologiapago,
   searchMonedas,searchMonedasById,createMoneda,updateMoneda,
   searchCedentes,searchCedentesById,createCedentes,updateCedentes,
   searchClientes,searchClienteById,createCliente,updateCliente,
-  searchProductores,searchProductoresById,createProductores,updateProductores,
+  searchProductores,searchProductoresById,createProductor,updateProductores,
   searchRamos,searchRamoById,createRamo,updateRamo,
   searchProductos,searchProductoById,createProducto,updateProducto,
   searchVehiculos,searchVehiculoById,createVehiculo,updateVehiculos

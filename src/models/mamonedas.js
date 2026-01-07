@@ -5,6 +5,7 @@ export default class mamonedas extends Model {
   static init(sequelize, DataTypes) {
   return sequelize.define('mamonedas', {
     cmoneda: {
+      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true

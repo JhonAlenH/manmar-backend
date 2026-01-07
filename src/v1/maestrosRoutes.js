@@ -20,6 +20,11 @@ router
 .get("/estados/get/:id", maestrosController.searchEstado)
 .post("/estados/edit/:id", maestrosController.updateEstado)
 
+.post("/ciudades/search", maestrosController.searchCiudades)
+.post("/ciudades/create", maestrosController.createCiudad)
+.get("/ciudades/get/:id", maestrosController.searchCiudad)
+.post("/ciudades/edit/:id", maestrosController.updateCiudad)
+
 .post("/metodologiapago/search", maestrosController.searchMetodologiapagos)
 .post("/metodologiapago/create", maestrosController.createMetodologiapago)
 .get("/metodologiapago/get/:id", maestrosController.searchMetodologiapago)
@@ -31,11 +36,12 @@ router
 .post("/monedas/edit/:id", maestrosController.updateMoneda)
 
 // Rutas para obtener los maestros en formulario de item
-.get("/bancos", maestrosController.getMaBancos)
 .get("/metodologiapago", maestrosController.getMaMetodologiapago)
 .get("/monedas", maestrosController.getMaMonedas)
+.get("/bancos/:cmoneda", maestrosController.getMaBancos)
 .get("/ramos", maestrosController.getMaRamos)
 .get("/cedentes", maestrosController.getMaCedentes)
+.get("/tipo_produc", maestrosController.getMaTipoProducto)
 
 .get("/paises", maestrosController.getMaPaises)
 .get("/ciudades/:estado", maestrosController.getMaCiudades)
@@ -57,7 +63,7 @@ router
 .post("/clientes/edit/:id", maestrosController.updateCliente)
 
 .post("/productores/search", maestrosController.searchProductores)
-.post("/productores/create", maestrosController.createProductores)
+.post("/productores/create", maestrosController.createProductor)
 .get("/productores/get/:id", maestrosController.searchProductor)
 .post("/productores/edit/:id", maestrosController.updateProductores)
 

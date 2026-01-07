@@ -9,6 +9,10 @@ export default class maproductores extends Model {
       allowNull: false,
       primaryKey: true
     },
+    csuper: {
+      type: DataTypes.STRING(10),
+      allowNull: true
+    },
     ctipo_productor: {
       type: DataTypes.INTEGER,
       allowNull: true,
