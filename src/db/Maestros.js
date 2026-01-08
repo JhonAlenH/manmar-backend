@@ -811,13 +811,18 @@ const createProductor = async(body) => {
 
   try {
     const personaC = await Personas.create(persona)
+    
+    usuario.cpersona = personaC.cpersona
+    
     const usuarioC = await Usuarios.create(usuario)
+
     const datos_bancariosC = await DatosBancarios.create(datos_bancarios)
 
     const productor = await Productores.create({
       csuper: data.csuper,
       ctipo_productor: data.ctipo_productor,
-      cusuario: data.cusua
+      cusuario: usuarioC.cusuario,
+      cdatos_bancarios: datos_bancariosC.cdatos_bancarios
     })
     return {result: productor} 
   } catch (error) {
@@ -826,13 +831,51 @@ const createProductor = async(body) => {
   }
 }
 const updateProductores = async(id, data) => {
-  const rData = insert.formatEditData(data)
+  const data = setAuItems(body)
+
+  const persona = {
+    cci_rif: `${data.itipodoc}-${data.cci_rif}`,
+    xnombre: data.xcedente,
+    xcorreo: data.xcorreo,
+    xtelefono: data.xtelefono,
+    xdireccion: data.xdireccion,
+    cciudad: data.cciudad,
+    itipo_persona: 'S',
+  }
+
+  const datos_bancarios = {
+    cbanco: data.cbanco,
+    xtelefono: data.xtelefono_banco,
+    cci_rif: data.cci_rif_banco,
+    xcuenta: data.xcuenta,
+    itipo_cuenta: data.itipo_cuenta,
+  }
+
+  const usuario = {
+    cbanco: data.cbanco,
+    xtelefono: data.xtelefono_banco,
+    cci_rif: data.cci_rif_banco,
+    xcuenta: data.xcuenta,
+    itipo_cuenta: data.itipo_cuenta,
+  }
 
   try {
-    const result = await Productores.update(data, {
-      where: {cproductor:id}
-    });
-    return result;
+    const productorU = await Productores.update({
+      csuper: data.csuper,
+      ctipo_productor: data.ctipo_productor,
+    }, {where: {cproductor:id}})
+
+    const productor = await Productores.findOne({
+      where: {cproductor: id},
+      attributes:['cproductor','cdatos_bancarios','cusuario'], include:[
+        {association: 'usuario', attributes: ['cpersona']}
+      ]
+    })
+    const datos_bancariosU = await DatosBancarios.update(datos_bancarios, {where: {cdatos_bancarios: productor.cdatos_bancarios}})
+    const usuarioU = await Usuarios.update(usuario, {where: {cusuario: productor.cusuario}})
+    const personaU = await Personas.update(persona, {where: {cpersona: productor?.usuario.cpersona}})
+
+    return {result: productor} 
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
