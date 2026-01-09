@@ -28,6 +28,7 @@ const Personas = models.mapersonas;
 const Productores = models.maproductores;
 const Productos = models.maproductos;
 const Ramos = models.maramos;
+const Roles = models.serol;
 const Ciudades = models.maciudades;
 const Estados = models.maestados;
 const Vehiculos = models.mainma;
@@ -58,6 +59,23 @@ const getMaCedentes = async() => {
       get.xcedente = get.persona?.xnombre; 
       return get
     });
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+}
+const getMaRoles = async(rol) => {
+  try {
+    let data = null
+    if (rol){
+      data = {crol:  { [Op.gte]: rol }}
+    }
+    const items = await Roles.findAll({
+      where: data,
+      attributes: ['crol', 'xrol'],
+    });
+    const result = items.map((item) => item.get({ plain: true }));
     return result;
   } catch (error) {
     console.log(error.message)
@@ -400,7 +418,7 @@ const updateBanco = async(id, data) => {
 const searchMetodologiapago = async () => {
   try {
     const items = await MetodologiaPago.findAll({
-      attributes: ['cmetodologiapago', 'xmetodologiapago', 'cpais'],
+      attributes: ['cmetodologiapago', 'xmetodologiapago', 'ncuotas'],
     });
     const result = items.map((item) => item.get({ plain: true }));
     return result;
@@ -411,46 +429,32 @@ const searchMetodologiapago = async () => {
 };
 const searchMetodologiapagoById = async (id) => {
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`SELECT cmetodologiapago, xmetodologiapago, cpais from MAMETODOLOGIAPAGO WHERE cmetodologiapago = ${parseInt(id)}`)
-    await pool.close();
-    return { 
-      result: result.recordset[0]
-    };
+    const result = await MetodologiaPago.findOne({
+      where:{cmetodologiapago: id},
+      attributes: ['cmetodologiapago', 'xmetodologiapago', 'ndias', 'ncuotas'],
+    });
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 };
-const createMetodologiapago = async(data) => {
-
-  const rData = insert.formatCreateData(data)
-
+const createMetodologiapago = async(body) => {
+  const data = setAuItems(body)
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    INSERT INTO MAMETODOLOGIAPAGO (${rData.keys}) VALUES (${rData.values})`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const metodologiapago = MetodologiaPago.create(data)
+    return { result: metodologiapago };
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
   }
 }
 const updateMetodologiapago = async(id, data) => {
-
-  const rData = insert.formatEditData(data)
-
   try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool.request().query(`
-    UPDATE MAMETODOLOGIAPAGO SET ${rData} where cmetodologiapago = ${id}`)
-    await pool.close();
-    return { 
-      result: result
-    };
+    const result = await MetodologiaPago.update(data, {
+      where: {cmetodologiapago: id}
+    });
+    return result;
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
@@ -782,10 +786,11 @@ const searchProductoresById = async (id) => {
 const createProductor = async(body) => {
 
   const data = setAuItems(body)
+  delete data.datos_bancarios; delete data.datos_usuario
 
   const persona = {
     cci_rif: `${data.itipodoc}-${data.cci_rif}`,
-    xnombre: data.xcedente,
+    xnombre: data.xproductor,
     xcorreo: data.xcorreo,
     xtelefono: data.xtelefono,
     xdireccion: data.xdireccion,
@@ -802,11 +807,9 @@ const createProductor = async(body) => {
   }
 
   const usuario = {
-    cbanco: data.cbanco,
-    xtelefono: data.xtelefono_banco,
-    cci_rif: data.cci_rif_banco,
-    xcuenta: data.xcuenta,
-    itipo_cuenta: data.itipo_cuenta,
+    xusuario: data.xusuario,
+    xobservacion: data.xobservacion,
+    xcontrasena: data.xcontrasena,
   }
 
   try {
@@ -830,17 +833,16 @@ const createProductor = async(body) => {
     return { error: error.message };
   }
 }
-const updateProductores = async(id, data) => {
-  const data = setAuItems(body)
+const updateProductores = async(id, body) => {
+  delete data.datos_bancarios; delete data.datos_usuario
 
   const persona = {
     cci_rif: `${data.itipodoc}-${data.cci_rif}`,
-    xnombre: data.xcedente,
+    xnombre: data.xproductor,
     xcorreo: data.xcorreo,
     xtelefono: data.xtelefono,
     xdireccion: data.xdireccion,
-    cciudad: data.cciudad,
-    itipo_persona: 'S',
+    cciudad: data.cciudad
   }
 
   const datos_bancarios = {
@@ -848,15 +850,13 @@ const updateProductores = async(id, data) => {
     xtelefono: data.xtelefono_banco,
     cci_rif: data.cci_rif_banco,
     xcuenta: data.xcuenta,
-    itipo_cuenta: data.itipo_cuenta,
+    itipo_cuenta: data.itipo_cuenta
   }
 
   const usuario = {
-    cbanco: data.cbanco,
-    xtelefono: data.xtelefono_banco,
-    cci_rif: data.cci_rif_banco,
-    xcuenta: data.xcuenta,
-    itipo_cuenta: data.itipo_cuenta,
+    xusuario: data.xusuario,
+    xobservacion: data.xobservacion,
+    xcontrasena: data.xcontrasena
   }
 
   try {
@@ -885,7 +885,8 @@ const updateProductores = async(id, data) => {
 const searchRamos = async () => {
   try {
     const items = await Ramos.findAll({
-      attributes: ['cramo','xramo']
+      attributes: ['cramo','xramo'],
+      order: [['cramo', 'ASC']]
     });
     const result = items.map((item) => item.get({ plain: true }));
     return result;
@@ -897,8 +898,8 @@ const searchRamos = async () => {
 const searchRamoById = async (id) => {
   try {
     const result = await Ramos.findOne({
-      where:{id},
-      attributes: ['cramo'],
+      where:{cramo: id},
+      attributes: ['cramo','xramo'],
     });
     return result;
   } catch (error) {
@@ -919,9 +920,130 @@ const createRamo = async(body) => {
 const updateRamo = async(id, data) => {
   try {
     const result = await Ramos.update(data, {
-      where: {id}
+      where: {cramo: id}
     });
     return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+}
+
+const searchUsuarios = async (cproductor) => {
+  try {
+    let data = null
+    if(cproductor) {
+      data = {cproductor}
+    }
+    const items = await Usuarios.findAll({
+      where: data,
+      attributes: ['cusuario','xusuario'],
+      include: [
+        {association: 'rol', attributes:['crol','xrol']}
+      ]
+    });
+    const result = items.map((item) => {
+      const get = item.get({ plain: true })
+      get.xrol = get.rol?.xrol; 
+      return get
+    });
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
+const searchUsuarioById = async (id) => {
+  try {
+    const result = await Usuarios.findOne({
+      where:{cusuario: id},
+      attributes: ['cusuario','xusuario', 'xobservacion', 'cproductor', 'cpersona', 'crol', 'xcontrasena'],
+      include: [
+        {association: 'persona', attributes: ['xnombre', 'xapellido', 'cci_rif', 'xtelefono', 'xcorreo', 'xdireccion'],
+            include:[
+              {association: 'ciudad', attributes: ['cciudad'], include: [
+                {association: 'estado', attributes: ['cestado'], include: [
+                  {association: 'pais', attributes: ['cpais']}
+                ]}
+              ]}
+            ]
+          }
+      ]
+    });
+
+    result.dataValues.xnombre = result.persona?.xnombre;
+    result.dataValues.xapellido = result.persona?.xapellido;
+    result.dataValues.itipodoc = result.persona?.cci_rif.split('-')[0];
+    result.dataValues.cci_rif = result.persona?.cci_rif.split('-')[1];
+    result.dataValues.xtelefono = result.persona?.xtelefono;
+    result.dataValues.xcorreo = result.persona?.xcorreo;
+    result.dataValues.xdireccion = result.persona?.xdireccion;
+
+    result.dataValues.cciudad = result.persona?.ciudad?.cciudad;
+    result.dataValues.cestado = result.persona?.ciudad?.estado?.cestado;
+    result.dataValues.cpais = result.persona?.ciudad?.estado?.pais?.cpais;
+
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
+const createUsuario = async(body) => {
+  const data = setAuItems(body)
+  const userP = await Usuarios.findOne({
+    where:{cusuario: data.cusuario_creacion},
+    attributes: ['cusuario', 'cproductor']
+  }) 
+  data.cproductor = userP.cproductor
+  
+  const personaBody = {
+    xnombre: data.xnombre,
+    xapellido: data.xapellido,
+    cci_rif: `${data.itipodoc}-${data.cci_rif}`,
+    xcorreo: data.xcorreo,
+    xtelefono: data.xtelefono,
+    xdireccion: data.xdireccion,
+    cciudad: data.cciudad,
+    itipo_persona: 'S',
+  }
+  const persona = setAuItems(personaBody)
+  console.log(persona)
+  try {
+    const personaC = await Personas.create(persona)
+    data.cpersona = personaC.cpersona
+    console.log(data)
+    const usuario = await Usuarios.create(data)
+    return { result: usuario };
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+}
+const updateUsuario = async(id, data) => {
+
+  console.log(data)
+  const persona = {
+    xnombre: data.xnombre,
+    xapellido: data.xapellido,
+    cci_rif: `${data.itipodoc}-${data.cci_rif}`,
+    xcorreo: data.xcorreo,
+    xtelefono: data.xtelefono,
+    xdireccion: data.xdireccion,
+    cciudad: data.cciudad
+  }
+
+  try {
+    const usuarioU = await Usuarios.update(data, {where: {cusuario:id}})
+
+    const usuario = await Usuarios.findOne({
+      where: {cusuario: id},
+      attributes:['cusuario','cpersona']
+    })
+
+    const personaU = await Personas.update(persona, {where: {cpersona: usuario.cpersona}})
+
+    return {result: usuario} 
   } catch (error) {
     console.log(error.message)
     return { error: error.message };
@@ -953,7 +1075,7 @@ const searchProductos = async () => {
 const searchProductoById = async (id) => {
   try {
     const result = await Productos.findOne({
-      where:{id},
+      where:{cproducto: id},
       attributes: ['cproducto','xproducto','cmoneda','cramo','ccedente','pcomision'],
     });
     return result;
@@ -981,7 +1103,7 @@ const createProducto = async(body) => {
 const updateProducto = async(id, data) => {
   try {
     const result = await Productos.update(data, {
-      where: {id}
+      where: {cproducto: id}
     });
     return result;
   } catch (error) {
@@ -1129,7 +1251,7 @@ const setAuItems = (data) => {
 }
 
 export default {
-  getMaMonedas,getMaCedentes,getMaEstados,getMaBancos,getMaCiudades,getMaMarcas,getMaTipoProducto,getMaModelos,getMaVersiones,getMaMetodologiapago,getMaBancos,
+  getMaMonedas,getMaCedentes, getMaRoles,getMaEstados,getMaBancos,getMaCiudades,getMaMarcas,getMaTipoProducto,getMaModelos,getMaVersiones,getMaMetodologiapago,getMaBancos,
   searchPaises,searchPaisById,createPais,updatePaises,
   searchEstados,searchEstadoById,createEstado,updateEstado,
   searchCiudades,searchCiudadById,createCiudad,updateCiudad,
@@ -1140,6 +1262,7 @@ export default {
   searchClientes,searchClienteById,createCliente,updateCliente,
   searchProductores,searchProductoresById,createProductor,updateProductores,
   searchRamos,searchRamoById,createRamo,updateRamo,
+  searchUsuarios,searchUsuarioById,createUsuario,updateUsuario,
   searchProductos,searchProductoById,createProducto,updateProducto,
   searchVehiculos,searchVehiculoById,createVehiculo,updateVehiculos
 }

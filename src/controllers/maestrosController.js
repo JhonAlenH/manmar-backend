@@ -55,6 +55,60 @@ const getMaRamos = async (req, res) => {
     
   }
 }
+const getMaRoles = async (req, res) => {
+  try {
+    const gettedRoles = await Maestros.getMaRoles(req.params.crol);
+    // console.log(gettedMonedas.result.recordset)
+    if (gettedRoles.error) {
+      return res.status(gettedRoles.code).send({
+        status: false,
+        message: gettedRoles.error
+      });
+    }
+    const formatData = gettedRoles.map(item => {
+      return{
+        text: item.xrol,
+        value: `${item.crol}`
+      }
+    })
+    formatData.unshift({text:'Seleccione una opcion...',value:''})
+    res.status(201).send({
+      status: true, 
+      message: 'Roles Obtenidos',
+      data: [...formatData]
+    });
+    
+  } catch (error) {
+    
+  }
+}
+const getMaRolesAll = async (req, res) => {
+  try {
+    const gettedRoles = await Maestros.getMaRoles(null);
+    // console.log(gettedMonedas.result.recordset)
+    if (gettedRoles.error) {
+      return res.status(gettedRoles.code).send({
+        status: false,
+        message: gettedRoles.error
+      });
+    }
+    const formatData = gettedRoles.map(item => {
+      return{
+        text: item.xrol,
+        value: `${item.crol}`
+      }
+    })
+    formatData.unshift({text:'Seleccione una opcion...',value:''})
+    res.status(201).send({
+      status: true, 
+      message: 'Roles Obtenidos',
+      data: [...formatData]
+    });
+    
+  } catch (error) {
+    
+  }
+}
 const getMaCedentes = async (req, res) => {
   try {
     const gettedCedentes = await Maestros.getMaCedentes();
@@ -1070,7 +1124,6 @@ const createRamo = async (req, res) => {
   }
 }
 const searchRamo = async (req, res) => {
-console.log('buscar Ramo')
   try {
     const findedRamos = await Maestros.searchRamoById(req.params.id);
     if (findedRamos.error) {
@@ -1102,6 +1155,103 @@ const updateRamo = async (req, res) => {
       status: true, 
       message: 'Ramo Actualizado',
       data: updatedRamos
+    });
+    
+  } catch (error) {
+    
+  }
+}
+
+// Usuarios
+const searchUsuarios = async (req, res) => {
+  try {
+    const usuarios = await Maestros.searchUsuarios(req.params.cproductor);
+    if (usuarios.error) {
+      return res.status(usuarios.code).send({
+        status: false,
+        message: usuarios.error
+      });
+      
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Usuarios Obtenidos',
+      data: usuarios
+    });
+  } catch (error){
+
+  }
+}
+const searchUsuariosAll = async (req, res) => {
+  try {
+    const usuarios = await Maestros.searchUsuarios();
+    if (usuarios.error) {
+      return res.status(usuarios.code).send({
+        status: false,
+        message: usuarios.error
+      });
+      
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Usuarios Obtenidos',
+      data: usuarios
+    });
+  } catch (error){
+
+  }
+}
+const createUsuario = async (req, res) => {
+  try {
+    const createdUsuario = await Maestros.createUsuario(req.body);
+    if (createdUsuario.error) {
+      return res.status(createdUsuario.code).send({
+        status: false,
+        message: createdUsuario.error
+      });
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Usuario Creado',
+      data: createdUsuario
+    });
+    
+  } catch (error) {
+    
+  }
+}
+const searchUsuario = async (req, res) => {
+  try {
+    const findeUsuario = await Maestros.searchUsuarioById(req.params.id);
+    if (findeUsuario.error) {
+      return res.status(findeUsuario.code).send({
+        status: false,
+        message: findeUsuario.error
+      });
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Usuario Obtenido',
+      data: findeUsuario
+    });
+    
+  } catch (error) {
+    
+  }
+}
+const updateUsuario = async (req, res) => {
+  try {
+    const updatedUsuario = await Maestros.updateUsuario(req.params.id, req.body);
+    if (updatedUsuario.error) {
+      return res.status(updatedUsuario.code).send({
+        status: false,
+        message: updatedUsuario.error
+      });
+    }
+    res.status(201).send({
+      status: true, 
+      message: 'Usuario Actualizado',
+      data: updatedUsuario
     });
     
   } catch (error) {
@@ -1268,7 +1418,7 @@ const updateVehiculos = async (req, res) => {
 
 
 export default {
-  getMaMonedas,getMaRamos,getMaCedentes,getMaPaises,getMaCiudades,getMaEstados,getMaBancos,getMaTipoProducto,getMaMarcas,getMaModelos,getMaVersiones,getMaMetodologiapago, 
+  getMaMonedas,getMaRamos,getMaRoles,getMaRolesAll,getMaCedentes,getMaPaises,getMaCiudades,getMaEstados,getMaBancos,getMaTipoProducto,getMaMarcas,getMaModelos,getMaVersiones,getMaMetodologiapago, 
   searchPaises,searchPais,createPais,updatePaises,
   searchEstados,searchEstado,createEstado,updateEstado,
   searchCiudades,searchCiudad,createCiudad,updateCiudad,
@@ -1279,6 +1429,7 @@ export default {
   searchClientes,searchCliente,createCliente,updateCliente,
   searchProductores,searchProductor,createProductor,updateProductores,
   searchRamos,searchRamo,createRamo,updateRamo,
+  searchUsuarios,searchUsuariosAll,searchUsuario,createUsuario,updateUsuario,
   searchProductos,searchProducto,createProducto,updateProducto,
   searchVehiculos,searchVehiculo,createVehiculo,updateVehiculos
 }

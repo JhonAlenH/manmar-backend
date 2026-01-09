@@ -40,6 +40,8 @@ router
 .get("/monedas", maestrosController.getMaMonedas)
 .get("/bancos/:cmoneda", maestrosController.getMaBancos)
 .get("/ramos", maestrosController.getMaRamos)
+.get("/roles/:crol", maestrosController.getMaRoles)
+.get("/roles/", maestrosController.getMaRolesAll)
 .get("/cedentes", maestrosController.getMaCedentes)
 .get("/tipo_produc", maestrosController.getMaTipoProducto)
 
@@ -71,6 +73,12 @@ router
 .post("/ramos/create", maestrosController.createRamo)
 .get("/ramos/get/:id", maestrosController.searchRamo)
 .post("/ramos/edit/:id", maestrosController.updateRamo)
+
+.post("/usuarios/search/:cproductor", maestrosController.searchUsuarios)
+.post("/usuarios/search/", maestrosController.searchUsuariosAll)
+.post("/usuarios/create", maestrosController.createUsuario)
+.get("/usuarios/get/:id", maestrosController.searchUsuario)
+.post("/usuarios/edit/:id", maestrosController.updateUsuario)
 
 .post("/productos/search", maestrosController.searchProductos)
 .post("/productos/create", maestrosController.createProducto)

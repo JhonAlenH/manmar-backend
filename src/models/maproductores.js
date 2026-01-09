@@ -5,6 +5,7 @@ export default class maproductores extends Model {
   static init(sequelize, DataTypes) {
   return sequelize.define('maproductores', {
     cproductor: {
+      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true

@@ -6,7 +6,7 @@ const models = initModels(sequelize)
 const verifyUser = async (data) => {
   try {
     const user = await models.seusuarios.findOne({
-      attributes: ['cusuario', 'xusuario', 'crol'],
+      attributes: ['cusuario', 'xusuario', 'crol', 'cproductor'],
       where: {
         xusuario: data.username,
         xcontrasena: data.password
