@@ -128,7 +128,7 @@ const searchContract = async (data) => {
         {
           association: 'vigencias',
           separate: true,
-          order: [['fhasta', 'ASC']]
+          order: [['fhasta', 'DESC']]
         },
         'ramo',
         'asegurado',
@@ -144,7 +144,8 @@ const searchContract = async (data) => {
       const get = item.get({ plain: true })
       get.countVigencias = get.vigencias?.length;
       get.estadoVigencia = get.vigencias[0]?.iestado;
-      get.ultimaVigencia = get.vigencias[0]?.fhasta;
+      get.fhasta = get.vigencias[0]?.fhasta;
+      get.fdesde = get.vigencias[0]?.fdesde;
       get.cci_rif_asegurado = get.asegurado?.cci_rif;
       get.xasegurado = `${get.asegurado?.xnombre} ${get.asegurado?.xapellido || ''}`.trim();
       get.xcedente = `${get.cedente?.persona?.xnombre} ${get.cedente?.persona?.xapellido || ''}`.trim();
@@ -152,13 +153,19 @@ const searchContract = async (data) => {
 
       if(get.countVigencias > 1 && get.estadoVigencia != 'A') {
         get.estado = 'Renovada'
-      } else if ((get.countVigencias > 2 && get.estadoVigencia == 'A') || (get.ultimaVigencia < (new Date()).toLocaleDateString('En-US'))) {
+      } else if ((get.countVigencias > 2 && get.estadoVigencia == 'A') || (get.fhasta < (new Date()).toLocaleDateString('En-US'))) {
         get.estado = 'Por Renovar'
       } else if (get.estadoVigencia == 'A') {
         get.estado = 'Anulada'
       } else {
         get.estado = 'Vigente'
       }
+      get.fdesde = new Date(get.fdesde)
+      get.fdesde.setDate(get.fdesde.getDate() + 1);
+      get.fdesde = get.fdesde.toLocaleDateString('en-GB') 
+      get.fhasta = new Date(get.fhasta)
+      get.fhasta.setDate(get.fhasta.getDate() + 1);
+      get.fhasta = get.fhasta.toLocaleDateString('en-GB')
 
       return get
     }
