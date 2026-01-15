@@ -4,7 +4,6 @@ import Maestros from '../db/Maestros.js';
 const getMaMonedas = async (req, res) => {
   try {
     const gettedMonedas = await Maestros.getMaMonedas();
-    // console.log(gettedMonedas.result.recordset)
     if (gettedMonedas.error) {
       return res.status(gettedMonedas.code).send({
         status: false,
@@ -31,7 +30,6 @@ const getMaMonedas = async (req, res) => {
 const getMaRamos = async (req, res) => {
   try {
     const gettedRamos = await Maestros.searchRamos();
-    // console.log(gettedMonedas.result.recordset)
     if (gettedRamos.error) {
       return res.status(gettedRamos.code).send({
         status: false,
@@ -58,7 +56,6 @@ const getMaRamos = async (req, res) => {
 const getMaRoles = async (req, res) => {
   try {
     const gettedRoles = await Maestros.getMaRoles(req.params.crol);
-    // console.log(gettedMonedas.result.recordset)
     if (gettedRoles.error) {
       return res.status(gettedRoles.code).send({
         status: false,
@@ -85,7 +82,6 @@ const getMaRoles = async (req, res) => {
 const getMaRolesAll = async (req, res) => {
   try {
     const gettedRoles = await Maestros.getMaRoles(null);
-    // console.log(gettedMonedas.result.recordset)
     if (gettedRoles.error) {
       return res.status(gettedRoles.code).send({
         status: false,
@@ -138,7 +134,6 @@ const getMaCedentes = async (req, res) => {
 const getMaPaises = async (req, res) => {
   try {
     const gettedPaises = await Maestros.searchPaises();
-    // console.log(gettedPaises.result)
     if (gettedPaises.error) {
       return res.status(gettedPaises.code).send({
         status: false,
@@ -165,7 +160,6 @@ const getMaPaises = async (req, res) => {
 const getMaCiudades = async (req, res) => {
   try {
     const gettedCiudades = await Maestros.getMaCiudades(req.params.estado);
-    // console.log(gettedCiudades.result)
     if (gettedCiudades.error) {
       return res.status(gettedCiudades.code).send({
         status: false,
@@ -192,7 +186,6 @@ const getMaCiudades = async (req, res) => {
 const getMaEstados = async (req, res) => {
   try {
     const gettedEstados = await Maestros.getMaEstados(req.params.pais);
-    // console.log(gettedCiudades.result)
     if (gettedEstados.error) {
       return res.status(gettedEstados.code).send({
         status: false,
@@ -219,7 +212,6 @@ const getMaEstados = async (req, res) => {
 const getMaMetodologiapago = async (req, res) => {
   try {
     const gettedMetodologiapago = await Maestros.getMaMetodologiapago();
-  //  console.log(gettedMetodologiapago.result)
     if (gettedMetodologiapago.error) {
       return res.status(gettedMetodologiapago.code).send({
         status: false,
@@ -245,7 +237,6 @@ const getMaMetodologiapago = async (req, res) => {
 const getMaBancos = async (req, res) => {
   try {
     const gettedBancos = await Maestros.getMaBancos(req.params.cmoneda);
-    // console.log(gettedPaises.result)
     if (gettedBancos.error) {
       return res.status(gettedBancos.code).send({
         status: false,
@@ -272,7 +263,6 @@ const getMaBancos = async (req, res) => {
 const getMaTipoProducto = async (req, res) => {
   try {
     const gettedTipos = await Maestros.getMaTipoProducto();
-    // console.log(gettedPaises.result)
     if (gettedTipos.error) {
       return res.status(gettedTipos.code).send({
         status: false,
@@ -299,7 +289,6 @@ const getMaTipoProducto = async (req, res) => {
 const getMaMarcas = async (req, res) => {
   try {
     const gettedMarcas = await Maestros.getMaMarcas();
-    // console.log(gettedProveedores.result)
     if (gettedMarcas.error) {
       return res.status(gettedMarcas.code).send({
         status: false,
@@ -326,7 +315,6 @@ const getMaMarcas = async (req, res) => {
 const getMaModelos = async (req, res) => {
   try {
     const gettedModelos = await Maestros.getMaModelos(req.params.cmarca);
-    // console.log(gettedProveedores.result)
     if (gettedModelos.error) {
       return res.status(gettedModelos.code).send({
         status: false,
@@ -353,7 +341,6 @@ const getMaModelos = async (req, res) => {
 const getMaVersiones = async (req, res) => {
   try {
     const gettedVersiones = await Maestros.getMaVersiones(req.params.cmarca, req.params.cmodelo);
-    // console.log(gettedProveedores.result)
     if (gettedVersiones.error) {
       return res.status(gettedVersiones.code).send({
         status: false,
@@ -380,7 +367,6 @@ const getMaVersiones = async (req, res) => {
 
 // Paises
 const searchPaises = async (req, res) => {
-//  console.log('holaaa')
   try {
     const paises = await Maestros.searchPaises();
     if (paises.error) {
@@ -459,7 +445,6 @@ const updatePaises = async (req, res) => {
 
 // Estados
 const searchEstados = async (req, res) => {
-//  console.log('holaaa')
   try {
     const estados = await Maestros.searchEstados();
     if (estados.error) {
@@ -538,7 +523,7 @@ const updateEstado = async (req, res) => {
 
 // Ciudades
 const searchCiudades = async (req, res) => {
-//  console.log('holaaa')
+
   try {
     const ciudades = await Maestros.searchCiudades();
     if (ciudades.error) {
@@ -1379,7 +1364,6 @@ const createVehiculo = async (req, res) => {
 const searchVehiculo = async (req, res) => {
   try {
     const findedVehiculo = await Maestros.searchVehiculoById(req.params.id);
-    console.log(findedVehiculo)
     if (findedVehiculo.error) {
       return res.status(findedVehiculo.code).send({
         status: false,

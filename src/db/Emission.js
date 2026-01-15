@@ -5,328 +5,342 @@ import initModels  from "../models/init-models.js";
 import e from "express";
 const models = initModels(sequelize)
 
-  const sqlConfig = {
-      user: process.env.USER_BD,
-      password: process.env.PASSWORD_BD,
-      server: process.env.SERVER_BD,
-      database: process.env.NAME_BD,
-      requestTimeout: 60000,
-      options: {
-          encrypt: true,
-          trustServerCertificate: true
-      }
+const sqlConfig = {
+  user: process.env.USER_BD,
+  password: process.env.PASSWORD_BD,
+  server: process.env.SERVER_BD,
+  database: process.env.NAME_BD,
+  requestTimeout: 60000,
+  options: {
+    encrypt: true,
+    trustServerCertificate: true
   }
-
-  const Producers = models.maproductores
-
-  const Tariffs = models.maproductos;
-
-
-  
-
-  const Abonos = sequelize.define('cbmovimientos', {
-    id: {
-      type: Sequelize.INTEGER,
-      primaryKey: true,
-      allowNull: true,
-    },
-  }, {tableName: 'cbmovimientos'});
-
-  const Distribution = sequelize.define('cbVmovimientos', {
-    ncuota: {
-      type: Sequelize.INTEGER,
-      primaryKey: true,
-      allowNull: true,
-    },
-  }, {tableName: 'cbVmovimientos'});
-
-
-  const Recibos = models.cbrecibos;
-  const Movimientos = models.cbmovimientos;
-  const Comisiones = models.cbcomisiones;
-  const Complement = models.cbmovimientos;
-  const Documentos = models.podocumentos;
-  const Products = models.maproductos;
-  const Polizas = models.popolizas;
-  const Policy = models.popolizas
-  const Contracts = models.povigencias
-
-  const getReceipt = async (data) => {
-    console.log(data)
-    const strPrecio = data.mprima || '0,00'; // El string que contiene el precio
-    const precioNumerico = parseFloat(strPrecio.replace(',', '.')); // Convertir a número con decimales
-    try {
-      let pool = await sql.connect(sqlConfig);
-      let result = await pool.request()
-      .input('fdesde_pol', sql.DateTime, data.fdesde)
-      .input('fhasta_pol', sql.DateTime, data.fhasta)
-      .input('mprima', sql.Numeric(18, 2), precioNumerico)
-      .input('pcomision', sql.Numeric(18, 2), data.pcomision)
-      .input('cmetodologiapago', sql.Int, data.cmetodologiapago)
-      .execute('tmBRecibos');
-      const receipt= await pool.request()
-      .query('select * from tmrecibos');
-      await pool.close();
-      return receipt       
-    } catch(err){
-      console.log(err.message)
-      return { error: err.message };
-    }
-  }
-
-  const getReceiptUpdate = async (getReceiptUpdate) => {
-    const strPrecio = getReceiptUpdate.mprima; // El string que contiene el precio
-    const precioNumerico = parseFloat(strPrecio.replace(',', '.')); // Convertir a número con decimales
-    try{
-        let pool = await sql.connect(sqlConfig);
-        let result = await pool.request()
-        .input('id', sql.Int, getReceiptUpdate.id)
-        .input('mmonto', sql.Numeric(18, 2), precioNumerico)
-        .input('fdesde', sql.DateTime, getReceiptUpdate.fdesde)
-        .execute('pobconsulta_prima');
-        const receipt= await pool.request()
-        .query('select * from tmconsulta_prima');
-        await pool.close();
-        return receipt
-              
-    }catch(err){
-      console.log(err.message)
-        return { error: err.message };
-        }
 }
 
-  const getProducers = async () => {
-    try {
-      const producers = await Producers.findOne({
-        attributes: ['cproductor', 'xproductor', 'pcomision'],
-      });
-      return producers ? producers.get({ plain: true }) : {};;
-    } catch (error) {
-      return { error: error.message };
-    }
-  };
+const Producers = models.maproductores
+const Tariffs = models.maproductos;
 
-  const getTariffs = async (data) => {
-    try {
-      const tariffs = await Products.findOne({
-        where:{cproducto: data.id},
-        attributes: ['pcomision'],
-      });
-      return tariffs ? tariffs.get({ plain: true }) : {};;
-    } catch (error) {
-      return { error: error.message };
-    }
-  };
+const Abonos = sequelize.define('cbmovimientos', {
+  id: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    allowNull: true,
+  },
+}, {tableName: 'cbmovimientos'});
 
-  const searchContract = async (data) => {
-    try {
-      const whereClause = {};
-      if (data.ccedente) {
-        whereClause.ccedente = data.ccedente;
+const Distribution = sequelize.define('cbVmovimientos', {
+  ncuota: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    allowNull: true,
+  },
+}, {tableName: 'cbVmovimientos'});
+
+
+const Recibos = models.cbrecibos;
+const Movimientos = models.cbmovimientos;
+const Comisiones = models.cbcomisiones;
+const Complement = models.cbmovimientos;
+const Documentos = models.podocumentos;
+const Products = models.maproductos;
+const Polizas = models.popolizas;
+const Policy = models.popolizas
+const Contracts = models.povigencias
+
+const getReceipt = async (data) => {
+  try {
+    let pool = await sql.connect(sqlConfig);
+    let result = await pool.request()
+    .input('fdesde_pol', sql.DateTime, data.fdesde)
+    .input('fhasta_pol', sql.DateTime, data.fhasta)
+    .input('mprima', sql.Numeric(18, 2), data.mprima)
+    .input('pcomision', sql.Numeric(18, 2), data.pcomision)
+    .input('cmetodologiapago', sql.Int, data.cmetodologiapago)
+    .execute('tmBRecibos');
+    const receipt= await pool.request()
+    .query('select * from tmrecibos');
+    await pool.close();
+    return receipt       
+  } catch(err){
+    console.log(err.message)
+    return { error: err.message };
+  }
+}
+
+const getReceiptUpdate = async (getReceiptUpdate) => {
+  const strPrecio = getReceiptUpdate.mprima; // El string que contiene el precio
+  const precioNumerico = parseFloat(strPrecio.replace(',', '.')); // Convertir a número con decimales
+  try{
+      let pool = await sql.connect(sqlConfig);
+      let result = await pool.request()
+      .input('id', sql.Int, getReceiptUpdate.id)
+      .input('mmonto', sql.Numeric(18, 2), precioNumerico)
+      .input('fdesde', sql.DateTime, getReceiptUpdate.fdesde)
+      .execute('pobconsulta_prima');
+      const receipt= await pool.request()
+      .query('select * from tmconsulta_prima');
+      await pool.close();
+      return receipt
+            
+  }catch(err){
+    console.log(err.message)
+      return { error: err.message };
       }
-      if (data.cramo) {
-        whereClause.cramo = data.cramo;
-      }
-      
-      const contratos = await Policy.findAll({
-        where: whereClause,
-        attributes: ['cpoliza', 'xpoliza', 'iestado', 'fcreacion'],
-        include: [
-          {
-            association: 'vigencias',
-            separate: true,
-            order: [['fhasta', 'ASC']]
-          },
-          'ramo',
-          'asegurado',
-          {
-            association: 'cedente',
-            include: ['persona'],
-          },
-          'tomador',
-        ]
-      });
-  
-      const contracts = contratos.map((item) => item.get({ plain: true }));
-      return contracts;
-    } catch (error) {
-      console.log(error)
-      return { error: error.message };
+}
+
+const getProducers = async () => {
+  try {
+    const producers = await Producers.findOne({
+      attributes: ['cproductor', 'xproductor', 'pcomision'],
+    });
+    return producers ? producers.get({ plain: true }) : {};;
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+const getTariffs = async (data) => {
+  try {
+    const tariffs = await Products.findOne({
+      where:{cproducto: data.id},
+      attributes: ['pcomision'],
+    });
+    return tariffs ? tariffs.get({ plain: true }) : {};;
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+const searchContract = async (data) => {
+  try {
+    const whereClause = {};
+    if (data.ccedente) {
+      whereClause.ccedente = data.ccedente;
     }
-  };
+    if (data.cramo) {
+      whereClause.cramo = data.cramo;
+    }
+    
+    const contratos = await Policy.findAll({
+      where: whereClause,
+      attributes: ['cpoliza', 'xpoliza', 'iestado', 'fcreacion'],
+      include: [
+        {
+          association: 'vigencias',
+          separate: true,
+          order: [['fhasta', 'ASC']]
+        },
+        'ramo',
+        'asegurado',
+        {
+          association: 'cedente',
+          include: ['persona'],
+        },
+        'tomador',
+      ]
+    });
 
-  const createContract = async (data) => {
-    try {
-      const documentos = data.documentos || [];
-      console.log(data)
-      const policy = await Polizas.create(data)
-      console.log('datos poliza cre')
+    const contracts = contratos.map((item) => {
+      const get = item.get({ plain: true })
+      get.countVigencias = get.vigencias?.length;
+      get.estadoVigencia = get.vigencias[0]?.iestado;
+      get.ultimaVigencia = get.vigencias[0]?.fhasta;
+      get.cci_rif_asegurado = get.asegurado?.cci_rif;
+      get.xasegurado = `${get.asegurado?.xnombre} ${get.asegurado?.xapellido || ''}`.trim();
+      get.xcedente = `${get.cedente?.persona?.xnombre} ${get.cedente?.persona?.xapellido || ''}`.trim();
+      get.xramo = get.ramo?.xramo;
 
-      for (const vigencia of data.vigencias) {
-        const contract = await Contracts.create({...vigencia, cpoliza: policy.cpoliza})
-        console.log('poliza cre')
-        if (policy && data.documentos.length > 0) {
-          for (const document of documentos) {
-            Documentos.create({
-              ...document,
-              itipo: 'P',
-              bactivo: 1,
-              ccodigo: contract.cvigencia,
-            })
-          }
+      if(get.countVigencias > 1 && get.estadoVigencia != 'A') {
+        get.estado = 'Renovada'
+      } else if ((get.countVigencias > 2 && get.estadoVigencia == 'A') || (get.ultimaVigencia < (new Date()).toLocaleDateString('En-US'))) {
+        get.estado = 'Por Renovar'
+      } else if (get.estadoVigencia == 'A') {
+        get.estado = 'Anulada'
+      } else {
+        get.estado = 'Vigente'
+      }
+
+      return get
+    }
+  );
+    return contracts;
+  } catch (error) {
+    console.log(error)
+    return { error: error.message };
+  }
+};
+
+const createContract = async (data) => {
+  try {
+    const documentos = data.documentos || [];
+    const policy = await Polizas.create(data)
+    console.log('datos poliza cre')
+
+    for (const vigencia of data.vigencias) {
+      const contract = await Contracts.create({...vigencia, cpoliza: policy.cpoliza})
+      console.log('poliza cre')
+      if (policy && data.documentos.length > 0) {
+        for (const document of documentos) {
+          Documentos.create({
+            ...document,
+            itipo: 'P',
+            bactivo: 1,
+            ccodigo: contract.cvigencia,
+          })
         }
-        for (const recibo of vigencia.recibos) {
-          const receipt = await Recibos.create({...recibo, cvigencia: contract.cvigencia})
-          console.log('recibo cre')
-          for (const comision of recibo.comisiones) {
-            const comitt = await Comisiones.create({...comision, crecibo: receipt.crecibo})
-            console.log('comision cre')
-          }
+      }
+      for (const recibo of vigencia.recibos) {
+        const receipt = await Recibos.create({...recibo, cvigencia: contract.cvigencia})
+        console.log('recibo cre')
+        for (const comision of recibo.comisiones) {
+          const comitt = await Comisiones.create({...comision, crecibo: receipt.crecibo})
+          console.log('comision cre')
         }
       }
-  
-      return policy;
-    } catch (error) {
+    }
+
+    return policy;
+  } catch (error) {
+    console.error(error.message);
+    return { error: error.message };
+  }
+};
+
+const detailContract = async (id) => {
+  try {
+    const contract = await Policy.findOne({
+      where: {
+        cpoliza: id
+      },
+      attributes: [
+        'cpoliza', 'xpoliza', 'iestado', 'fcreacion',
+      ],
+      include: [
+        {
+          association: 'cedente', attributes: ['ccedente'],
+          include: [{association: 'persona', attributes: ['xnombre']}],
+        },
+        {
+          association: 'vigencias', attributes: [
+            'cvigencia', 'mprimaext', 'mprima', 'msumaext', 'msuma', 'fdesde', 'fhasta','iestado',
+          ], 
+          separate: true,
+          order: [['fhasta', 'DESC']],
+          include: [
+            {
+              association: 'producto', attributes: ['cproducto', 'xproducto', 'pcomision'],
+              include: [
+                {association: 'ramo', attributes: ['cramo', 'xramo']},
+              ]
+            },
+            {association: 'recibos', attributes: [
+              'crecibo', 'ncuota', 'iestadorec', 'fcobro', 'mprimaext', 'mprima', 'pcomision', 'mcomisionext','mcomision','fdesde_rec', 'fhasta_rec', 'iestadorec', 'cmovimiento'
+            ]},
+            {association: 'metodologia_pago', attributes: ['cmetodologiapago', 'xmetodologiapago']},
+            {association: 'moneda', attributes: ['cmoneda', 'xmoneda', 'xrepresentacion']},
+          ]
+        },
+        {association: 'asegurado', attributes: ['cpersona', 'cci_rif','xnombre', 'xapellido']},
+        {association: 'tomador', attributes: ['cpersona', 'cci_rif','xnombre', 'xapellido']},
+        {
+          association: 'productor', attributes: ['cproductor'],
+          include: [{
+            association: 'usuario', attributes: ['cusuario'],
+            include: [
+              {association: 'persona',  attributes: ['xnombre']}
+            ]
+          }],
+        },
+      ]
+    });
+    return contract ? contract : {};;
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+const documentsContract = async (data) => {
+  try {
+    const documentos = await Documentos.findAll({
+      where: {
+        itipo: 'P',
+        bactivo: 1,
+        ccodigo: data.cvigencia
+      },
+      attributes: [
+        'cdocumento', 'xtitulo', 'xruta', 'xarchivo'
+      ],
+    });
+    const documents = documentos.map((item) => item.get({ plain: true }));
+    return documents;
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+const getReceiptDocument = async (data) => {
+  try {
+    if (data.cmovimiento) {
+    const documento = await Documentos.findOne({
+      where: {
+        itipo: 'M',
+        bactivo: 1,
+        ccodigo: data.cmovimiento
+      },
+      attributes: [
+        'cdocumento','xtitulo', 'xruta', 'xarchivo'
+      ],
+    });
+    return documento;
+    } else {
+      return null
+    }
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+const updateContract = async (data) => {
+  let pool;
+  try {
+      pool = await sql.connect(sqlConfig);
+      const keys = Object.keys(data).filter(key => key !== 'id');
+
+      // Construir la cláusula SET
+      const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
+
+      const query = `UPDATE povigencias SET ${setClause} WHERE cvigencia = @id`;
+
+      const updateRequest = pool.request();
+
+      // Asignar los valores correspondientes desde data
+      keys.forEach((key, index) => {
+          updateRequest.input(`param${index + 1}`, data[key]);
+      });
+      updateRequest.input('id', data.id);
+
+      const update = await updateRequest.query(query);
+
+      // Actualizar solo ccedente en cbrecibos
+      const updateCbrecibosQuery = `UPDATE cbrecibos SET ccedente = @ccedente WHERE cvigencia = @id`;
+
+      const updateRequestCbrecibos = pool.request();
+      updateRequestCbrecibos.input('ccedente', data.ccedente);
+      updateRequestCbrecibos.input('id', data.id);
+
+      // Ejecutar la actualización en cbrecibos
+      await updateRequestCbrecibos.query(updateCbrecibosQuery);
+
+      return update;
+  } catch (error) {
       console.error(error.message);
       return { error: error.message };
-    }
-  };
-
-  const detailContract = async (id) => {
-    try {
-      const contract = await Policy.findOne({
-        where: {
-          cpoliza: id
-        },
-        attributes: [
-          'cpoliza', 'xpoliza', 'iestado', 'fcreacion',
-        ],
-        include: [
-          {
-            association: 'cedente', attributes: ['ccedente'],
-            include: [{association: 'persona', attributes: ['xnombre']}],
-          },
-          {
-            association: 'vigencias', attributes: [
-              'cvigencia', 'mprimaext', 'mprima', 'msumaext', 'msuma', 'fdesde', 'fhasta','iestado',
-            ], 
-            separate: true,
-            order: [['fhasta', 'DESC']],
-            include: [
-              {
-                association: 'producto', attributes: ['cproducto', 'xproducto', 'pcomision'],
-                include: [
-                  {association: 'ramo', attributes: ['cramo', 'xramo']},
-                ]
-              },
-              {association: 'recibos', attributes: [
-                'crecibo', 'ncuota', 'iestadorec', 'fcobro', 'mprimaext', 'mprima', 'pcomision', 'mcomisionext','mcomision','fdesde_rec', 'fhasta_rec', 'iestadorec', 'cmovimiento'
-              ]},
-              {association: 'metodologia_pago', attributes: ['cmetodologiapago', 'xmetodologiapago']},
-              {association: 'moneda', attributes: ['cmoneda', 'xmoneda', 'xrepresentacion']},
-            ]
-          },
-          {association: 'asegurado', attributes: ['cpersona', 'cci_rif','xnombre', 'xapellido']},
-          {association: 'tomador', attributes: ['cpersona', 'cci_rif','xnombre', 'xapellido']},
-          {
-            association: 'productor', attributes: ['cproductor'],
-            include: [{
-              association: 'usuario', attributes: ['cusuario'],
-              include: [
-                {association: 'persona',  attributes: ['xnombre']}
-              ]
-            }],
-          },
-        ]
-      });
-      return contract ? contract : {};;
-    } catch (error) {
-      return { error: error.message };
-    }
-  };
-
-  const documentsContract = async (data) => {
-    try {
-      const documentos = await Documentos.findAll({
-        where: {
-          itipo: 'P',
-          bactivo: 1,
-          ccodigo: data.cvigencia
-        },
-        attributes: [
-          'cdocumento', 'xtitulo', 'xruta', 'xarchivo'
-        ],
-      });
-      const documents = documentos.map((item) => item.get({ plain: true }));
-      return documents;
-    } catch (error) {
-      return { error: error.message };
-    }
-  };
-
-  const getReceiptDocument = async (data) => {
-    try {
-      if (data.cmovimiento) {
-      const documento = await Documentos.findOne({
-        where: {
-          itipo: 'M',
-          bactivo: 1,
-          ccodigo: data.cmovimiento
-        },
-        attributes: [
-          'cdocumento','xtitulo', 'xruta', 'xarchivo'
-        ],
-      });
-      return documento;
-      } else {
-        return null
+  } finally {
+      if (pool) {
+          await pool.close();
       }
-    } catch (error) {
-      return { error: error.message };
-    }
-  };
-
-  const updateContract = async (data) => {
-    let pool;
-    try {
-        pool = await sql.connect(sqlConfig);
-        const keys = Object.keys(data).filter(key => key !== 'id');
-
-        // Construir la cláusula SET
-        const setClause = keys.map((key, index) => `${key} = @param${index + 1}`).join(', ');
-
-        const query = `UPDATE povigencias SET ${setClause} WHERE cvigencia = @id`;
-
-        const updateRequest = pool.request();
-
-        // Asignar los valores correspondientes desde data
-        keys.forEach((key, index) => {
-            updateRequest.input(`param${index + 1}`, data[key]);
-        });
-        updateRequest.input('id', data.id);
-
-        const update = await updateRequest.query(query);
-
-        // Actualizar solo ccedente en cbrecibos
-        const updateCbrecibosQuery = `UPDATE cbrecibos SET ccedente = @ccedente WHERE cvigencia = @id`;
-
-        const updateRequestCbrecibos = pool.request();
-        updateRequestCbrecibos.input('ccedente', data.ccedente);
-        updateRequestCbrecibos.input('id', data.id);
-
-        // Ejecutar la actualización en cbrecibos
-        await updateRequestCbrecibos.query(updateCbrecibosQuery);
-
-        return update;
-    } catch (error) {
-        console.error(error.message);
-        return { error: error.message };
-    } finally {
-        if (pool) {
-            await pool.close();
-        }
-    }
-  };
+  }
+};
 
 const searchPolicy = async (xpoliza, ccedente) => {
   try {
@@ -453,7 +467,6 @@ const updateReceiptPremium = async (data) => {
       cusuario_creacion: data.cusuario,
     }
     const movimiento = await Movimientos.create(dataMovimiento)
-    console.log(movimiento)
 
     const dataRecibo = {
       ptasamon_cobro: data.ptasamon,
@@ -492,7 +505,6 @@ const searchFertilizers = async (searchFertilizers) => {
       attributes: ['fmovimiento', 'mpagado', 'id_poliza', 'crecibo', 'xruta_tipomov'],
     });
     const abonos = fer.map((item) => item.get({ plain: true }));
-    console.log(abonos)
     return abonos
   } catch (error) {
     return { error: error.message };

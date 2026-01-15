@@ -33,7 +33,6 @@ const verifyUser = async (data) => {
     return { error: error.parent.message };
   }
 }
-
 const getProductor = async (cusuario) => {
   try {
     const data = await models.maproductores.findOne({

@@ -75,7 +75,6 @@ const Coverage = models.macoberturas
 
 const getCedents = async (data) => {
   try {
-    console.log(data)
     const cedentes = await Cedents.findAll({
       attributes: ['ccedente'],
       include: [

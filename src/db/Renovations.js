@@ -52,9 +52,7 @@ const searchRenovations = async (data) => {
         [Sequelize.Op.between]: [startOfMonth, endOfMonth],
       };
     }
-
-    console.log(conditions)
-
+    
     const renovaciones = await Renovations.findAll({
       where: conditions,
       attributes: [
@@ -131,9 +129,7 @@ const getReceipt = async (getReceipt) => {
     }
   } else {
     // Manejo de caso si no hay puntos
-    const mprimaNumeric = parseFloat(mprimaString.replace(',', '.'));
-    console.log('Valor de mprima sin puntos:', mprimaNumeric); // Ver el valor sin puntos
-    
+    const mprimaNumeric = parseFloat(mprimaString.replace(',', '.'));    
     try {
       let pool = await sql.connect(sqlConfig);
       let result = await pool.request()

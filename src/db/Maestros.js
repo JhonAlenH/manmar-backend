@@ -268,7 +268,6 @@ const searchEstadoById = async (id) => {
   }
 };
 const createEstado = async(body) => {
-  console.log(body)
   const data = setAuItems(body)
   try {
     const estado = Estados.create(data)
@@ -280,7 +279,6 @@ const createEstado = async(body) => {
 }
 const updateEstado = async(id, data) => {
   try {
-    console.log(data)
     const result = await Estados.update(data, {
       where: {cestado: id}
     });
@@ -335,7 +333,6 @@ const searchCiudadById = async (id) => {
   }
 };
 const createCiudad = async(body) => {
-  console.log(body)
   const data = setAuItems(body)
   delete data.cpais
   try {
@@ -348,7 +345,6 @@ const createCiudad = async(body) => {
 }
 const updateCiudad = async(id, data) => {
   try {
-    console.log(data)
     delete data.cpais
     const result = await Ciudades.update(data, {
       where: {cciudad: id}
@@ -423,7 +419,7 @@ const searchMetodologiapago = async () => {
     const result = items.map((item) => item.get({ plain: true }));
     return result;
   } catch (error) {
-    console.log(error.messagec)
+    console.log(error.message)
     return { error: error.message };
   }
 };
@@ -469,7 +465,7 @@ const searchMonedas = async () => {
     const result = items.map((item) => item.get({ plain: true }));
     return result;
   } catch (error) {
-    console.log(error.messagec)
+    console.log(error.message)
     return { error: error.message };
   }
 };
@@ -526,7 +522,7 @@ const searchCedentes = async () => {
     });
     return result;
   } catch (error) {
-    console.log(error.messagec)
+    console.log(error.message)
     return { error: error.message };
   }
 };
@@ -626,7 +622,6 @@ const updateCedentes = async(id, data) => {
       where: {ccedente: id},
       attributes: ['ccedente', 'cpersona'],
     })
-    console.log(cedente)
    const personaC = await Personas.update(persona, {where: {cpersona: cedente.cpersona}})
     return { 
       result: cedente
@@ -1008,11 +1003,9 @@ const createUsuario = async(body) => {
     itipo_persona: 'S',
   }
   const persona = setAuItems(personaBody)
-  console.log(persona)
   try {
     const personaC = await Personas.create(persona)
     data.cpersona = personaC.cpersona
-    console.log(data)
     const usuario = await Usuarios.create(data)
     return { result: usuario };
   } catch (error) {
@@ -1022,7 +1015,6 @@ const createUsuario = async(body) => {
 }
 const updateUsuario = async(id, data) => {
 
-  console.log(data)
   const persona = {
     xnombre: data.xnombre,
     xapellido: data.xapellido,
