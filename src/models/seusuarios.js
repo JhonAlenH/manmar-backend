@@ -54,6 +54,10 @@ export default class seusuarios extends Model {
       type: DataTypes.INTEGER,
       allowNull: true
     },
+    bactivo: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
+    },
     fcreacion: {
       type: DataTypes.DATE,
       allowNull: true

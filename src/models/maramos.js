@@ -15,7 +15,7 @@ export default class maramos extends Model {
       allowNull: true
     },
     bactivo: {
-      type: DataTypes.CHAR(1),
+      type: DataTypes.BOOLEAN,
       allowNull: true
     },
     fcreacion: {

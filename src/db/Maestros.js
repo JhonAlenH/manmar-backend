@@ -193,7 +193,7 @@ const getMaMetodologiapago = async() => {
 const searchPaises = async () => {
   try {
     const items = await Paises.findAll({
-      attributes: ['cpais', 'xpais'],
+      attributes: ['cpais', 'xpais', 'bactivo'],
     });
     const result = items.map((item) => item.get({ plain: true }));
     return result;
@@ -239,7 +239,7 @@ const updatePaises = async(id, data) => {
 const searchEstados = async () => {
   try {
     const items = await Estados.findAll({
-      attributes: ['cestado', 'xestado', 'cpais'],
+      attributes: ['cestado', 'xestado', 'cpais','bactivo'],
       include: [
         {association: 'pais', attributes: ['xpais']}
       ]
@@ -292,7 +292,7 @@ const updateEstado = async(id, data) => {
 const searchCiudades = async () => {
   try {
     const items = await Ciudades.findAll({
-      attributes: ['cciudad', 'xciudad', 'cestado'],
+      attributes: ['cciudad', 'xciudad', 'cestado', 'bactivo'],
       include: [
         {association: 'estado', attributes: ['xestado'], include:[
           {association: 'pais', attributes: ['xpais']}
@@ -359,7 +359,7 @@ const updateCiudad = async(id, data) => {
 const searchBancos = async () => {
   try {
     const items = await Bancos.findAll({
-      attributes: ['cbanco', 'xbanco', 'cod_bancario'],
+      attributes: ['cbanco', 'xbanco', 'cod_bancario', 'bactivo'],
       include:[
         {association: 'moneda', attributes: ['xmoneda']},
         {association: 'pais', attributes: ['xpais']}
@@ -414,7 +414,7 @@ const updateBanco = async(id, data) => {
 const searchMetodologiapago = async () => {
   try {
     const items = await MetodologiaPago.findAll({
-      attributes: ['cmetodologiapago', 'xmetodologiapago', 'ncuotas'],
+      attributes: ['cmetodologiapago', 'xmetodologiapago', 'ncuotas', 'bactivo'],
     });
     const result = items.map((item) => item.get({ plain: true }));
     return result;
@@ -460,7 +460,7 @@ const updateMetodologiapago = async(id, data) => {
 const searchMonedas = async () => {
   try {
     const items = await Monedas.findAll({
-      attributes: ['cmoneda', 'xmoneda', 'xabreviatura'],
+      attributes: ['cmoneda', 'xmoneda', 'xabreviatura', 'bactivo'],
     });
     const result = items.map((item) => item.get({ plain: true }));
     return result;
@@ -506,7 +506,7 @@ const updateMoneda = async(id, data) => {
 const searchCedentes = async () => {
   try {
     const items = await Cedentes.findAll({
-      attributes: ['ccedente'],
+      attributes: ['ccedente', 'bactivo'],
       include: [
         {association: 'persona', attributes: ['xnombre', 'cci_rif', 'xtelefono', 'xcorreo']}
       ]
@@ -636,7 +636,7 @@ const searchClientes = async () => {
   try {
     const items = await Personas.findAll({
       where: {itipo_persona: 'C'},
-      attributes: ['cpersona', 'cci_rif', 'xnombre', 'xapellido', 'fnacimiento'],
+      attributes: ['cpersona', 'cci_rif', 'xnombre', 'xapellido', 'fnacimiento', 'bactivo'],
     });
     const result = items.map((item) => item.get({ plain: true }));
     return result;
@@ -705,7 +705,7 @@ const updateCliente = async(id, data) => {
 const searchProductores = async () => {
   try {
     const items = await Productores.findAll({
-      attributes: ['cproductor', 'cusuario', 'ctipo_productor'],
+      attributes: ['cproductor', 'cusuario', 'ctipo_productor', 'bactivo'],
       include:[
         {association: 'tipo_productor', attributes: ['xtipo']},
         {association: 'usuario', attributes: ['cpersona'], include:[
@@ -880,7 +880,7 @@ const updateProductores = async(id, body) => {
 const searchRamos = async () => {
   try {
     const items = await Ramos.findAll({
-      attributes: ['cramo','xramo'],
+      attributes: ['cramo','xramo', 'bactivo'],
       order: [['cramo', 'ASC']]
     });
     const result = items.map((item) => item.get({ plain: true }));
@@ -932,7 +932,7 @@ const searchUsuarios = async (cproductor) => {
     }
     const items = await Usuarios.findAll({
       where: data,
-      attributes: ['cusuario','xusuario'],
+      attributes: ['cusuario','xusuario', 'bactivo'],
       include: [
         {association: 'rol', attributes:['crol','xrol']}
       ]
@@ -1045,7 +1045,7 @@ const updateUsuario = async(id, data) => {
 const searchProductos = async () => {
   try {
     const items = await Productos.findAll({
-      attributes: ['cproducto','xproducto'],
+      attributes: ['cproducto','xproducto', 'bactivo'],
       include:[
         {association: 'cedente', attributes: ['ccedente'], include:[
           {association: 'persona', attributes: ['xnombre']}
@@ -1107,7 +1107,7 @@ const updateProducto = async(id, data) => {
 const searchVehiculos = async () => {
   try {
     const items = await Vehiculos.findAll({
-      attributes: ['ccodigo','cmarca','xmarca','cmodelo', 'xmodelo','cversion','xversion','xtrans', 'xmotor','qano']
+      attributes: ['ccodigo','cmarca','xmarca','cmodelo', 'xmodelo','cversion','xversion','xtrans', 'xmotor','qano', 'bactivo']
     });
     const result = items.map((item) => item.get({ plain: true }));
     return result;
