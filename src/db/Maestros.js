@@ -195,6 +195,33 @@ const getMaMetodologiapago = async() => {
     return { error: error.message };
   }
 }
+const getMaPaises = async () => {
+  try {
+    const items = await Paises.findAll({
+      where: {bactivo:1},
+      attributes: ['cpais', 'xpais'],
+    });
+    const result = items.map((item) => item.get({ plain: true }));
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
+const getMaRamos = async () => {
+  try {
+    const items = await Ramos.findAll({
+      where: {bactivo:1},
+      attributes: ['cramo','xramo'],
+      order: [['cramo', 'ASC']]
+    });
+    const result = items.map((item) => item.get({ plain: true }));
+    return result;
+  } catch (error) {
+    console.log(error.message)
+    return { error: error.message };
+  }
+};
 
 const searchPaises = async () => {
   try {
@@ -1250,7 +1277,7 @@ const setAuItems = (data) => {
 }
 
 export default {
-  getMaMonedas,getMaCedentes, getMaRoles,getMaEstados,getMaBancos,getMaCiudades,getMaMarcas,getMaTipoProducto,getMaModelos,getMaVersiones,getMaMetodologiapago,getMaBancos,
+  getMaMonedas,getMaCedentes, getMaRoles,getMaEstados,getMaBancos,getMaCiudades,getMaMarcas,getMaTipoProducto,getMaModelos,getMaVersiones,getMaMetodologiapago,getMaBancos,getMaPaises,getMaRamos,
   searchPaises,searchPaisById,createPais,updatePaises,
   searchEstados,searchEstadoById,createEstado,updateEstado,
   searchCiudades,searchCiudadById,createCiudad,updateCiudad,
