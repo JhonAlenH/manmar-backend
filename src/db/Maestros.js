@@ -548,6 +548,7 @@ const searchCedentesById = async (id) => {
     result.dataValues.cci_rif = result.persona?.cci_rif.split('-')[1];
     result.dataValues.xcedente = result.persona?.xnombre;
     result.dataValues.xcorreo = result.persona?.xcorreo;
+    result.dataValues.xtelefono = result.persona?.xtelefono;
     result.dataValues.xdireccion = result.persona?.xdireccion;
     result.dataValues.cciudad = result.persona?.ciudad?.cciudad;
     result.dataValues.cestado = result.persona?.ciudad?.estado?.cestado;
@@ -585,9 +586,9 @@ const createCedentes = async(body) => {
   // const rData = insert.formatCreateData(data)
 
   try {
-    const personaC = Personas.create(persona)
+    const personaC = await Personas.create(persona)
     data.cpersona = personaC.cpersona
-    const cedente = Cedentes.create(data)
+    const cedente = await Cedentes.create(data)
     return { result: cedente };
   } catch (error) {
     console.log(error.message)
