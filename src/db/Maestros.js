@@ -37,6 +37,7 @@ const Usuarios = models.seusuarios;
 const getMaMonedas = async() => {
   try {
     const items = await Monedas.findAll({
+      where: {bactivo:1},
       attributes: ['cmoneda', 'xmoneda', 'xabreviatura'],
     });
     const result = items.map((item) => item.get({ plain: true }));
@@ -49,6 +50,7 @@ const getMaMonedas = async() => {
 const getMaCedentes = async() => {
   try {
     const items = await Cedentes.findAll({
+      where: {bactivo:1},
       attributes: ['ccedente'],
       include: [
         {association: 'persona', attributes: ['xnombre']}
@@ -71,6 +73,7 @@ const getMaRoles = async(rol) => {
     if (rol){
       data = {crol:  { [Op.gte]: rol }}
     }
+    data.bactivo = 1
     const items = await Roles.findAll({
       where: data,
       attributes: ['crol', 'xrol'],
@@ -85,7 +88,7 @@ const getMaRoles = async(rol) => {
 const getMaCiudades = async(estado) => {
   try {
     const items = await Ciudades.findAll({
-      where: {cestado:  estado},
+      where: {cestado:  estado, bactivo: 1},
       attributes: ['cciudad', 'xciudad'],
     });
     const result = items.map((item) => item.get({ plain: true }));
@@ -98,7 +101,7 @@ const getMaCiudades = async(estado) => {
 const getMaEstados = async(pais) => {
   try {
     const items = await Estados.findAll({
-      where: {cpais:  pais},
+      where: {cpais:  pais, bactivo: 1},
       attributes: ['cestado', 'xestado'],
     });
     const result = items.map((item) => item.get({ plain: true }));
@@ -111,7 +114,7 @@ const getMaEstados = async(pais) => {
 const getMaBancos = async(cmoneda) => {
   try {
     const items = await Bancos.findAll({
-      where:{cmoneda},
+      where:{cmoneda: cmoneda, bactivo: bactivo},
       attributes: ['cbanco', 'xbanco'],
     });
     const result = items.map((item) => item.get({ plain: true }));
@@ -124,6 +127,7 @@ const getMaBancos = async(cmoneda) => {
 const getMaTipoProducto = async() => {
   try {
     const items = await TipoProductor.findAll({
+      where: {bactivo:1},
       attributes: ['ctipo_produc', 'xtipo'],
     });
     const result = items.map((item) => item.get({ plain: true }));
@@ -136,6 +140,7 @@ const getMaTipoProducto = async() => {
 const getMaMarcas = async() => {
   try {
     const items = await Vehiculos.findAll({
+      where: {bactivo:1},
       attributes: ['cmarca', 'xmarca'],
       group: ['cmarca', 'xmarca'],
       order: [['xmarca', 'ASC']]
@@ -150,7 +155,7 @@ const getMaMarcas = async() => {
 const getMaModelos = async(cmarca) => {
   try {
     const items = await Vehiculos.findAll({
-      where: {cmarca},
+      where: {cmarca: cmarca, bactivo:1},
       attributes: ['cmodelo', 'xmodelo'],
       group: ['cmodelo', 'xmodelo'],
       order: [['xmodelo', 'ASC']]
@@ -165,7 +170,7 @@ const getMaModelos = async(cmarca) => {
 const getMaVersiones = async(cmarca,cmodelo) => {
   try {
     const items = await Vehiculos.findAll({
-      where: {cmarca,cmodelo},
+      where: {cmarca: cmarca,cmodelo: cmodelo, bactivo: 1},
       attributes: ['cversion', 'xversion'],
       group: ['cversion', 'xversion'],
       order: [['xversion', 'ASC']]
@@ -180,6 +185,7 @@ const getMaVersiones = async(cmarca,cmodelo) => {
 const getMaMetodologiapago = async() => {
   try {
     const items = await Bancos.findAll({
+      where: {bactivo:1},
       attributes: ['cmetodologiapago', 'xmetodologiapago', 'cpais'],
     });
     const result = items.map((item) => item.get({ plain: true }));
