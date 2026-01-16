@@ -35,7 +35,7 @@ if(process.env.DEV == 'LOCAL'){
     
   }));
 
-  app.use(cors());
+  // app.use(cors());
 } else {
   // app.use(cors({
   //   origin: 'https://corretaje.manmar.com.ve/',  // o especifica el dominio permitido
