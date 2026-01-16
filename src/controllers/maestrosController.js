@@ -29,7 +29,7 @@ const getMaMonedas = async (req, res) => {
 }
 const getMaRamos = async (req, res) => {
   try {
-    const gettedRamos = await Maestros.searchRamos();
+    const gettedRamos = await Maestros.getMaRamos();
     if (gettedRamos.error) {
       return res.status(gettedRamos.code).send({
         status: false,
@@ -133,7 +133,7 @@ const getMaCedentes = async (req, res) => {
 }
 const getMaPaises = async (req, res) => {
   try {
-    const gettedPaises = await Maestros.searchPaises();
+    const gettedPaises = await Maestros.getMaPaises();
     if (gettedPaises.error) {
       return res.status(gettedPaises.code).send({
         status: false,
