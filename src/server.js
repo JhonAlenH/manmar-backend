@@ -38,7 +38,7 @@ if(process.env.DEV == 'LOCAL'){
   app.use(cors());
 } else {
   app.use(cors({
-    origin: 'https://corretaje.manmar.com.ve',  // o especifica el dominio permitido
+    origin: 'https://corretaje.manmar.com.ve/',  // o especifica el dominio permitido
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     optionsSuccessStatus: 204,
     credentials: true ,
