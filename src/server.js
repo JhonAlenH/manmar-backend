@@ -52,6 +52,10 @@ app.use(express.json({ limit: '10mb' }));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
+app.options('/*', (_, res) => {
+    res.sendStatus(200);
+});
+
 app.use("/api/v1/auth", v1AuthRouter);
 app.use("/api/v1/valrep", v1ValrepRouter);
 app.use("/api/v1/emission", v1EmissionRouter);
