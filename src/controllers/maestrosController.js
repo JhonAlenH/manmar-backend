@@ -260,9 +260,9 @@ const getMaBancos = async (req, res) => {
     
   }
 }
-const getMaTipoProducto = async (req, res) => {
+const getMaTipoProductor = async (req, res) => {
   try {
-    const gettedTipos = await Maestros.getMaTipoProducto();
+    const gettedTipos = await Maestros.getMaTipoProductor();
     if (gettedTipos.error) {
       return res.status(gettedTipos.code).send({
         status: false,
@@ -278,7 +278,7 @@ const getMaTipoProducto = async (req, res) => {
     formatData.unshift({text:'Seleccione una opcion...',value:''})
     res.status(201).send({
       status: true, 
-      message: 'Bancos Obtenidos',
+      message: 'Tipo Productor Obtenidos',
       data: [...formatData]
     });
     
@@ -1402,7 +1402,7 @@ const updateVehiculos = async (req, res) => {
 
 
 export default {
-  getMaMonedas,getMaRamos,getMaRoles,getMaRolesAll,getMaCedentes,getMaPaises,getMaCiudades,getMaEstados,getMaBancos,getMaTipoProducto,getMaMarcas,getMaModelos,getMaVersiones,getMaMetodologiapago, 
+  getMaMonedas,getMaRamos,getMaRoles,getMaRolesAll,getMaCedentes,getMaPaises,getMaCiudades,getMaEstados,getMaBancos,getMaTipoProductor,getMaMarcas,getMaModelos,getMaVersiones,getMaMetodologiapago, 
   searchPaises,searchPais,createPais,updatePaises,
   searchEstados,searchEstado,createEstado,updateEstado,
   searchCiudades,searchCiudad,createCiudad,updateCiudad,

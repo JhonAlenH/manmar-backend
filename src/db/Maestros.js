@@ -114,7 +114,7 @@ const getMaEstados = async(pais) => {
 const getMaBancos = async(cmoneda) => {
   try {
     const items = await Bancos.findAll({
-      where:{cmoneda: cmoneda, bactivo: bactivo},
+      where:{cmoneda: cmoneda, bactivo: 1},
       attributes: ['cbanco', 'xbanco'],
     });
     const result = items.map((item) => item.get({ plain: true }));
@@ -124,10 +124,9 @@ const getMaBancos = async(cmoneda) => {
     return { error: error.message };
   }
 }
-const getMaTipoProducto = async() => {
+const getMaTipoProductor = async() => {
   try {
     const items = await TipoProductor.findAll({
-      where: {bactivo:1},
       attributes: ['ctipo_produc', 'xtipo'],
     });
     const result = items.map((item) => item.get({ plain: true }));
@@ -640,16 +639,6 @@ const updateCedentes = async(id, data) => {
     itipo_persona: 'E',
   }
 
-  delete data.itipodoc
-  delete data.cci_rif
-  delete data.xcedente
-  delete data.xcorreo
-  delete data.xtelefono
-  delete data.xdireccion
-  delete data.cestado
-  delete data.cpais
-  delete data.cciudad
-
   try {
     const cedenteUp = await Cedentes.update(data, {where: {ccedente: id}})
     const cedente =  await Cedentes.findOne({
@@ -724,6 +713,9 @@ const createCliente = async(body) => {
   }
 }
 const updateCliente = async(id, data) => {
+
+  data.cci_rif = `${data.itipodoc}-${data.cci_rif}`
+  console.log(data)
 
   try {
     const result = await Personas.update(data, {
@@ -862,7 +854,7 @@ const createProductor = async(body) => {
     return { error: error.message };
   }
 }
-const updateProductores = async(id, body) => {
+const updateProductores = async(id, data) => {
   delete data.datos_bancarios; delete data.datos_usuario
 
   const persona = {
@@ -1277,7 +1269,7 @@ const setAuItems = (data) => {
 }
 
 export default {
-  getMaMonedas,getMaCedentes, getMaRoles,getMaEstados,getMaBancos,getMaCiudades,getMaMarcas,getMaTipoProducto,getMaModelos,getMaVersiones,getMaMetodologiapago,getMaBancos,getMaPaises,getMaRamos,
+  getMaMonedas,getMaCedentes, getMaRoles,getMaEstados,getMaBancos,getMaCiudades,getMaMarcas,getMaTipoProductor,getMaModelos,getMaVersiones,getMaMetodologiapago,getMaBancos,getMaPaises,getMaRamos,
   searchPaises,searchPaisById,createPais,updatePaises,
   searchEstados,searchEstadoById,createEstado,updateEstado,
   searchCiudades,searchCiudadById,createCiudad,updateCiudad,

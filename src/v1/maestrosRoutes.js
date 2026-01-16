@@ -43,7 +43,7 @@ router
 .get("/roles/:crol", maestrosController.getMaRoles)
 .get("/roles/", maestrosController.getMaRolesAll)
 .get("/cedentes", maestrosController.getMaCedentes)
-.get("/tipo_produc", maestrosController.getMaTipoProducto)
+.get("/tipo_produc", maestrosController.getMaTipoProductor)
 
 .get("/paises", maestrosController.getMaPaises)
 .get("/ciudades/:estado", maestrosController.getMaCiudades)
