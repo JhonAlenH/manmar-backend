@@ -33,12 +33,16 @@ const searchRenovations = async (data) => {
     };
 
     // Solo agrega ccedente y cramo si están presentes
-    if (data.ccedente) {
-      conditions.ccedente = data.ccedente;
-    }
-
-    if (data.cramo) {
-      conditions.cramo = data.cramo;
+    const polizaData = { association: 'poliza', attributes: ['cpoliza', 'xpoliza'], include: [
+      {association: 'asegurado', attributes: ['cpersona','xnombre', 'xapellido']},
+    ]};
+    if (data.ccedente || data.cramo) {
+      if (data.ccedente) {
+        polizaData.where = { ccedente: data.ccedente };
+      }
+      if (data.cramo) {
+        polizaData.where = { cramo: data.cramo };
+      }
     }
 
     // Verifica si se proporcionó mes y año
@@ -65,9 +69,7 @@ const searchRenovations = async (data) => {
           ]},
           {association: 'ramo', attributes: ['cramo','xramo']},
         ]},
-        {association: 'poliza', attributes: ['cpoliza', 'xpoliza'], include: [
-          {association: 'asegurado', attributes: ['cpersona','xnombre', 'xapellido']},
-        ]},
+        polizaData
       ]
     });
 
@@ -94,21 +96,6 @@ const searchRenovations = async (data) => {
 
 const getReceipt = async (getReceipt) => {
   // Transformar el valor de mprima
-  const mprimaString = getReceipt.mprima.toString();
-
-  const parts = mprimaString.split('.');
-
-  // Eliminar todos los puntos menos el último
-  if (parts.length > 1) {
-    // Tomar todas las partes excepto el último y unirlas sin puntos
-    const wholeNumber = parts.slice(0, parts.length - 1).join('');
-    const decimalPart = parts[parts.length - 1];
-
-    // Combinar de nuevo en la forma correcta
-    const mprimaNumericString = wholeNumber + '.' + decimalPart;
-
-    // Convertir a número
-    const mprimaNumeric = parseFloat(mprimaNumericString);
     try {
       let pool = await sql.connect(sqlConfig);
       let result = await pool.request()
@@ -127,27 +114,6 @@ const getReceipt = async (getReceipt) => {
       console.log(err.message);
       return { error: err.message };
     }
-  } else {
-    // Manejo de caso si no hay puntos
-    const mprimaNumeric = parseFloat(mprimaString.replace(',', '.'));    
-    try {
-      let pool = await sql.connect(sqlConfig);
-      let result = await pool.request()
-        .input('fdesde_pol', sql.DateTime, getReceipt.fdesde)
-        .input('fhasta_pol', sql.DateTime, getReceipt.fhasta)
-        .input('mprima', sql.Numeric(18, 2), mprimaNumeric) // Ahora pasa el valor numérico correcto
-        .input('cmetodologiapago', sql.Int, getReceipt.cmetodologiapago)
-        .execute('tmBRecibos');
-
-      const receipt = await pool.request().query('select * from tmrecibos');
-      await pool.close();
-
-      return receipt;
-    } catch (err) {
-      console.log(err.message);
-      return { error: err.message };
-    }
-  }
 };
 
 const createRenovation = async (data,id) => {
