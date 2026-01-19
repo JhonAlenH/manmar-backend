@@ -44,7 +44,7 @@ const getMaMonedas = async() => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const getMaCedentes = async() => {
@@ -64,7 +64,7 @@ const getMaCedentes = async() => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const getMaRoles = async(rol) => {
@@ -82,7 +82,7 @@ const getMaRoles = async(rol) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const getMaCiudades = async(estado) => {
@@ -95,7 +95,7 @@ const getMaCiudades = async(estado) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const getMaEstados = async(pais) => {
@@ -108,7 +108,7 @@ const getMaEstados = async(pais) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const getMaBancos = async(cmoneda) => {
@@ -121,7 +121,7 @@ const getMaBancos = async(cmoneda) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const getMaTipoProductor = async() => {
@@ -133,7 +133,7 @@ const getMaTipoProductor = async() => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const getMaMarcas = async() => {
@@ -148,7 +148,7 @@ const getMaMarcas = async() => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const getMaModelos = async(cmarca) => {
@@ -163,7 +163,7 @@ const getMaModelos = async(cmarca) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const getMaVersiones = async(cmarca,cmodelo) => {
@@ -178,7 +178,7 @@ const getMaVersiones = async(cmarca,cmodelo) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const getMaMetodologiapago = async() => {
@@ -191,7 +191,7 @@ const getMaMetodologiapago = async() => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const getMaPaises = async () => {
@@ -204,7 +204,7 @@ const getMaPaises = async () => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const getMaRamos = async () => {
@@ -218,7 +218,7 @@ const getMaRamos = async () => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 
@@ -231,7 +231,7 @@ const searchPaises = async () => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const searchPaisById = async (id) => {
@@ -243,7 +243,7 @@ const searchPaisById = async (id) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const createPais = async(body) => {
@@ -253,7 +253,7 @@ const createPais = async(body) => {
     return { result: pais };
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const updatePaises = async(id, data) => {
@@ -264,7 +264,7 @@ const updatePaises = async(id, data) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 
@@ -284,7 +284,7 @@ const searchEstados = async () => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const searchEstadoById = async (id) => {
@@ -296,7 +296,7 @@ const searchEstadoById = async (id) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const createEstado = async(body) => {
@@ -306,7 +306,7 @@ const createEstado = async(body) => {
     return { result: estado };
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const updateEstado = async(id, data) => {
@@ -317,7 +317,7 @@ const updateEstado = async(id, data) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 
@@ -340,7 +340,7 @@ const searchCiudades = async () => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const searchCiudadById = async (id) => {
@@ -361,7 +361,7 @@ const searchCiudadById = async (id) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const createCiudad = async(body) => {
@@ -372,7 +372,7 @@ const createCiudad = async(body) => {
     return { result: estado };
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const updateCiudad = async(id, data) => {
@@ -384,7 +384,7 @@ const updateCiudad = async(id, data) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 
@@ -405,7 +405,7 @@ const searchBancos = async () => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const searchBancoById = async (id) => {
@@ -417,7 +417,7 @@ const searchBancoById = async (id) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const createBanco = async(body) => {
@@ -428,7 +428,7 @@ const createBanco = async(body) => {
     return { result: banco };
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const updateBanco = async(id, data) => {
@@ -439,7 +439,7 @@ const updateBanco = async(id, data) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 
@@ -452,7 +452,7 @@ const searchMetodologiapago = async () => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const searchMetodologiapagoById = async (id) => {
@@ -464,7 +464,7 @@ const searchMetodologiapagoById = async (id) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const createMetodologiapago = async(body) => {
@@ -474,7 +474,7 @@ const createMetodologiapago = async(body) => {
     return { result: metodologiapago };
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const updateMetodologiapago = async(id, data) => {
@@ -485,7 +485,7 @@ const updateMetodologiapago = async(id, data) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 
@@ -498,7 +498,7 @@ const searchMonedas = async () => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const searchMonedasById = async (id) => {
@@ -510,7 +510,7 @@ const searchMonedasById = async (id) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const createMoneda = async(body) => {
@@ -520,7 +520,7 @@ const createMoneda = async(body) => {
     return { result: moneda };
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const updateMoneda = async(id, data) => {
@@ -531,7 +531,7 @@ const updateMoneda = async(id, data) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 
@@ -555,7 +555,7 @@ const searchCedentes = async () => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const searchCedentesById = async (id) => {
@@ -589,7 +589,7 @@ const searchCedentesById = async (id) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const createCedentes = async(body) => {
@@ -624,7 +624,7 @@ const createCedentes = async(body) => {
     return { result: cedente };
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const updateCedentes = async(id, data) => {
@@ -651,7 +651,7 @@ const updateCedentes = async(id, data) => {
     };
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 
@@ -665,7 +665,7 @@ const searchClientes = async () => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const searchClienteById = async (id) => {
@@ -690,7 +690,7 @@ const searchClienteById = async (id) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const createCliente = async(body) => {
@@ -709,7 +709,7 @@ const createCliente = async(body) => {
     return { result: client };
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const updateCliente = async(id, data) => {
@@ -724,7 +724,7 @@ const updateCliente = async(id, data) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 
@@ -750,7 +750,7 @@ const searchProductores = async () => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const searchProductoresById = async (id) => {
@@ -801,7 +801,7 @@ const searchProductoresById = async (id) => {
     return result
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const createProductor = async(body) => {
@@ -851,7 +851,7 @@ const createProductor = async(body) => {
     return {result: productor} 
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const updateProductores = async(id, data) => {
@@ -899,7 +899,7 @@ const updateProductores = async(id, data) => {
     return {result: productor} 
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 
@@ -913,7 +913,7 @@ const searchRamos = async () => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const searchRamoById = async (id) => {
@@ -925,7 +925,7 @@ const searchRamoById = async (id) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const createRamo = async(body) => {
@@ -935,7 +935,7 @@ const createRamo = async(body) => {
     return { result: ramo };
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const updateRamo = async(id, data) => {
@@ -946,7 +946,7 @@ const updateRamo = async(id, data) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 
@@ -971,7 +971,7 @@ const searchUsuarios = async (cproductor) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const searchUsuarioById = async (id) => {
@@ -1007,7 +1007,7 @@ const searchUsuarioById = async (id) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const createUsuario = async(body) => {
@@ -1036,7 +1036,7 @@ const createUsuario = async(body) => {
     return { result: usuario };
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const updateUsuario = async(id, data) => {
@@ -1064,7 +1064,7 @@ const updateUsuario = async(id, data) => {
     return {result: usuario} 
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 
@@ -1087,7 +1087,7 @@ const searchProductos = async () => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const searchProductoById = async (id) => {
@@ -1099,7 +1099,7 @@ const searchProductoById = async (id) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const createProducto = async(body) => {
@@ -1111,11 +1111,19 @@ const createProducto = async(body) => {
   data.cproductor = usuario.cproductor
 
   try {
-    const producto = Productos.create(data)
+    const productoFindeded = await Productos.findOne({
+      where: {xproducto: data.xproducto, cproductor: data.cproductor, cramo: data.cramo, cmoneda: data.cmoneda},
+      attributes: ['cproducto']
+    })
+    console.log(productoFindeded?.cproducto)
+    if(productoFindeded?.cproducto){
+      return { error: 'Producto ya registrado para el productor', code: 500 };
+    }
+    const producto = await Productos.create(data)
     return { result: producto };
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const updateProducto = async(id, data) => {
@@ -1126,7 +1134,7 @@ const updateProducto = async(id, data) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 
@@ -1139,7 +1147,7 @@ const searchVehiculos = async () => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const searchVehiculoById = async (id) => {
@@ -1151,7 +1159,7 @@ const searchVehiculoById = async (id) => {
     return item
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 };
 const createVehiculo = async(data) => {
@@ -1164,7 +1172,7 @@ const createVehiculo = async(data) => {
       if(key === 'cmarca') {
         const check = await checkItem(data['xmarca'].split('[]')[0], 'xmarca', key, 'MAINMA')
         if(check.error){
-          return { error: error.message };
+          return { error: error.message, code: 500 };
         } else {
           data[key] = check.value +'[]'+ valueNoTrimmed.split('[]')[1]
         }
@@ -1172,7 +1180,7 @@ const createVehiculo = async(data) => {
       if(key === 'cmodelo') {
         const check = await checkItem(data['xmodelo'].split('[]')[0], 'xmodelo', key, 'MAINMA')
         if(check.error){
-          return { error: error.message };
+          return { error: error.message, code: 500 };
         } else {
           data[key] = check.value +'[]'+ valueNoTrimmed.split('[]')[1]
         }
@@ -1180,7 +1188,7 @@ const createVehiculo = async(data) => {
       if(key === 'cversion') {
         const check = await checkItem(data['xversion'].split('[]')[0], 'xversion', key, 'MAINMA')
         if(check.error){
-          return { error: error.message };
+          return { error: error.message, code: 500 };
         } else {
           data[key] = check.value +'[]'+ valueNoTrimmed.split('[]')[1]
         }
@@ -1192,7 +1200,7 @@ const createVehiculo = async(data) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const updateVehiculos = async(id, data) => {
@@ -1205,7 +1213,7 @@ const updateVehiculos = async(id, data) => {
       if(key === 'cmarca') {
         const check = await checkItem(data['xmarca'].split('[]')[0], 'xmarca', key, 'MAINMA')
         if(check.error){
-          return { error: error.message };
+          return { error: error.message, code: 500 };
         } else {
           data[key] = check.value +'[]'+ valueNoTrimmed.split('[]')[1]
         }
@@ -1213,7 +1221,7 @@ const updateVehiculos = async(id, data) => {
       if(key === 'cmodelo') {
         const check = await checkItem(data['xmodelo'].split('[]')[0], 'xmodelo', key, 'MAINMA')
         if(check.error){
-          return { error: error.message };
+          return { error: error.message, code: 500 };
         } else {
           data[key] = check.value +'[]'+ valueNoTrimmed.split('[]')[1]
         }
@@ -1221,7 +1229,7 @@ const updateVehiculos = async(id, data) => {
       if(key === 'cversion') {
         const check = await checkItem(data['xversion'].split('[]')[0], 'xversion', key, 'MAINMA')
         if(check.error){
-          return { error: error.message };
+          return { error: error.message, code: 500 };
         } else {
           data[key] = check.value +'[]'+ valueNoTrimmed.split('[]')[1]
         }
@@ -1237,7 +1245,7 @@ const updateVehiculos = async(id, data) => {
     return result;
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 
@@ -1256,7 +1264,7 @@ const checkItem = async(otherValue, otherKey, key, table) => {
     }
   } catch (error) {
     console.log(error.message)
-    return { error: error.message };
+    return { error: error.message, code: 500 };
   }
 }
 const setAuItems = (data) => {
