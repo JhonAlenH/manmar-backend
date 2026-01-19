@@ -661,7 +661,12 @@ const searchClientes = async () => {
       where: {itipo_persona: 'C'},
       attributes: ['cpersona', 'cci_rif', 'xnombre', 'xapellido', 'fnacimiento', 'bactivo'],
     });
-    const result = items.map((item) => item.get({ plain: true }));
+    const result = items.map((item) => {
+      const get = item.get({ plain: true })
+      get.fnacimiento = formatDate(get.fnacimiento);
+      
+      return get
+    });
     return result;
   } catch (error) {
     console.log(error.message)
@@ -1274,6 +1279,12 @@ const setAuItems = (data) => {
   newData.fcreacion = new Date();
 
   return newData
+}
+const formatDate = (value) => {
+  const date = new Date(value)
+  date.setDate(date.getDate() + 1);
+
+  return date.toLocaleDateString('en-GB')
 }
 
 export default {
