@@ -663,7 +663,7 @@ const searchClientes = async () => {
     });
     const result = items.map((item) => {
       const get = item.get({ plain: true })
-      get.fnacimiento = formatDate(get.fnacimiento);
+      get.fnacimiento = get.fnacimiento ? formatDate(get.fnacimiento) :  null;
       
       return get
     });
