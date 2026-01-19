@@ -76,6 +76,7 @@ const Coverage = models.macoberturas
 const getCedents = async (data) => {
   try {
     const cedentes = await Cedents.findAll({
+      where: {bactivo: 1},
       attributes: ['ccedente'],
       include: [
         // {association: 'productores', attributes: [], where: data},
@@ -93,6 +94,7 @@ const getCedents = async (data) => {
 const getTrade = async () => {
   try {
     const trade = await Trade.findAll({
+      where: {bactivo: 1},
       attributes: ['cramo', 'xramo'],
     });
     const trades = trade.map((item) => item.get({ plain: true }));
@@ -110,7 +112,7 @@ const getTrade = async () => {
 const getProduct = async (data) => {
   try {
     const product = await Products.findAll({
-      where: data,
+      where: {...data, bactivo: 1},
       attributes: ['cproducto', 'xproducto'],
     });
     const products = product.map((item) => item.get({ plain: true }));
@@ -123,6 +125,7 @@ const getProduct = async (data) => {
 const getCoins = async () => {
   try {
     const coin = await Coin.findAll({
+      where: {bactivo: 1},
       attributes: ['cmoneda', 'xmoneda'],
     });
     const coins = coin.map((item) => item.get({ plain: true }));
@@ -140,7 +143,7 @@ const getCoins = async () => {
 const getClients = async () => {
   try {
     const client = await Clients.findAll({
-      where: {itipo_persona: 'C'},
+      where: {itipo_persona: 'C', bactivo: 1},
       attributes: ['cpersona', 'cci_rif', 'xnombre', 'xapellido'],
     });
     const clients = client.map((item) => item.get({ plain: true }));
@@ -158,7 +161,7 @@ const getClients = async () => {
 const getBrand = async (data) => {
   try {
     const marca = await Brand.findAll({
-      where: data,
+      where: {...data, bactivo: 1},
       attributes: [[sequelize.fn('DISTINCT', sequelize.col('xmarca')), 'xmarca']]
     });
     const brand = marca.map((item) => item.get({ plain: true }));
@@ -176,7 +179,7 @@ const getBrand = async (data) => {
 const getModel = async (data) => {
   try {
     const modelo = await Model.findAll({
-      where: data,
+      where: {...data, bactivo: 1},
       attributes: [[sequelize.fn('DISTINCT', sequelize.col('xmodelo')), 'xmodelo']]
     });
     const model = modelo.map((item) => item.get({ plain: true }));
@@ -194,7 +197,7 @@ const getModel = async (data) => {
 const getVersion = async (data) => {
   try {
     const versions = await Version.findAll({
-      where: data,
+      where: {...data, bactivo: 1},
       attributes: ['xversion', 'cversion'],
     });
     const version = versions.map((item) => item.get({ plain: true }));
@@ -209,6 +212,7 @@ const getVersion = async (data) => {
 const getColor = async () => {
   try {
     const colores = await Color.findAll({
+      where: {bactivo: 1},
       attributes: ['ccolor', 'xcolor'],
     });
     const color = colores.map((item) => item.get({ plain: true }));
@@ -226,6 +230,7 @@ const getColor = async () => {
 const getMethodOfPayment = async () => {
   try {
     const metodologia = await Payment.findAll({
+      where: {bactivo: 1},
       attributes: ['cmetodologiapago', 'xmetodologiapago'],
     });
     const result = metodologia.map((item) => item.get({ plain: true }));
@@ -243,6 +248,7 @@ const getMethodOfPayment = async () => {
 const getTakers = async () => {
   try {
     const tomador = await Persons.findAll({
+      where: {bactivo: 1},
       attributes: ['cpersona', 'xnombre', 'xapellido', 'cci_rif'],
       include: [{
         association: 'usuario',
@@ -301,7 +307,7 @@ const getTakersId = async (data) => {
 const getState = async (data) => {
   try {
     const items = await State.findAll({
-      where: data,
+      where: {...data, bactivo: 1},
       attributes: ['cestado', 'xestado'],
     });
     const result = items.map((item) => item.get({ plain: true }));
@@ -319,7 +325,7 @@ const getState = async (data) => {
 const getCity = async (data) => {
   try {
     const items = await City.findAll({
-      where: data,
+      where: {...data, bactivo: 1},
       attributes: ['cciudad', 'xciudad'],
     });
     const result = items.map((item) => item.get({ plain: true }));
@@ -337,6 +343,7 @@ const getCity = async (data) => {
 const getExecutive = async () => {
   try {
     const exec = await Executive.findAll({
+      where: {bactivo: 1},
       attributes: ['cejecutivo', 'xejecutivo', 'pcomision'],
     });
     const executive = exec.map((item) => item.get({ plain: true }));
@@ -354,7 +361,7 @@ const getExecutive = async () => {
 const getAgents = async (cejecutivo) => {
   try {
     const agent = await Agents.findAll({
-      where: {cejecutivo: cejecutivo},
+      where: {cejecutivo: cejecutivo, bactivo: 1},
       attributes: ['cagente', 'xagente', 'pcomision'],
     });
     const agents = agent.map((item) => item.get({ plain: true }));
@@ -372,6 +379,7 @@ const getAgents = async (cejecutivo) => {
 const getInsurance = async () => {
   try {
     const asegurados = await Persons.findAll({
+      where: {bactivo: 1},
       attributes: ['cpersona', 'xnombre', 'xapellido', 'cci_rif'],
       include: [{
         association: 'usuario',
@@ -401,7 +409,7 @@ const getInsurance = async () => {
 const getCoverage = async (cramo) => {
   try {
     const coberturas = await Coverage.findAll({
-      where: {cramo: cramo},
+      where: {cramo: cramo, bactivo: 1},
       attributes: ['ccobertura', 'xcobertura'],
     });
     const coverage = coberturas.map((item) => item.get({ plain: true }));
@@ -419,6 +427,7 @@ const getCoverage = async (cramo) => {
 const getBank = async () => {
   try {
     const bancos = await Bank.findAll({
+      where: {bactivo: 1},
       attributes: ['cbanco', 'xbanco', 'cmoneda'],
     });
     const bank = bancos.map((item) => item.get({ plain: true }));
