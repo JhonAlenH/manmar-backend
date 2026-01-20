@@ -14,6 +14,8 @@ router
     .post("/create", emissionController.createContract)
     .post("/detail/:id", emissionController.detailContract)
     .post("/update", emissionController.updateContract)
+    .post("/disableContract/:cpoliza", emissionController.disableContract)
+    .post("/disable/:cvigencia", emissionController.disablePolicy)
     .post("/policy/:xpoliza", emissionController.searchPolicy)
     .post("/search-receipt/:id", emissionController.searchReceipt)
     .post("/search-complement", emissionController.searchComplement)

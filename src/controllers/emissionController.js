@@ -218,12 +218,63 @@ const detailContract = async (req, res) => {
             }
         }
     }
-    
     return res
         .status(200)
         .send({
             status: true,
             data: contratos,
+        });
+}
+
+const disableContract = async (req, res) => {
+    const update = await emissionService.updateContract(req.body);
+    if (update.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: update.permissionError
+            });
+    }
+    if (update.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: update.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            message: `Se ha actualizado el contrato exitosamente`
+        });
+}
+
+const disablePolicy = async (req, res) => {
+    const update = await emissionService.updateContract(req.body);
+    if (update.permissionError) {
+        return res
+            .status(403)
+            .send({
+                status: false,
+                message: update.permissionError
+            });
+    }
+    if (update.error) {
+        return res
+            .status(500)
+            .send({
+                status: false,
+                message: update.error
+            });
+    }
+    return res
+        .status(200)
+        .send({
+            status: true,
+            message: `Se ha actualizado el contrato exitosamente`
         });
 }
 
@@ -692,6 +743,8 @@ export default {
     createContract,
     detailContract,
     updateContract,
+    disableContract,
+    disablePolicy,
     searchPolicy,
     searchReceipt,
     searchComplement,

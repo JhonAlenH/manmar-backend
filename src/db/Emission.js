@@ -43,8 +43,7 @@ const Comisiones = models.cbcomisiones;
 const Complement = models.cbmovimientos;
 const Documentos = models.podocumentos;
 const Products = models.maproductos;
-const Polizas = models.popolizas;
-const Policy = models.popolizas
+const Policys = models.popolizas
 const Contracts = models.povigencias
 
 const getReceipt = async (data) => {
@@ -121,7 +120,7 @@ const searchContract = async (data) => {
       whereClause.cramo = data.cramo;
     }
     
-    const contratos = await Policy.findAll({
+    const contratos = await Policys.findAll({
       where: whereClause,
       attributes: ['cpoliza', 'xpoliza', 'iestado', 'fcreacion'],
       include: [
@@ -181,7 +180,7 @@ const searchContract = async (data) => {
 const createContract = async (data) => {
   try {
     const documentos = data.documentos || [];
-    const policy = await Polizas.create(data)
+    const policy = await Policys.create(data)
     console.log('datos poliza cre')
 
     for (const vigencia of data.vigencias) {
@@ -216,7 +215,7 @@ const createContract = async (data) => {
 
 const detailContract = async (id) => {
   try {
-    const contract = await Policy.findOne({
+    const contract = await Policys.findOne({
       where: {
         cpoliza: id
       },
@@ -308,6 +307,87 @@ const getReceiptDocument = async (data) => {
   }
 };
 
+const disablePolicy = async (id) => {
+  const policy = await Policys.findOne({
+    where: { cpoliza: id },
+    attributes: ['cvigencia', 'ccedente'],
+    include: [
+      {association: 'vigencias', attributes: ['cvigencia'], include : [
+        {
+          association: 'recibos', attributes: [sequelize.fn('COUNT', sequelize.col('crecibo')), 'recibos_cobrados'], where: { iestadorec: 'C'}
+        }
+      ]
+      },
+    ]
+  })
+  console.log(policy)
+  try {
+    // const dPolicy = await Policys.update({iestado: 0}, {
+    //   where: {cpoliza: id}
+    // })
+    // const dVigency = await Contracts.update({iestado: 'A'}, {
+    //   where: {cvigencia: id}
+    // })
+    // const vigencias = await Contracts.findAll({
+    //   where: {cvigencia: id},
+    //   attributes: ['cvigencia']
+    // }).map((item => item.cvigencia));
+
+    // console.log(vigencias)
+    // const dRecibos = await Recibos.update({iestadorec: 'A'}, {
+    //   where: { cvigencia: { [Op.in]: vigencias }} 
+    // })
+    // const recibos = await Recibos.findAll({
+    //   where: { cvigencia: { [Op.in]: vigencias }},
+    //   attributes: ['crecibo']
+    // }).map((item => item.crecibo));
+
+    // console.log(recibos)
+    // const dComisiones = await Comisiones.update({iestado: 'A'}, {
+    //   where: { crecibo: { [Op.in]: recibos } } 
+    // })
+    return true
+    // return { dVigency, dRecibos, comisiones };
+  } catch (error) {
+      console.error(error.message);
+      return { error: error.message };
+  }
+};
+
+const disableContract = async (id) => {
+  const contract = await Contracts.findOne({
+    where: { cvigencia: id },
+    attributes: ['cvigencia', 'ccedente'],
+    include: [
+      {association: 'recibos', attributes: [sequelize.fn('COUNT', sequelize.col('crecibo')), 'recibos_cobrados'],
+        where: { iestadorec: 'C'}
+      },
+    ]
+  })
+  try {
+    // const dVigency = await Contracts.update({iestado: 'A'}, {
+    //   where: {cvigencia: id}
+    // })
+    // const dRecibos = await Recibos.update({iestadorec: 'A'}, {
+    //   where: {cvigencia: id}
+    // })
+    // const recibos = await Recibos.findAll({
+    //   where: {cvigencia: id},
+    //   attributes: ['crecibo']
+    // }).map((item => item.crecibo));
+
+    // console.log(recibos)
+    // const dComisiones = await Comisiones.update({iestado: 'A'}, {
+    //   where: { crecibo: { [Op.in]: recibos } }
+    // })
+    return true
+    // return { dVigency, dRecibos, comisiones };
+  } catch (error) {
+      console.error(error.message);
+      return { error: error.message };
+  }
+};
+
 const updateContract = async (data) => {
   let pool;
   try {
@@ -356,7 +436,7 @@ const searchPolicy = async (xpoliza, ccedente) => {
       xpoliza: xpoliza,
       ccedente: ccedente
     }
-    const producers = await Policy.findOne({
+    const producers = await Policys.findOne({
       where: data,
       attributes: ['xpoliza'],
     });
@@ -911,6 +991,8 @@ export default {
   documentsContract,
   updateContract,
   searchPolicy,
+  disablePolicy,
+  disableContract,
   searchReceipt,
   searchComplement,
   updateReceipt,

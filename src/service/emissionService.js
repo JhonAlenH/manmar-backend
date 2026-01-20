@@ -80,6 +80,25 @@ const documentsContract = async (data) => {
     return document;
 }
 
+const disableContract = async (id,data) => {
+    const update = await Emission.disableContract(id,data);
+    if (update.error) {
+        return {
+            error: update.error
+        }
+    }
+    return update;
+}
+const disablePolicy = async (id,data) => {
+    const update = await Emission.disablePolicy(id,data);
+    if (update.error) {
+        return {
+            error: update.error
+        }
+    }
+    return update;
+}
+
 const updateContract = async (updateContract) => {
     const update = await Emission.updateContract(updateContract);
     if (update.error) {
@@ -251,6 +270,8 @@ export default {
     detailContract,
     documentsContract,
     updateContract,
+    disablePolicy,
+    disableContract,
     searchPolicy,
     searchReceipt,
     searchComplement,
