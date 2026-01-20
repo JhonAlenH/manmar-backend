@@ -307,84 +307,91 @@ const getReceiptDocument = async (data) => {
   }
 };
 
-const disablePolicy = async (id) => {
+const updateStatusPolicy = async (id) => {
   const policy = await Policys.findOne({
     where: { cpoliza: id },
-    attributes: ['cvigencia', 'ccedente'],
+    attributes: ['cpoliza'],
     include: [
       {association: 'vigencias', attributes: ['cvigencia'], include : [
-        {
-          association: 'recibos', attributes: [sequelize.fn('COUNT', sequelize.col('crecibo')), 'recibos_cobrados'], where: { iestadorec: 'C'}
-        }
-      ]
-      },
-    ]
+        {association: 'recibos', attributes: ['crecibo'], where: { iestadorec: 'C'}}
+      ]},
+    ],
   })
-  console.log(policy)
+  for (const vigency of policy.vigencias) {
+    for (const recibo of vigency.recibos) {
+      policy.recibos_cobrados = (policy.recibos_cobrados || 0) + 1
+    }
+  }
   try {
-    // const dPolicy = await Policys.update({iestado: 0}, {
-    //   where: {cpoliza: id}
-    // })
-    // const dVigency = await Contracts.update({iestado: 'A'}, {
-    //   where: {cvigencia: id}
-    // })
-    // const vigencias = await Contracts.findAll({
-    //   where: {cvigencia: id},
-    //   attributes: ['cvigencia']
-    // }).map((item => item.cvigencia));
-
-    // console.log(vigencias)
-    // const dRecibos = await Recibos.update({iestadorec: 'A'}, {
-    //   where: { cvigencia: { [Op.in]: vigencias }} 
-    // })
-    // const recibos = await Recibos.findAll({
-    //   where: { cvigencia: { [Op.in]: vigencias }},
-    //   attributes: ['crecibo']
-    // }).map((item => item.crecibo));
-
-    // console.log(recibos)
-    // const dComisiones = await Comisiones.update({iestado: 'A'}, {
-    //   where: { crecibo: { [Op.in]: recibos } } 
-    // })
-    return true
-    // return { dVigency, dRecibos, comisiones };
+    if(policy.recibos_cobrados === 0){
+      const dPolicy = await Policys.update({iestado: 0}, {
+        where: {cpoliza: id}
+      })
+      const dVigency = await Contracts.update({iestado: 'A'}, {
+        where: {cvigencia: id}
+      })
+      const vigencias = await Contracts.findAll({
+        where: {cpoliza: id},
+        attributes: ['cvigencia']
+      })
+      const vigenciasIds = vigencias.map((item) => item.cvigencia);
+  
+      const dRecibos = await Recibos.update({iestadorec: 'A'}, {
+        where: { cvigencia: { [Op.in]: vigenciasIds }} 
+      })
+      const recibos = await Recibos.findAll({
+        where: { cvigencia: { [Op.in]: vigenciasIds }},
+        attributes: ['crecibo']
+      })
+      const recibosIds = recibos.map((item) => item.crecibo);
+  
+      const dComisiones = await Comisiones.update({iestado: 'A'}, {
+        where: { crecibo: { [Op.in]: recibosIds } } 
+      })
+    } else {
+      return { error: 'No se puede anular la póliza porque tiene recibos cobrados.' };
+    }
+    return { status: true, message: 'Póliza anulada correctamente.' };
   } catch (error) {
-      console.error(error.message);
-      return { error: error.message };
+    return { error: error.message };
   }
 };
 
-const disableContract = async (id) => {
+const updateStatusContract = async (id) => {
   const contract = await Contracts.findOne({
     where: { cvigencia: id },
-    attributes: ['cvigencia', 'ccedente'],
+    attributes: ['cvigencia'],
     include: [
-      {association: 'recibos', attributes: [sequelize.fn('COUNT', sequelize.col('crecibo')), 'recibos_cobrados'],
-        where: { iestadorec: 'C'}
-      },
+      { association: 'recibos', attributes: ['crecibo'], where: { iestadorec: 'C'} },
     ]
   })
+  for (const recibo of contract.recibos) {
+    contract.recibos_cobrados = (contract.recibos_cobrados || 0) + 1
+  }
   try {
-    // const dVigency = await Contracts.update({iestado: 'A'}, {
-    //   where: {cvigencia: id}
-    // })
-    // const dRecibos = await Recibos.update({iestadorec: 'A'}, {
-    //   where: {cvigencia: id}
-    // })
-    // const recibos = await Recibos.findAll({
-    //   where: {cvigencia: id},
-    //   attributes: ['crecibo']
-    // }).map((item => item.crecibo));
+    if(contract.recibos_cobrados === 0){
+      const dVigency = await Contracts.update({iestado: 'A'}, {
+        where: {cvigencia: id}
+      })
+      const dRecibos = await Recibos.update({iestadorec: 'A'}, {
+        where: {cvigencia: id}
+      })
+      const recibos = await Recibos.findAll({
+        where: {cvigencia: id},
+        attributes: ['crecibo']
+      })
+      const recibosIds = recibos.map((item) => item.crecibo);
 
-    // console.log(recibos)
-    // const dComisiones = await Comisiones.update({iestado: 'A'}, {
-    //   where: { crecibo: { [Op.in]: recibos } }
-    // })
-    return true
-    // return { dVigency, dRecibos, comisiones };
+      const dComisiones = await Comisiones.update({iestado: 'A'}, {
+        where: { crecibo: { [Op.in]: recibosIds } }
+      })
+    }
+    else {
+      return { error: 'No se puede anular la vigencia porque tiene recibos cobrados.' };
+    }
+    return { status: true, message: 'Vigencia anulada correctamente.' };
   } catch (error) {
-      console.error(error.message);
-      return { error: error.message };
+    return { error: error.message };
   }
 };
 
@@ -991,8 +998,8 @@ export default {
   documentsContract,
   updateContract,
   searchPolicy,
-  disablePolicy,
-  disableContract,
+  updateStatusPolicy,
+  updateStatusContract,
   searchReceipt,
   searchComplement,
   updateReceipt,

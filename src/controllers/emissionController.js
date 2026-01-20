@@ -226,55 +226,55 @@ const detailContract = async (req, res) => {
         });
 }
 
-const disableContract = async (req, res) => {
-    const update = await emissionService.updateContract(req.body);
-    if (update.permissionError) {
+const updateStatusContract = async (req, res) => {
+    const contract = await emissionService.updateStatusContract(req.params.cvigencia);
+    if (contract.permissionError) {
         return res
             .status(403)
             .send({
                 status: false,
-                message: update.permissionError
+                message: contract.permissionError
             });
     }
-    if (update.error) {
+    if (contract.error) {
         return res
             .status(500)
             .send({
                 status: false,
-                message: update.error
+                message: contract.error
             });
     }
     return res
         .status(200)
         .send({
             status: true,
-            message: `Se ha actualizado el contrato exitosamente`
+            message: `Vigencia del contrato ha sido actualizada exitosamente`
         });
 }
 
-const disablePolicy = async (req, res) => {
-    const update = await emissionService.updateContract(req.body);
-    if (update.permissionError) {
+const updateStatusPolicy = async (req, res) => {
+    const policy = await emissionService.updateStatusPolicy(req.params.cpoliza);
+    if (policy.permissionError) {
         return res
             .status(403)
             .send({
                 status: false,
-                message: update.permissionError
+                message: policy.permissionError
             });
     }
-    if (update.error) {
+    if (policy.error) {
         return res
             .status(500)
             .send({
                 status: false,
-                message: update.error
+                message: policy.error
             });
     }
     return res
         .status(200)
         .send({
             status: true,
-            message: `Se ha actualizado el contrato exitosamente`
+            message: `Poliza ha sido actualizada exitosamente`
         });
 }
 
@@ -743,8 +743,8 @@ export default {
     createContract,
     detailContract,
     updateContract,
-    disableContract,
-    disablePolicy,
+    updateStatusContract,
+    updateStatusPolicy,
     searchPolicy,
     searchReceipt,
     searchComplement,
