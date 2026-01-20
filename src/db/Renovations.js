@@ -39,10 +39,10 @@ const searchRenovations = async (data) => {
     ]};
     if (data.ccedente || data.cramo) {
       if (data.ccedente) {
-        polizaData.where = { ccedente: data.ccedente };
+        polizaData.where = { ...polizaData.where, ccedente: data.ccedente };
       }
       if (data.cramo) {
-        polizaData.where = { cramo: data.cramo };
+        polizaData.where = { ...polizaData.where, cramo: data.cramo };
       }
     }
 

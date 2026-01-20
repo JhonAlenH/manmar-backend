@@ -1119,7 +1119,7 @@ const createProducto = async(body) => {
 
   try {
     const productoFindeded = await Productos.findOne({
-      where: {xproducto: data.xproducto, cproductor: data.cproductor, cramo: data.cramo, cmoneda: data.cmoneda},
+      where: {xproducto: data.xproducto, cproductor: data.cproductor, ccedente: data.ccedente, cramo: data.cramo, cmoneda: data.cmoneda},
       attributes: ['cproducto']
     })
     console.log(productoFindeded?.cproducto)
