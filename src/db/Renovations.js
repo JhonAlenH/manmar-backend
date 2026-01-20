@@ -30,6 +30,7 @@ const searchRenovations = async (data) => {
       fhasta: {
         [Sequelize.Op.lt]: new Date(), // Solo contratos vencidos
       },
+      iestado: 'V', // Solo contratos vigentes
     };
 
     // Solo agrega ccedente y cramo si están presentes
@@ -75,6 +76,10 @@ const searchRenovations = async (data) => {
 
     const renovations = renovaciones.map((item) => {
       const itemData = item.get({ plain: true });
+      itemData.xpoliza = itemData.poliza.xpoliza
+      itemData.xcedente = itemData.producto?.cedente?.persona?.xnombre
+      itemData.xramo = itemData.producto?.ramo?.xramo
+      itemData.xasegurado = `${itemData.poliza?.asegurado?.xnombre} ${itemData.poliza?.asegurado?.xapellido || ''}`.trim();
 
       // Calcular cuántos días lleva vencido el contrato
       const today = new Date();

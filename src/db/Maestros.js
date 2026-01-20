@@ -73,7 +73,6 @@ const getMaRoles = async(rol) => {
     if (rol){
       data = {crol:  { [Op.gte]: rol }}
     }
-    data.bactivo = 1
     const items = await Roles.findAll({
       where: data,
       attributes: ['crol', 'xrol'],
