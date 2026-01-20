@@ -964,12 +964,15 @@ const searchUsuarios = async (cproductor) => {
       where: data,
       attributes: ['cusuario','xusuario', 'bactivo'],
       include: [
-        {association: 'rol', attributes:['crol','xrol']}
+        {association: 'rol', attributes:['crol','xrol']},
+        {association: 'persona', attributes:['xnombre', 'xapellido', 'cci_rif']}
       ]
     });
     const result = items.map((item) => {
       const get = item.get({ plain: true })
       get.xrol = get.rol?.xrol; 
+      get.xpersona = `${get.persona?.xnombre} ${get.persona?.xapellido}`.trim();
+      get.cci_rif = get.persona?.cci_rif;
       return get
     });
     return result;
