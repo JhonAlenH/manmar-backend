@@ -152,9 +152,7 @@ const searchContract = async (data) => {
       get.xramo = get.ramo?.xramo;
       let dateFormated = new Date(get.fhasta);
       dateFormated.setDate(dateFormated.getDate() + 1);
-      if(get.countVigencias > 1 && get.estadoVigencia != 'A') {
-        get.estado = 'Renovada'
-      } else if ((get.countVigencias > 2 && get.estadoVigencia == 'A') || (dateFormated < new Date())) {
+      if ((get.countVigencias > 2 && get.estadoVigencia == 'A') || (dateFormated < new Date())) {
         get.estado = 'Por Renovar'
       } else if ((get.estadoVigencia != 'A') && (dateFormated < new Date())) {
         get.estado = 'Por Renovar'
