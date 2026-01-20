@@ -151,7 +151,9 @@ const searchContract = async (data) => {
       get.xramo = get.ramo?.xramo;
       let dateFormated = new Date(get.fhasta);
       dateFormated.setDate(dateFormated.getDate() + 1);
-      if ((get.countVigencias > 2 && get.estadoVigencia == 'A') || (dateFormated < new Date())) {
+      if (!get.iestado) {
+        get.estado = 'Anulada'
+      }else if ((get.countVigencias > 2 && get.estadoVigencia == 'A') || (dateFormated < new Date())) {
         get.estado = 'Por Renovar'
       } else if ((get.estadoVigencia != 'A') && (dateFormated < new Date())) {
         get.estado = 'Por Renovar'
@@ -317,18 +319,14 @@ const updateStatusPolicy = async (id) => {
       ]},
     ],
   })
-  for (const vigency of policy.vigencias) {
-    for (const recibo of vigency.recibos) {
-      policy.recibos_cobrados = (policy.recibos_cobrados || 0) + 1
-    }
-  }
-  try {
-    if(policy.recibos_cobrados === 0){
+  console.log(policy.vigencias.length)
+  if(policy.vigencias.length == 0){ 
+    try {
       const dPolicy = await Policys.update({iestado: 0}, {
         where: {cpoliza: id}
       })
       const dVigency = await Contracts.update({iestado: 'A'}, {
-        where: {cvigencia: id}
+        where: {cpoliza: id}
       })
       const vigencias = await Contracts.findAll({
         where: {cpoliza: id},
@@ -348,16 +346,17 @@ const updateStatusPolicy = async (id) => {
       const dComisiones = await Comisiones.update({iestado: 'A'}, {
         where: { crecibo: { [Op.in]: recibosIds } } 
       })
-    } else {
-      return { error: 'No se puede anular la póliza porque tiene recibos cobrados.' };
+      return { status: true, message: 'Póliza anulada correctamente.' };
+    } catch (error) {
+      return { error: error.message };
     }
-    return { status: true, message: 'Póliza anulada correctamente.' };
-  } catch (error) {
-    return { error: error.message };
+  } else {
+    return { error: 'No se puede anular la póliza porque tiene recibos cobrados.' };
   }
 };
 
 const updateStatusContract = async (id) => {
+  console.log(id)
   const contract = await Contracts.findOne({
     where: { cvigencia: id },
     attributes: ['cvigencia'],
@@ -365,11 +364,9 @@ const updateStatusContract = async (id) => {
       { association: 'recibos', attributes: ['crecibo'], where: { iestadorec: 'C'} },
     ]
   })
-  for (const recibo of contract.recibos) {
-    contract.recibos_cobrados = (contract.recibos_cobrados || 0) + 1
-  }
-  try {
-    if(contract.recibos_cobrados === 0){
+  console.log(contract)
+  if(contract?.recibos.length == 0){
+    try {
       const dVigency = await Contracts.update({iestado: 'A'}, {
         where: {cvigencia: id}
       })
@@ -385,13 +382,12 @@ const updateStatusContract = async (id) => {
       const dComisiones = await Comisiones.update({iestado: 'A'}, {
         where: { crecibo: { [Op.in]: recibosIds } }
       })
+      return { status: true, message: 'Vigencia anulada correctamente.' };
+    } catch (error) {
+      return { error: error.message };
     }
-    else {
-      return { error: 'No se puede anular la vigencia porque tiene recibos cobrados.' };
-    }
-    return { status: true, message: 'Vigencia anulada correctamente.' };
-  } catch (error) {
-    return { error: error.message };
+  } else {
+    return { error: 'No se puede anular la vigencia porque tiene recibos cobrados.' };
   }
 };
 
