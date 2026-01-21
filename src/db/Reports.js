@@ -52,11 +52,13 @@ const emissionsReport = async (data) => {
       SELECT 
       a.xpoliza, a.cpoliza,
       b.fdesde, b.fhasta,
-      d.cci_rif cci_rif_asegurado, TRIM(CONCAT(d.xnombre,' ',d.xapellido)) xasegurado, 
-      e.cci_rif cci_rif_tomador, TRIM(CONCAT(d.xnombre,' ',e.xapellido)) xtomador,
-      (select max(ncuota) from cbrecibos where cvigencia =b.cvigencia) ncuotas,
-      (select top(1) mprimaext from cbrecibos where cvigencia =b.cvigencia) monto_individual_ext,
-      (select top(1) mprima from cbrecibos where cvigencia =b.cvigencia) monto_individual,
+      d.cci_rif cci_rif_asegurado, CONCAT(d.xnombre,' ',d.xapellido) xasegurado, 
+      e.cci_rif cci_rif_tomador, CONCAT(d.xnombre,' ',e.xapellido) xtomador,
+      (select top(1) xramo from maramos where cramo = (select top(1) cramo from maproductos where cproducto = b.cproducto)) xramo,
+      (select max(ncuota) from cbrecibos where cvigencia = b.cvigencia) ncuotas,
+      (select max(ncuota) from cbrecibos where cvigencia = b.cvigencia and iestadorec = 'C') ncuotas_pagadas,
+      (select top(1) mprimaext from cbrecibos where cvigencia = b.cvigencia) monto_individual_ext,
+      (select top(1) mprima from cbrecibos where cvigencia = b.cvigencia) monto_individual,
       (select sum(mprimaext) from cbrecibos where cvigencia = b.cvigencia and fcobro is not null) prima_pagada_ext,
       (select sum(mprima) from cbrecibos where cvigencia = b.cvigencia and fcobro is not null) prima_pagada
       from popolizas a
@@ -66,7 +68,24 @@ const emissionsReport = async (data) => {
     `
     let result = await pool.request().query(queryInitial + queryWhere)
     await pool.close();
-    return {data:result.recordset, label}
+
+    const formatResult = await result.recordset.map(item => {
+      return {
+        "Nombre del Tomador": item.xtomador.replace('NULL','').trim(),
+        "C.I del Tomador": item.cci_rif_tomador.trim(),
+        "Nombre del Titular": item.xasegurado.replace('NULL','').trim(),
+        "C.I del Titular": item.cci_rif_asegurado.trim(),
+        "Nº de Póliza": item.xpoliza.trim(),
+        "Vigencia Desde": item.fdesde.toLocaleDateString('en-GB'),
+        "Vigencia Hasta": item.fhasta.toLocaleDateString('en-GB'),
+        "Ramo": item.xramo.trim(),
+        "Monto Cuota $": item.monto_individual,
+        "Nº de Cuotas": item.ncuotas,
+        "Monto Pagado $": item.prima_pagada_ext || 0,
+        "Nº de Cuotas Pagadas": item.ncuotas_pagadas || 0,
+      }
+    })
+    return {data: formatResult, label}
   } catch (error) {
     console.log(error)
     return { error: await error.parent.message };
