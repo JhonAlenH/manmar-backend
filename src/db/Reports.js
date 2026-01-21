@@ -16,13 +16,18 @@ const sqlConfig = {
   }
 }
 
+const isEmpty = (obj) => {
+  return Object.keys(obj).length === 0;
+}
+
 const emissionsReport = async (data) => {
   try {
     let pool = await sql.connect(sqlConfig);
     let queryWhere = ''
     let date = new Date()
     let label = `Reporte_emisiones(generado_${date.toLocaleDateString('en-GB')})`
-    if(data != {}) {
+    if(!isEmpty(data)) {
+      console.log('aqui entro')
       const entries = Object.entries(data)
       queryWhere += ' WHERE '
       label += '-var_('
@@ -48,6 +53,7 @@ const emissionsReport = async (data) => {
       label += ')'
       
     }
+    console.log(queryWhere)
     let queryInitial = `
       SELECT 
       a.xpoliza, a.cpoliza,
