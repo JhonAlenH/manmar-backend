@@ -227,7 +227,7 @@ const detailContract = async (req, res) => {
 }
 
 const updateStatusContract = async (req, res) => {
-    const contract = await emissionService.updateStatusContract(req.params.cvigencia);
+    const contract = await emissionService.updateStatusContract(req.params.cvigencia, req.body.type);
     if (contract.permissionError) {
         return res
             .status(403)
@@ -253,7 +253,7 @@ const updateStatusContract = async (req, res) => {
 }
 
 const updateStatusPolicy = async (req, res) => {
-    const policy = await emissionService.updateStatusPolicy(req.params.cpoliza);
+    const policy = await emissionService.updateStatusPolicy(req.params.cpoliza, req.body.type);
     if (policy.permissionError) {
         return res
             .status(403)

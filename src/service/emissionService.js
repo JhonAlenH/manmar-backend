@@ -80,8 +80,14 @@ const documentsContract = async (data) => {
     return document;
 }
 
-const updateStatusContract = async (id, data) => {
-    const update = await Emission.updateStatusContract(id);
+const updateStatusContract = async (id, type) => {
+    let data = {};
+    if(type === 'disable'){
+        data = { iestado_new: 'V', iestadorec: 'A', iestado_vigencia: 'A', iestado_check: 'V', iestado_comision: 'A', check_index: 0 };
+    } else {
+        data = { iestado_new: 'R', iestadorec: 'V', iestado_vigencia: 'V', iestado_check: 'A', iestado_comision: 'P', check_index: 0 };
+    }
+    const update = await Emission.updateStatusContract(id, data);
     if (update.error) {
         return {
             error: update.error
@@ -89,8 +95,14 @@ const updateStatusContract = async (id, data) => {
     }
     return update;
 }
-const updateStatusPolicy = async (id, data) => {
-    const update = await Emission.updateStatusPolicy(id);
+const updateStatusPolicy = async (id, type) => {
+    let data = {};
+    if(type === 'disable'){
+        data = { iestado_poliza: 0, iestadorec: 'A', iestado_vigencia: 'A', iestado_first: 'A', iestado_comision: 'A' };
+    } else {
+        data = { iestado_poliza: 1, iestadorec: 'P', iestado_vigencia: 'R', iestado_first: 'V', iestado_comision: 'P' };
+    }
+    const update = await Emission.updateStatusPolicy(id, data);
     if (update.error) {
         return {
             error: update.error

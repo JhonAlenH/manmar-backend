@@ -153,7 +153,9 @@ const searchContract = async (data) => {
       dateFormated.setDate(dateFormated.getDate() + 1);
       if (!get.iestado) {
         get.estado = 'Anulada'
-      }else if ((get.countVigencias > 2 && get.estadoVigencia == 'A') || (dateFormated < new Date())) {
+      } else if ((get.countVigencias >= 2 && get.estadoVigencia != 'A')) {
+        get.estado = 'Renovada'
+      } else if ((get.countVigencias >= 2 && get.estadoVigencia == 'A') || (dateFormated < new Date())) {
         get.estado = 'Por Renovar'
       } else if ((get.estadoVigencia != 'A') && (dateFormated < new Date())) {
         get.estado = 'Por Renovar'
@@ -309,7 +311,7 @@ const getReceiptDocument = async (data) => {
   }
 };
 
-const updateStatusPolicy = async (id) => {
+const updateStatusPolicy = async (id, data) => {
   const policy = await Policys.findOne({
     where: { cpoliza: id },
     attributes: ['cpoliza'],
@@ -322,19 +324,22 @@ const updateStatusPolicy = async (id) => {
   console.log(policy.vigencias.length)
   if(policy.vigencias.length == 0){ 
     try {
-      const dPolicy = await Policys.update({iestado: 0}, {
+      const dPolicy = await Policys.update({iestado: data.iestado_poliza}, {
         where: {cpoliza: id}
       })
-      const dVigency = await Contracts.update({iestado: 'A'}, {
+      const dVigency = await Contracts.update({iestado: data.iestado_vigencia}, {
         where: {cpoliza: id}
       })
       const vigencias = await Contracts.findAll({
         where: {cpoliza: id},
         attributes: ['cvigencia']
       })
+      const dFirstVigency = Contracts.update({iestado: data.iestado_first}, {
+        where: {cvigencia: vigencias[0].cvigencia}
+      })
       const vigenciasIds = vigencias.map((item) => item.cvigencia);
   
-      const dRecibos = await Recibos.update({iestadorec: 'A'}, {
+      const dRecibos = await Recibos.update({iestadorec: data.iestadorec}, {
         where: { cvigencia: { [Op.in]: vigenciasIds }} 
       })
       const recibos = await Recibos.findAll({
@@ -343,7 +348,7 @@ const updateStatusPolicy = async (id) => {
       })
       const recibosIds = recibos.map((item) => item.crecibo);
   
-      const dComisiones = await Comisiones.update({iestado: 'A'}, {
+      const dComisiones = await Comisiones.update({iestado: data.iestado_comision}, {
         where: { crecibo: { [Op.in]: recibosIds } } 
       })
       return { status: true, message: 'Póliza anulada correctamente.' };
@@ -355,22 +360,39 @@ const updateStatusPolicy = async (id) => {
   }
 };
 
-const updateStatusContract = async (id) => {
+const updateStatusContract = async (id, data) => {
   console.log(id)
   const contract = await Contracts.findOne({
     where: { cvigencia: id },
     attributes: ['cvigencia'],
     include: [
-      { association: 'recibos', attributes: ['crecibo'], where: { iestadorec: 'C'} },
+      { association: 'recibos', attributes: ['crecibo'] , where: { iestadorec: 'C' } },
     ]
   })
   console.log(contract)
-  if(contract?.recibos.length == 0){
+  if(!contract || contract?.recibos.length == 0){
     try {
-      const dVigency = await Contracts.update({iestado: 'A'}, {
+      const contrato = await Contracts.findOne({
+        where: { cvigencia: id },
+        attributes: ['cpoliza'],
+      })
+      const dVigency = await Contracts.update({iestado: data.iestado_vigencia}, {
         where: {cvigencia: id}
       })
-      const dRecibos = await Recibos.update({iestadorec: 'A'}, {
+      const policy = await Policys.findOne({
+        where: {cpoliza: contrato?.cpoliza},
+        attributes: ['cpoliza'],
+        include: [
+          {association: 'vigencias', attributes: ['cvigencia'], order: [['fhasta', 'DESC']], where: { iestado: { [Op.ne]: data.iestado_check } } },
+        ]
+      })
+      if(policy?.vigencias?.length > 0){
+        const lastVigency = policy.vigencias[data.check_index];
+        const dLastVigency = await Contracts.update({iestado: data.iestado_new}, {
+          where: {cvigencia: lastVigency.cvigencia}
+        })
+      }
+      const dRecibos = await Recibos.update({iestadorec: data.iestadorec}, {
         where: {cvigencia: id}
       })
       const recibos = await Recibos.findAll({
@@ -379,7 +401,7 @@ const updateStatusContract = async (id) => {
       })
       const recibosIds = recibos.map((item) => item.crecibo);
 
-      const dComisiones = await Comisiones.update({iestado: 'A'}, {
+      const dComisiones = await Comisiones.update({iestado: data.iestado_comision}, {
         where: { crecibo: { [Op.in]: recibosIds } }
       })
       return { status: true, message: 'Vigencia anulada correctamente.' };
