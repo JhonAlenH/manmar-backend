@@ -153,9 +153,9 @@ const searchContract = async (data) => {
       dateFormated.setDate(dateFormated.getDate() + 1);
       if (!get.iestado) {
         get.estado = 'Anulada'
-      } else if ((get.countVigencias >= 2 && get.estadoVigencia != 'A')) {
+      }  /*else if ((get.countVigencias >= 2 && get.estadoVigencia != 'A')) {
         get.estado = 'Renovada'
-      } else if ((get.countVigencias >= 2 && get.estadoVigencia == 'A') || (dateFormated < new Date())) {
+      } */else if ((get.countVigencias >= 2 && get.estadoVigencia == 'A') || (dateFormated < new Date())) {
         get.estado = 'Por Renovar'
       } else if ((get.estadoVigencia != 'A') && (dateFormated < new Date())) {
         get.estado = 'Por Renovar'
