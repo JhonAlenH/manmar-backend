@@ -61,10 +61,13 @@ const emissionsReport = async (data) => {
       d.cci_rif cci_rif_asegurado, CONCAT(d.xnombre,' ',d.xapellido) xasegurado, 
       e.cci_rif cci_rif_tomador, CONCAT(d.xnombre,' ',e.xapellido) xtomador,
       (select top(1) xramo from maramos where cramo = (select top(1) cramo from maproductos where cproducto = b.cproducto)) xramo,
-      (select max(ncuota) from cbrecibos where cvigencia = b.cvigencia) ncuotas,
-      (select max(ncuota) from cbrecibos where cvigencia = b.cvigencia and iestadorec = 'C') ncuotas_pagadas,
+      CONCAT((select max(ncuota) from cbrecibos where cvigencia = b.cvigencia and iestadorec = 'C'), '/', (select max(ncuota) from cbrecibos where cvigencia = b.cvigencia)) ncuotas_pagadas,
       (select top(1) mprimaext from cbrecibos where cvigencia = b.cvigencia) monto_individual_ext,
       (select top(1) mprima from cbrecibos where cvigencia = b.cvigencia) monto_individual,
+      b.mprimaext monto_total_emision_ext,
+      b.mprima monto_total_emision,
+      (select sum(mprimaext) from cbrecibos where cvigencia = b.cvigencia) monto_total_actual_ext,
+      (select sum(mprima) from cbrecibos where cvigencia = b.cvigencia) monto_total_actual,
       (select sum(mprimaext) from cbrecibos where cvigencia = b.cvigencia and fcobro is not null) prima_pagada_ext,
       (select sum(mprima) from cbrecibos where cvigencia = b.cvigencia and fcobro is not null) prima_pagada
       from popolizas a
@@ -85,10 +88,15 @@ const emissionsReport = async (data) => {
         "Vigencia Desde": item.fdesde.toLocaleDateString('en-GB'),
         "Vigencia Hasta": item.fhasta.toLocaleDateString('en-GB'),
         "Ramo": item.xramo.trim(),
-        "Monto Cuota $": item.monto_individual,
-        "Nº de Cuotas": item.ncuotas,
-        "Monto Pagado $": item.prima_pagada_ext || 0,
+        "Monto Emision (Bs.)": item.monto_total_emision || 0,
+        "Monto Emision ($)": item.monto_total_emision_ext || 0,
+        "Monto Total (Bs.)": item.monto_total_actual || 0,
+        "Monto Total ($)": item.monto_total_actual_ext || 0,
+        "Monto Cuota (Bs.)": item.monto_individual,
+        "Monto Cuota ($)": item.monto_individual_ext,
         "Nº de Cuotas Pagadas": item.ncuotas_pagadas || 0,
+        "Monto Pagado (Bs.)": item.prima_pagada || 0,
+        "Monto Pagado ($)": item.prima_pagada_ext || 0,
       }
     })
     return {data: formatResult, label}
