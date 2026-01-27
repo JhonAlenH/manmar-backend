@@ -127,10 +127,12 @@ const searchContract = async (data) => {
         {
           association: 'vigencias',
           separate: true,
+          where: { iestado: { [Op.ne]: 'A' } },
           order: [['fhasta', 'DESC']]
         },
         'ramo',
         'asegurado',
+        'tomador',
         {
           association: 'cedente',
           include: ['persona'],
@@ -143,10 +145,12 @@ const searchContract = async (data) => {
       const get = item.get({ plain: true })
       get.countVigencias = get.vigencias?.length;
       get.estadoVigencia = get.vigencias[0]?.iestado;
-      get.fhasta = get.vigencias[0]?.fhasta;
-      get.fdesde = get.vigencias[0]?.fdesde;
+      get.fhasta = get.vigencias[0]?.fhasta || null;
+      get.fdesde = get.vigencias[0]?.fdesde || null;
       get.cci_rif_asegurado = get.asegurado?.cci_rif;
       get.xasegurado = `${get.asegurado?.xnombre} ${get.asegurado?.xapellido || ''}`.trim();
+      get.cci_rif_tomador = get.tomador?.cci_rif || '';
+      get.xtomador = `${get.tomador?.xnombre} ${get.tomador?.xapellido || ''}`.trim();
       get.xcedente = `${get.cedente?.persona?.xnombre} ${get.cedente?.persona?.xapellido || ''}`.trim();
       get.xramo = get.ramo?.xramo;
       let dateFormated = new Date(get.fhasta);
@@ -164,12 +168,17 @@ const searchContract = async (data) => {
       } else {
         get.estado = 'Vigente'
       }
-      get.fdesde = new Date(get.fdesde)
-      get.fdesde.setDate(get.fdesde.getDate() + 1);
-      get.fdesde = get.fdesde.toLocaleDateString('en-GB') 
-      get.fhasta = new Date(get.fhasta)
-      get.fhasta.setDate(get.fhasta.getDate() + 1);
-      get.fhasta = get.fhasta.toLocaleDateString('en-GB')
+      if (get.fdesde) {
+        get.fdesde = new Date(get.fdesde)
+        get.fdesde.setDate(get.fdesde.getDate() + 1);
+        get.fdesde = get.fdesde.toLocaleDateString('en-GB') || ''
+      }
+
+      if(get.fhasta) {
+        get.fhasta = new Date(get.fhasta)
+        get.fhasta.setDate(get.fhasta.getDate() + 1);
+        get.fhasta = get.fhasta.toLocaleDateString('en-GB') || ''
+      }
 
       return get
     }

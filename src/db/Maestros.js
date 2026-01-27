@@ -628,7 +628,7 @@ const createCedentes = async(body) => {
 }
 const updateCedentes = async(id, data) => {
 
-  const persona = {
+  let persona = {
     cci_rif: `${data.itipodoc}-${data.cci_rif}`,
     xnombre: data.xcedente,
     xcorreo: data.xcorreo,
@@ -637,6 +637,7 @@ const updateCedentes = async(id, data) => {
     cciudad: data.cciudad,
     itipo_persona: 'E',
   }
+  if(!data.cci_rif || !data.itipodoc) persona = {}
 
   try {
     const cedenteUp = await Cedentes.update(data, {where: {ccedente: id}})
@@ -1057,6 +1058,7 @@ const updateUsuario = async(id, data) => {
     xdireccion: data.xdireccion,
     cciudad: data.cciudad
   }
+  if(!data.cci_rif || !data.itipodoc) persona = {}
 
   try {
     const usuarioU = await Usuarios.update(data, {where: {cusuario:id}})

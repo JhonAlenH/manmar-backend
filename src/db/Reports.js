@@ -61,7 +61,7 @@ const emissionsReport = async (data) => {
       d.cci_rif cci_rif_asegurado, CONCAT(d.xnombre,' ',d.xapellido) xasegurado, 
       e.cci_rif cci_rif_tomador, CONCAT(d.xnombre,' ',e.xapellido) xtomador,
       (select top(1) xramo from maramos where cramo = (select top(1) cramo from maproductos where cproducto = b.cproducto)) xramo,
-      CONCAT((select max(ncuota) from cbrecibos where cvigencia = b.cvigencia and iestadorec = 'C'), '/', (select max(ncuota) from cbrecibos where cvigencia = b.cvigencia)) ncuotas_pagadas,
+      CONCAT(ISNULL(select max(ncuota) from cbrecibos where cvigencia = b.cvigencia and iestadorec = 'C'), '/', (select max(ncuota) from cbrecibos where cvigencia = b.cvigencia)) ncuotas_pagadas,
       (select top(1) mprimaext from cbrecibos where cvigencia = b.cvigencia) monto_individual_ext,
       (select top(1) mprima from cbrecibos where cvigencia = b.cvigencia) monto_individual,
       b.mprimaext monto_total_emision_ext,
