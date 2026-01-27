@@ -80,14 +80,15 @@ const documentsContract = async (data) => {
     return document;
 }
 
-const updateStatusContract = async (id, type) => {
+const updateStatusContract = async (id, body) => {
     let data = {};
-    if(type === 'disable'){
-        data = { iestado_new: 'V', iestadorec: 'A', iestado_vigencia: 'A', iestado_check: 'V', iestado_comision: 'A', check_index: 0 };
+    if(body.enable){
+        data = { iestado_new: 'R', iestadorec: 'V', iestado_vigencia: 'V', iestado_check: 'V', iestado_comision: 'P', check_index: 0 };
     } else {
-        data = { iestado_new: 'R', iestadorec: 'V', iestado_vigencia: 'V', iestado_check: 'A', iestado_comision: 'P', check_index: 0 };
+        data = { iestado_new: 'V', iestadorec: 'A', iestado_vigencia: 'A', iestado_check: 'A', iestado_comision: 'A', check_index: 1 };
     }
-    const update = await Emission.updateStatusContract(id, data);
+    console.log(data)
+    const update = await Emission.updateStatusContract(id, data, body);
     if (update.error) {
         return {
             error: update.error
@@ -95,14 +96,14 @@ const updateStatusContract = async (id, type) => {
     }
     return update;
 }
-const updateStatusPolicy = async (id, type) => {
+const updateStatusPolicy = async (id, body) => {
     let data = {};
-    if(type === 'disable'){
-        data = { iestado_poliza: 0, iestadorec: 'A', iestado_vigencia: 'A', iestado_first: 'A', iestado_comision: 'A' };
-    } else {
+    if(body.enable){
         data = { iestado_poliza: 1, iestadorec: 'P', iestado_vigencia: 'R', iestado_first: 'V', iestado_comision: 'P' };
+    } else {
+        data = { iestado_poliza: 0, iestadorec: 'A', iestado_vigencia: 'A', iestado_first: 'A', iestado_comision: 'A' };
     }
-    const update = await Emission.updateStatusPolicy(id, data);
+    const update = await Emission.updateStatusPolicy(id, data, body);
     if (update.error) {
         return {
             error: update.error

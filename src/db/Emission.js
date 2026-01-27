@@ -2,7 +2,7 @@ import sql from "mssql";
 import { Sequelize, Op, where } from 'sequelize';
 import sequelize from '../config/database.js';
 import initModels  from "../models/init-models.js";
-import e from "express";
+import Operaciones  from "../utilities/operaciones.js";
 const models = initModels(sequelize)
 
 const sqlConfig = {
@@ -320,7 +320,19 @@ const getReceiptDocument = async (data) => {
   }
 };
 
-const updateStatusPolicy = async (id, data) => {
+const updateStatusPolicy = async (id, data, dataO) => {
+  const operacionData = {
+    cproceso: dataO.enable? 3 : 1,
+    iestado: 'I',
+    xitem: dataO.item,
+    xcambio: dataO.xcambio,
+    xdetalles: dataO.xdetalles,
+    cusuario_creacion: dataO.cusuario_creacion,
+    fcreacion: dataO.fcreacion
+  }
+
+  const operacion = await Operaciones.createAuOperaciones(operacionData)
+
   const policy = await Policys.findOne({
     where: { cpoliza: id },
     attributes: ['cpoliza'],
@@ -343,8 +355,8 @@ const updateStatusPolicy = async (id, data) => {
         where: {cpoliza: id},
         attributes: ['cvigencia']
       })
-      const dFirstVigency = Contracts.update({iestado: data.iestado_first}, {
-        where: {cvigencia: vigencias[0].cvigencia}
+      const dFirstVigencyNot = Contracts.update({iestado: data.iestado_first}, {
+        where: {cvigencia: { [Op.ne]: vigencias[0]?.cvigencia}}
       })
       const vigenciasIds = vigencias.map((item) => item.cvigencia);
   
@@ -360,8 +372,12 @@ const updateStatusPolicy = async (id, data) => {
       const dComisiones = await Comisiones.update({iestado: data.iestado_comision}, {
         where: { crecibo: { [Op.in]: recibosIds } } 
       })
+
+      const uOperacion = await Operaciones.editAuOperaciones(operacion.coperacion, {iestado: 'F'})
+
       return { status: true, message: 'Póliza anulada correctamente.' };
     } catch (error) {
+      const uOperacion = await Operaciones.editAuOperaciones(operacion.coperacion, {iestado: 'E', xdetalles: error.message })
       return { error: error.message };
     }
   } else {
@@ -369,8 +385,19 @@ const updateStatusPolicy = async (id, data) => {
   }
 };
 
-const updateStatusContract = async (id, data) => {
-  console.log(id)
+const updateStatusContract = async (id, data, dataO) => {
+  const operacionData = {
+    cproceso: dataO.enable? 4 : 2,
+    iestado: 'I',
+    xitem: dataO.xitem,
+    xcambio: dataO.xcambio,
+    xdetalles: dataO.xdetalles,
+    cusuario_creacion: dataO.cusuario_creacion,
+    fcreacion: dataO.fcreacion
+  }
+  
+  const operacion = await Operaciones.createAuOperaciones(operacionData)
+
   const contract = await Contracts.findOne({
     where: { cvigencia: id },
     attributes: ['cvigencia'],
@@ -378,7 +405,7 @@ const updateStatusContract = async (id, data) => {
       { association: 'recibos', attributes: ['crecibo'] , where: { iestadorec: 'C' } },
     ]
   })
-  console.log(contract)
+
   if(!contract || contract?.recibos.length == 0){
     try {
       const contrato = await Contracts.findOne({
@@ -392,10 +419,11 @@ const updateStatusContract = async (id, data) => {
         where: {cpoliza: contrato?.cpoliza},
         attributes: ['cpoliza'],
         include: [
-          {association: 'vigencias', attributes: ['cvigencia'], order: [['fhasta', 'DESC']], where: { iestado: { [Op.ne]: data.iestado_check } } },
+          {association: 'vigencias', attributes: ['cvigencia', 'iestado'], order: [['fhasta', 'DESC']], where: { iestado: { [Op.ne]: data.iestado_check } } },
         ]
       })
-      if(policy?.vigencias?.length > 0){
+      console.log(policy?.vigencias)
+      if(policy?.vigencias?.length > data.check_index){
         const lastVigency = policy.vigencias[data.check_index];
         const dLastVigency = await Contracts.update({iestado: data.iestado_new}, {
           where: {cvigencia: lastVigency.cvigencia}
@@ -413,8 +441,12 @@ const updateStatusContract = async (id, data) => {
       const dComisiones = await Comisiones.update({iestado: data.iestado_comision}, {
         where: { crecibo: { [Op.in]: recibosIds } }
       })
+
+      const uOperacion = await Operaciones.editAuOperaciones(operacion.coperacion, {iestado: 'F'})
+
       return { status: true, message: 'Vigencia anulada correctamente.' };
     } catch (error) {
+      const uOperacion = await Operaciones.editAuOperaciones(operacion.coperacion, {iestado: 'E', xdetalles: error.message })
       return { error: error.message };
     }
   } else {
