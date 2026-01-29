@@ -83,11 +83,10 @@ const documentsContract = async (data) => {
 const updateStatusContract = async (id, body) => {
     let data = {};
     if(body.enable){
-        data = { iestado_new: 'R', iestadorec: 'V', iestado_vigencia: 'V', iestado_check: 'V', iestado_comision: 'P', check_index: 0 };
+        data = { iestado_new: 'R', iestadorec: 'V', iestado_vigencia: 'V', iestado_check: ['A'], iestado_comision: 'P' };
     } else {
-        data = { iestado_new: 'V', iestadorec: 'A', iestado_vigencia: 'A', iestado_check: 'A', iestado_comision: 'A', check_index: 1 };
+        data = { iestado_new: 'V', iestadorec: 'A', iestado_vigencia: 'A', iestado_check: ['V','A'], iestado_comision: 'A' };
     }
-    console.log(data)
     const update = await Emission.updateStatusContract(id, data, body);
     if (update.error) {
         return {

@@ -422,7 +422,6 @@ const updateStatusContract = async (id, data, dataO) => {
           {association: 'vigencias', attributes: ['cvigencia', 'iestado'], order: [['fhasta', 'DESC']], where: { iestado: { [Op.ne]: data.iestado_check } } },
         ]
       })
-      console.log(policy?.vigencias)
       if(policy?.vigencias?.length > data.check_index){
         const lastVigency = policy.vigencias[data.check_index];
         const dLastVigency = await Contracts.update({iestado: data.iestado_new}, {
