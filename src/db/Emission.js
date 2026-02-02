@@ -342,8 +342,9 @@ const updateStatusPolicy = async (id, data, dataO) => {
       ]},
     ],
   })
+  console.log('asdas',policy)
   console.log(policy.vigencias.length)
-  if(policy.vigencias.length == 0){ 
+  if(policy.vigencias?.length == 0){ 
     try {
       const dPolicy = await Policys.update({iestado: data.iestado_poliza}, {
         where: {cpoliza: id}
@@ -353,10 +354,11 @@ const updateStatusPolicy = async (id, data, dataO) => {
       })
       const vigencias = await Contracts.findAll({
         where: {cpoliza: id},
-        attributes: ['cvigencia']
+        attributes: ['cvigencia'],
+        order: [['fhasta', 'DESC']]
       })
       const dFirstVigencyNot = Contracts.update({iestado: data.iestado_first}, {
-        where: {cvigencia: { [Op.ne]: vigencias[0]?.cvigencia}}
+        where: {cvigencia: vigencias[0]?.cvigencia, cpoliza: id}
       })
       const vigenciasIds = vigencias.map((item) => item.cvigencia);
   
