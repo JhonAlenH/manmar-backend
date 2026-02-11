@@ -575,8 +575,10 @@ const searchCedentesById = async (id) => {
       ]
     });
 
-    result.dataValues.itipodoc = result.persona?.cci_rif.split('-')[0];
-    result.dataValues.cci_rif = result.persona?.cci_rif.split('-')[1];
+    const cci_rif = result.persona?.cci_rif.split('-')
+    result.dataValues.itipodoc = cci_rif[0];
+    cci_rif.shift()
+    result.dataValues.cci_rif = cci_rif.join('-');
     result.dataValues.xcedente = result.persona?.xnombre;
     result.dataValues.xcorreo = result.persona?.xcorreo;
     result.dataValues.xtelefono = result.persona?.xtelefono;
@@ -688,9 +690,10 @@ const searchClienteById = async (id) => {
         ]}
       ]
     });
-    
-    result.dataValues.itipodoc = result.cci_rif.split('-')[0];
-    result.dataValues.cci_rif = result.cci_rif.split('-')[1];
+    const cci_rif = result.cci_rif.split('-')
+    result.dataValues.itipodoc = cci_rif[0];
+    cci_rif.shift()
+    result.dataValues.cci_rif = cci_rif.join('-');
     result.dataValues.cestado = result.ciudad?.estado?.cestado;
     result.dataValues.cpais = result.ciudad?.estado?.pais?.cpais;
 
@@ -999,10 +1002,12 @@ const searchUsuarioById = async (id) => {
       ]
     });
 
+    const cci_rif = result.persona?.cci_rif.split('-')
+    result.dataValues.itipodoc = cci_rif[0];
+    cci_rif.shift()
+    result.dataValues.cci_rif = cci_rif.join('-');
     result.dataValues.xnombre = result.persona?.xnombre;
     result.dataValues.xapellido = result.persona?.xapellido;
-    result.dataValues.itipodoc = result.persona?.cci_rif.split('-')[0];
-    result.dataValues.cci_rif = result.persona?.cci_rif.split('-')[1];
     result.dataValues.xtelefono = result.persona?.xtelefono;
     result.dataValues.xcorreo = result.persona?.xcorreo;
     result.dataValues.xdireccion = result.persona?.xdireccion;
@@ -1057,7 +1062,6 @@ const updateUsuario = async(id, data) => {
     xdireccion: data.xdireccion,
     cciudad: data.cciudad
   }
-  if(!data.cci_rif || !data.itipodoc) persona = {}
 
   try {
     const usuarioU = await Usuarios.update(data, {where: {cusuario:id}})
@@ -1066,6 +1070,7 @@ const updateUsuario = async(id, data) => {
       where: {cusuario: id},
       attributes:['cusuario','cpersona']
     })
+    console.log(data)
     if(typeof data.bactivo == 'undefined') {
       const personaU = await Personas.update(persona, {where: {cpersona: usuario.cpersona}})
     }
