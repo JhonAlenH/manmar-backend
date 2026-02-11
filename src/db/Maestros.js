@@ -645,7 +645,9 @@ const updateCedentes = async(id, data) => {
       where: {ccedente: id},
       attributes: ['ccedente', 'cpersona'],
     })
-   const personaC = await Personas.update(persona, {where: {cpersona: cedente.cpersona}})
+    if(typeof data.bactivo == 'undefined') {
+      const personaC = await Personas.update(persona, {where: {cpersona: cedente.cpersona}})
+    }
     return { 
       result: cedente
     };
@@ -886,21 +888,18 @@ const updateProductores = async(id, data) => {
   }
 
   try {
-    const productorU = await Productores.update({
-      csuper: data.csuper,
-      ctipo_productor: data.ctipo_productor,
-    }, {where: {cproductor:id}})
-
+    const productorU = await Productores.update(data, {where: {cproductor:id}})
     const productor = await Productores.findOne({
       where: {cproductor: id},
       attributes:['cproductor','cdatos_bancarios','cusuario'], include:[
         {association: 'usuario', attributes: ['cpersona']}
       ]
     })
-    const datos_bancariosU = await DatosBancarios.update(datos_bancarios, {where: {cdatos_bancarios: productor.cdatos_bancarios}})
-    const usuarioU = await Usuarios.update(usuario, {where: {cusuario: productor.cusuario}})
-    const personaU = await Personas.update(persona, {where: {cpersona: productor?.usuario.cpersona}})
-
+    if(typeof data.bactivo == 'undefined') {
+      const datos_bancariosU = await DatosBancarios.update(datos_bancarios, {where: {cdatos_bancarios: productor.cdatos_bancarios}})
+      const usuarioU = await Usuarios.update(usuario, {where: {cusuario: productor.cusuario}})
+      const personaU = await Personas.update(persona, {where: {cpersona: productor?.usuario.cpersona}})
+    }
     return {result: productor} 
   } catch (error) {
     console.log(error.message)
@@ -1067,8 +1066,9 @@ const updateUsuario = async(id, data) => {
       where: {cusuario: id},
       attributes:['cusuario','cpersona']
     })
-
-    const personaU = await Personas.update(persona, {where: {cpersona: usuario.cpersona}})
+    if(typeof data.bactivo == 'undefined') {
+      const personaU = await Personas.update(persona, {where: {cpersona: usuario.cpersona}})
+    }
 
     return {result: usuario} 
   } catch (error) {
