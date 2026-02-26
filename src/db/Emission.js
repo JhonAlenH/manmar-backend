@@ -192,6 +192,7 @@ const searchContract = async (data) => {
 
 const createContract = async (data) => {
   try {
+    console.log(data.vigencias[0]?.recibos)
     const documentos = data.documentos || [];
     const policy = await Policys.create(data)
     console.log('datos poliza cre')
@@ -273,6 +274,8 @@ const detailContract = async (id) => {
         },
       ]
     });
+    contract.dataValues.fcreacion = new Date(contract.dataValues.fcreacion)
+    contract.dataValues.fcreacion.setDate(contract.dataValues.fcreacion.getDate() + 1);
     return contract ? contract : {};;
   } catch (error) {
     return { error: error.message };
